@@ -16,8 +16,8 @@
 #' meta.df <- LNoutput@meta
 #' articles.df <- LNoutput@articles
 #' paragraphs.df <- LNoutput@paragraphs
-
  
+
 read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRUE, convertDate = TRUE){
   ###' Track the time
   if(verbose){start.time <- Sys.time(); cat("Creating LNoutput from a connection input...\n")}
