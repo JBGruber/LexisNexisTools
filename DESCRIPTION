@@ -1,0 +1,16 @@
+Package: LexisNexisTools
+Title: Import text data from LexisNexis
+Version: 0.0.1
+Authors@R: person("Johannes", "Gruber", email = "j.gruber.1@research.gla.ac.uk", role = c("aut", "cre"))
+Description: My PhD supervisor once told me that everyone doing newspaper analysis
+    starts by writing code to read in files from the LexisNexis newspaper archive. However,
+    while this is a nice excercise I do recommend, not everyone has the time. This package takes
+    TXT files downloaded from LexisNexis in English and German. 
+    If you want other languages included, ask me or fork this project :). 
+Depends: R (>= 3.4.1)
+License: GPL-3
+Imports: stringi, data.table
+Encoding: UTF-8
+LazyData: true
+Packaged: 2017-10-01 12:15:11 UTC
+RoxygenNote: 6.0.1
