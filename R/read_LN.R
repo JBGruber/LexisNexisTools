@@ -217,7 +217,7 @@ read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRU
     if(verbose){cat("\t...paragraphs extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
   }
   
-  out <- new("LNoutput", meta = meta.df, articles = articles.df, paragraphs = paragraphs.df)
+  out <- new("LNoutput", meta = meta.df, articles = articles.df, paragraphs = ifelse(exists("paragraphs.df"), paragraphs.df, data.frame(NA)))
   
   if(verbose){cat("Elapsed time: ", format((Sys.time()-start.time), digits = 2, nsmall = 2),"\n", sep = "")}
   out
