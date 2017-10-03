@@ -184,36 +184,38 @@ read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRU
                             stringsAsFactors = FALSE)
   if(verbose){cat("\t...articles extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
 
-  paragraphs.df <- lapply(1:length(Beginnings), function(i){
-    article.lines.v <- articles.v[(lengths[i]+1):(Ends[i]-1)]
-    empties <- grep("^$", article.lines.v)
-    empties <- empties[!diff(empties)==1]
-    pars <- ifelse(length(empties)>1,length(empties)-1,1)
-    out <- data.frame(Art_ID = as.integer(rep(i, times = pars)),
-                      Par_ID = 1:pars,
-                      Paragraph = NA,
-                      stringsAsFactors = FALSE)
-    
-    
-    if(length(empties)>1) {
-      out$Paragraph <- sapply(1:pars, function(j){
-        out <- paste(article.lines.v[(empties[j]+1):(empties[j+1]-1)], collapse=" ")
-        out <- gsub("^\\s+|\\s+$", "", out) 
-        #double blanks
-        out <- gsub("\\s+", " ", out)
-        out
-      })
-    } else {
-      out$Paragraph <- paste(article.lines.v, collapse=" ")
-    } 
-    out
-  })
-  #relabel IDs
-  for(i in 1:(length(paragraphs.df)-1)){
-    paragraphs.df[[i+1]]$Par_ID <- paragraphs.df[[i+1]]$Par_ID + max(paragraphs.df[[i]]$Par_ID)
+  if(extractParagraphs){
+    paragraphs.df <- lapply(1:length(Beginnings), function(i){
+      article.lines.v <- articles.v[(lengths[i]+1):(Ends[i]-1)]
+      empties <- grep("^$", article.lines.v)
+      empties <- empties[!diff(empties)==1]
+      pars <- ifelse(length(empties)>1,length(empties)-1,1)
+      out <- data.frame(Art_ID = as.integer(rep(i, times = pars)),
+                        Par_ID = 1:pars,
+                        Paragraph = NA,
+                        stringsAsFactors = FALSE)
+      
+      
+      if(length(empties)>1) {
+        out$Paragraph <- sapply(1:pars, function(j){
+          out <- paste(article.lines.v[(empties[j]+1):(empties[j+1]-1)], collapse=" ")
+          out <- gsub("^\\s+|\\s+$", "", out) 
+          #double blanks
+          out <- gsub("\\s+", " ", out)
+          out
+        })
+      } else {
+        out$Paragraph <- paste(article.lines.v, collapse=" ")
+      } 
+      out
+    })
+    #relabel IDs
+    for(i in 1:(length(paragraphs.df)-1)){
+      paragraphs.df[[i+1]]$Par_ID <- paragraphs.df[[i+1]]$Par_ID + max(paragraphs.df[[i]]$Par_ID)
+    }
+    paragraphs.df <- data.table::rbindlist(paragraphs.df)
+    if(verbose){cat("\t...paragraphs extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
   }
-  paragraphs.df <- data.table::rbindlist(paragraphs.df)
-  if(verbose){cat("\t...paragraphs extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
   
   out <- new("LNoutput", meta = meta.df, articles = articles.df, paragraphs = paragraphs.df)
   
