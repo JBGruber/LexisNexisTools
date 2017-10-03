@@ -215,9 +215,14 @@ read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRU
     }
     paragraphs.df <- data.table::rbindlist(paragraphs.df)
     if(verbose){cat("\t...paragraphs extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
+  }else{
+    paragraphs.df <- data.frame(Art_ID = NA,
+                                Par_ID = NA,
+                                Paragraph = NA,
+                                stringsAsFactors = FALSE)
   }
   
-  out <- new("LNoutput", meta = meta.df, articles = articles.df, paragraphs = ifelse(exists("paragraphs.df"), paragraphs.df, data.frame(NA)))
+  out <- new("LNoutput", meta = meta.df, articles = articles.df, paragraphs = paragraphs.df)
   
   if(verbose){cat("Elapsed time: ", format((Sys.time()-start.time), digits = 2, nsmall = 2),"\n", sep = "")}
   out
