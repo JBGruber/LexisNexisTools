@@ -1,3 +1,3 @@
   .onAttach <- function(...) {
-      packageStartupMessage("LexisNexisTools Version",packageVersion("LexisNexisTools"),"\n")
+      packageStartupMessage("LexisNexisTools Version ",packageVersion("LexisNexisTools"),"\n")
   }
