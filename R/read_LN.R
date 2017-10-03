@@ -1,3 +1,11 @@
+
+
+#' make S4 object
+setClass("LNoutput", 
+         representation(meta = "data.frame", articles = "data.frame", paragraphs = "data.frame"))
+
+
+
 #' Read in a LexisNexis TXT file
 #'
 #' Read a LexisNexis TXT file and convert it to a data frame.
@@ -17,7 +25,6 @@
 #' articles.df <- LNoutput@articles
 #' paragraphs.df <- LNoutput@paragraphs
  
-
 read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRUE, convertDate = TRUE){
   ###' Track the time
   if(verbose){start.time <- Sys.time(); cat("Creating LNoutput from a connection input...\n")}
@@ -208,8 +215,6 @@ read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRU
   paragraphs.df <- data.table::rbindlist(paragraphs.df)
   if(verbose){cat("\t...paragraphs extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
   
-  ### make S4 object
-  setClass("LNoutput", representation(meta = "data.frame", articles = "data.frame", paragraphs = "data.frame"))
   out <- new("LNoutput", meta = meta.df, articles = articles.df, paragraphs = paragraphs.df)
   
   if(verbose){cat("Elapsed time: ", format((Sys.time()-start.time), digits = 2, nsmall = 2),"\n", sep = "")}
