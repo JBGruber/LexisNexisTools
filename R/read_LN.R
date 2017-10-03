@@ -158,11 +158,11 @@ read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRU
                         row.names = 1:length(Beginnings),
                         stringsAsFactors = FALSE)
   if(convertDate){
-    meta.m$Date <- gsub('EDITION[a-zA-Z0-9]$', '', meta.m$Date)
-    meta.m$Date <- gsub('[^0-9,.]', '', meta.m$Date)
-    meta.m$Date <- gsub('[[:punct:]]$', '', meta.m$Date)
+    meta.df$Date <- gsub('EDITION[a-zA-Z0-9]$', '', meta.df$Date)
+    meta.df$Date <- gsub('[^0-9,.]', '', meta.df$Date)
+    meta.df$Date <- gsub('[[:punct:]]$', '', meta.df$Date)
     # And finally convert to date
-    meta.m$Date <- as.Date(meta.m$Date, "%m.%d.%Y")}
+    meta.df$Date <- as.Date(meta.df$Date, "%m.%d.%Y")}
   if(verbose){cat("\t...meta extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
   ### Article
   articles.df <- data.frame(ID = 1:length(Beginnings),
