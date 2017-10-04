@@ -1,6 +1,6 @@
 #' Check LexisNexis TXT files
 #'
-#' Read a LexisNexis TXT file and convert it to a data frame.
+#' Read a LexisNexis TXT file and check consistency.
 #' @param x Name or names of LexisNexis TXT file to be converted.
 #' @param encoding Encoding to be assumed for input files. Defaults to UTF-8 (the LexisNexis standard value).
 #' @param verbose A logical flag indicating whether information should be printed to the screen.
