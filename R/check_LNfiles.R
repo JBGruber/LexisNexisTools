@@ -35,7 +35,6 @@ check_LNfiles <- function(x, encoding = "UTF-8", verbose = TRUE){
     }
     
     if(length(which(articles.v[lengths+1]!=""|articles.v[lengths-1]!=""))>0) {
-      lengths.v <- lengths.v[-(which(articles.v[lengths+1]!=""|articles.v[lengths-1]!=""))]
       lengths <-  lengths[-(which(articles.v[lengths+1]!=""|articles.v[lengths-1]!=""))]
     }
     out <- data.frame(file = x,
