@@ -44,7 +44,7 @@ read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRU
   Beginnings <- grep("\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$", articles.v)
   
   ### Find ends. Language is the last line of the article; use this to mark the end of an article
-  Ends <- grep("^LANGUAGE: ENGLISH|^SPRACHE: ", articles.v)
+  Ends <- grep("^LANGUAGE: |^SPRACHE: ", articles.v)
   
   if(!length(Beginnings)==length(Ends)){cat("Warning: Beginnings and ends do not match\n")}
   
