@@ -44,7 +44,7 @@ read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRU
   Beginnings <- grep("\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$", articles.v)
   
   ### Find ends. Language is the last line of the article; use this to mark the end of an article
-  Ends <- grep("^LANGUAGE: ENGLISH|^SPRACHE: ", articles.v)
+  Ends <- grep("^LANGUAGE: |^SPRACHE: ", articles.v)
   
   ### Debug Beginnings and Ends
   # if the lines before or after Ends and Beginnings are not empty, the keyword is a coincidence
@@ -73,7 +73,6 @@ read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRU
   }
   
   if(length(which(articles.v[lengths+1]!=""|articles.v[lengths-1]!=""))>0) {
-    lengths.v <- lengths.v[-(which(articles.v[lengths+1]!=""|articles.v[lengths-1]!=""))]
     lengths <-  lengths[-(which(articles.v[lengths+1]!=""|articles.v[lengths-1]!=""))]
   }
   if(!length(Beginnings)==length(lengths)){cat("Warning: Missing or extra instances of Length\n")}

@@ -20,7 +20,7 @@ check_LNfiles <- function(x, encoding = "UTF-8", verbose = TRUE){
     if(verbose){cat("\r\tChecking file",i,"...")}
     articles.v <- stringi::stri_read_lines(i, encoding = encoding)
     Beginnings <- grep("\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$", articles.v)
-    Ends <- grep("^LANGUAGE: ENGLISH|^SPRACHE: ", articles.v)
+    Ends <- grep("^LANGUAGE: |^SPRACHE: ", articles.v)
     lengths <- grep("^LENGTH: |^LÄNGE: ", articles.v)
     ### Debug lengths
     # Note: In some rare cases, this will delete articles that do not contain length for other reasons
@@ -35,10 +35,9 @@ check_LNfiles <- function(x, encoding = "UTF-8", verbose = TRUE){
     }
     
     if(length(which(articles.v[lengths+1]!=""|articles.v[lengths-1]!=""))>0) {
-      lengths.v <- lengths.v[-(which(articles.v[lengths+1]!=""|articles.v[lengths-1]!=""))]
       lengths <-  lengths[-(which(articles.v[lengths+1]!=""|articles.v[lengths-1]!=""))]
     }
-    out <- data.frame(file = x,
+    out <- data.frame(file = i,
                       Beginnings = length(Beginnings),
                       Ends = length(Ends),
                       Lengths = length(lengths),
