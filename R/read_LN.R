@@ -108,21 +108,6 @@ read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRU
   #To bring this in a more useful form
   dates.v<- gsub("Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag",
                  "", articles.v[Newspaper+2])
-  dates.v<- gsub("January|Januar", "01.", dates.v)
-  dates.v<- gsub("February|Februar", "02.", dates.v)
-  dates.v<- gsub("March", "03.", dates.v)
-  dates.v<- gsub("April", "04.", dates.v)
-  dates.v<- gsub("May|Mai", "05.", dates.v)
-  dates.v<- gsub("June|Juni", "06.", dates.v)
-  dates.v<- gsub("July|Juli", "07.", dates.v)
-  dates.v<- gsub("August", "08.", dates.v)
-  dates.v<- gsub("September", "09.", dates.v)
-  dates.v<- gsub("October|Oktober", "10.", dates.v)
-  dates.v<- gsub("November", "11.", dates.v)
-  dates.v<- gsub("December|Dezember", "12.", dates.v)
-  dates.v<- gsub(" ", "", dates.v)
-  dates.v<- gsub("[[:punct:]]$", "", dates.v)
-  dates.v<- gsub(",", ".", dates.v)
   
   
   ### Author (where available)
