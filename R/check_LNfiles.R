@@ -23,6 +23,9 @@ check_LNfiles <- function(x, encoding = "UTF-8", verbose = TRUE){
     Ends <- grep("^LANGUAGE: |^SPRACHE: ", articles.v)
     lengths <- grep("^LENGTH: |^LÄNGE: ", articles.v)
     ### Debug lengths
+    # one line before and after length are always empty
+    lengths <-  lengths[!(articles.v[lengths+1]!=""|articles.v[lengths-1]!="")]
+
     # Note: In some rare cases, this will delete articles that do not contain length for other reasons
     if(length(which(Ends[1:(length(lengths))]<lengths))>0) {
       for (i in 1:(length(Beginnings)-length(lengths))){
@@ -32,10 +35,6 @@ check_LNfiles <- function(x, encoding = "UTF-8", verbose = TRUE){
         Ends<-Ends[-(empty.articles[1]-1)]
         rm(empty.articles)
       }
-    }
-    
-    if(length(which(articles.v[lengths+1]!=""|articles.v[lengths-1]!=""))>0) {
-      lengths <-  lengths[-(which(articles.v[lengths+1]!=""|articles.v[lengths-1]!=""))]
     }
     out <- data.frame(file = i,
                       Beginnings = length(Beginnings),
