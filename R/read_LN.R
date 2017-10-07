@@ -95,13 +95,11 @@ read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRU
   for(i in 1:5){
     Newspaper <- ifelse(articles.v[Newspaper]=="",Newspaper+1,Newspaper)
   }
-  # If newspaper name is not provided the object now contains a date. We clean those from the database
-  Newspaper[grepl("January|February|March|April|May|June|July|August|September|October|November|December", 
-                  articles.v[Newspaper], ignore.case = TRUE)] <- grep("^$", articles.v)[1]
-  
   newspaper.v<-articles.v[Newspaper]
-  newspaper.v<- ifelse(grepl("\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$", newspaper.v)==TRUE, 
-                       "", newspaper.v)
+ 
+  #remove if newspaper.v contains Date or Beginning                     
+  newspaper.v[grep("January|February|March|April|May|June|July|August|September|October|November|December", newspaper.v)] <- ""
+  newspaper.v[grep("\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$", newspaper.v)] <- ""
   newspaper.v<-gsub("^\\s+|\\s+$", "", newspaper.v)
   
   ### Date
