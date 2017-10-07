@@ -137,12 +137,21 @@ read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRU
   section.v <- articles.v[lengths-2]
   section.v <- ifelse(grepl("SECTION: |RUBRIK: ",section.v), section.v,"")
   section.v<- gsub("SECTION: |RUBRIK: ", "", section.v)
+
+  ### edition (where available)
+  edition.v <- sapply(1:length(Beginnings), function(i){
+    edition.v <- articles.v[(Newspaper[i]+3):(lengths[i]-1)]
+    empties <- grep("^$", edition.v)
+    edition.v <- paste(edition.v[1:(empties[1]-1)], collapse = " ")
+  })
+  edition.v <- gsub("^\\s+|\\s+$", "", edition.v) 
   
   ### Headline 
   headlines.l <- lapply(1:length(Beginnings), function(i){
     start <- Newspaper[i]+3
     end <- lengths[i]-1
     headline.v <- articles.v[start:end]
+    headline.v <- headline.v[grep("^$", headline.v)[1]:length(headline.v)] #cut everything before the first empty line
     # Now we also grabbed Byline and section where they appear. If we get rid of that what is left 
     # is the headline
     headline.v[grep("^BYLINE:|^SECTION:|^RUBRIK:|^AUTOR:", headline.v)]<-""  
@@ -159,6 +168,7 @@ read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRU
                         Length = lengths.v,
                         Section = section.v,
                         Author = author.v,
+                        Edition = edition.v,
                         Headline = unlist(headlines.l),
                         row.names = 1:length(Beginnings),
                         stringsAsFactors = FALSE)
