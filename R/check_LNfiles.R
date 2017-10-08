@@ -28,7 +28,7 @@ check_LNfiles <- function(x, encoding = "UTF-8", verbose = TRUE){
 
     # Note: In some rare cases, this will delete articles that do not contain length for other reasons
     if(length(which(Ends[1:(length(lengths))]<lengths))>0) {
-      for (i in 1:(length(Beginnings)-length(lengths))){
+      for (n in 1:(length(Beginnings)-length(lengths))){
         # Which Ends are smaller than length? in those cases length is absent and the article gets neglected.
         empty.articles <- which(Ends[1:(length(lengths))]<lengths)
         Beginnings<-Beginnings[-(empty.articles[1]-1)]
