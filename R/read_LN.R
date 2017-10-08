@@ -179,7 +179,7 @@ read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRU
     paragraphs.df <- lapply(1:length(Beginnings), function(i){
       article.lines.v <- articles.v[(lengths[i]+1):(Ends[i]-1)]
       empties <- grep("^$", article.lines.v)
-      empties <- empties[!diff(empties)==1]
+      empties <- empties[-which(diff(empties)==1)]
       pars <- ifelse(length(empties)>1,length(empties)-1,1)
       out <- data.frame(Art_ID = as.integer(rep(i, times = pars)),
                         Par_ID = 1:pars,
