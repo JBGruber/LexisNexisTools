@@ -18,7 +18,7 @@ check_LNfiles <- function(x, encoding = "UTF-8", verbose = TRUE){
   ### read in file
   out <- lapply(x, function(i){
     if(verbose){cat("\r\tChecking file",i,"...")}
-    articles.v <- readLines(i, encoding = encoding)
+    articles.v <- stringi::stri_read_lines(i, encoding = encoding)
     Beginnings <- grep("\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$", articles.v)
     Ends <- grep("^LANGUAGE: |^SPRACHE: ", articles.v)
     lengths <- grep("^LENGTH: |^LÄNGE: ", articles.v)
