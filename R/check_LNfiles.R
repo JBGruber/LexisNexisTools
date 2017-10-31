@@ -18,7 +18,7 @@ check_LNfiles <- function(x, encoding = "UTF-8", verbose = TRUE){
   ### read in file
   out <- lapply(x, function(i){
     if(verbose){cat("\r\tChecking file",i,"...")}
-    articles.v <- stringi::stri_read_lines(i, encoding = encoding)
+    articles.v <- readLines(i, encoding = encoding)
     Beginnings <- grep("\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$", articles.v)
     Ends <- grep("^LANGUAGE: |^SPRACHE: ", articles.v)
     lengths <- grep("^LENGTH: |^LÄNGE: ", articles.v)
@@ -37,17 +37,25 @@ check_LNfiles <- function(x, encoding = "UTF-8", verbose = TRUE){
         rm(empty.articles)
       }
     }
+    
+    # range
+    range.v <- articles.v[grep("^Download Request|^Ausgabeauftrag:", articles.v)]
+    range.v <- unlist(strsplit(range.v, "-"))
+    range.v <- gsub("[[:alpha:]]|[[:punct:]]|\\s+", "", range.v)
+    range.v <- as.numeric(range.v[2])-as.numeric(range.v[1])+1
     out <- data.frame(file = i,
                       Beginnings = length(Beginnings),
                       Ends = length(Ends),
                       Lengths = length(lengths),
+                      range = range.v,
                       Test1 = length(Beginnings) == length(Ends),
                       Test2 = length(Beginnings) == length(lengths),
+                      Test3 = length(Beginnings) == range.v,
                       stringsAsFactors = FALSE)
     out
   })
   out <- data.table::rbindlist(out)
-
+  
   if(verbose){cat("\nElapsed time: ", format((Sys.time()-start.time), digits = 2, nsmall = 2),"\n", sep = "")}
   out
 }
