@@ -25,7 +25,7 @@ setClass("LNoutput",
 #' articles.df <- LNoutput@articles
 #' paragraphs.df <- LNoutput@paragraphs
  
-read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRUE, convertDate = FALSE){
+read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRUE, convertDate = FALSE, dateFormat = "%m.%d.%Y"){
   ###' Track the time
   if(verbose){start.time <- Sys.time(); cat("Creating LNoutput from a connection input...\n")}
   
@@ -160,7 +160,7 @@ read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRU
     meta.df$Date <- gsub('[^0-9,.]', '', meta.df$Date)
     meta.df$Date <- gsub('[[:punct:]]$', '', meta.df$Date)
     # And finally convert to date
-    meta.df$Date <- as.Date(meta.df$Date, "%m.%d.%Y")}
+    meta.df$Date <- as.Date(meta.df$Date, format = dateFormat)}
   if(verbose){cat("\t...meta extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
   ### Article
   articles.df <- data.frame(ID = 1:length(Beginnings),
