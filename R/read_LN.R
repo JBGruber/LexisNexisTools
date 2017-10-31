@@ -75,12 +75,10 @@ read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRU
           Ends<-Ends[-(empty.articles[1])]
         }else{
           if(max(lengths)<max(Beginnings)){
-            Beginnings <- Beginnings[!which.max(Beginnings)]
-            Ends <- Ends[!which.max(Ends)]
+            Beginnings <- Beginnings[-which.max(Beginnings)]
+            Ends <- Ends[-which.max(Ends)]
           }
         }
-        
-        
       }
     }
   
