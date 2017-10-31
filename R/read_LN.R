@@ -31,14 +31,14 @@ read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRU
   
   ### read in file
   if(length(x)>1){
-    articles.v <- unlist(sapply(x, readLines, encoding = encoding))
+    articles.v <- unlist(sapply(x, stringi::stri_read_lines, encoding = encoding))
   } else {
-    articles.v <- readLines(x, encoding = encoding)
+    articles.v <- stringi::stri_read_lines(x, encoding = encoding)
   }
   if(verbose){cat("\t...files loaded [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
   
   #exclude some lines
-  articles.v[grep("^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIF: ", articles.v)]<-""
+  articles.v[grep("^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIC: ", articles.v)]<-""
   
   ### Find the beginning of each article marked by the expression "Dokument * von *", e.g. "21 of 500 DOCUMENTS"
   Beginnings <- grep("\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$", articles.v)
