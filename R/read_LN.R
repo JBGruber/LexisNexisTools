@@ -49,7 +49,7 @@ read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRU
   ### Debug Beginnings and Ends
   # if the lines before or after Ends and Beginnings are not empty, the keyword is a coincidence
   if(length(which(articles.v[Ends+1]!=""|articles.v[Ends-1]!=""))>0) {
-    Ends <- Ends[-(which(articles.v[Ends+1]!=""|articles.v[Ends-1]!=""))]
+    #Ends <- Ends[-(which(articles.v[Ends+1]!=""|articles.v[Ends-1]!=""))]
   }
   if(length(which(articles.v[Beginnings+1]!=""|articles.v[Beginnings-1]!=""))>0) {
     Beginnings <- Beginnings[-(which(articles.v[Beginnings+1]!=""|articles.v[Beginnings-1]!=""))]
