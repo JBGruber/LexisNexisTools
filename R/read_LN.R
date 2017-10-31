@@ -67,14 +67,22 @@ read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRU
   #Ends <-  Ends[!(articles.v[Ends+1]!=""|articles.v[Ends-1]!="")]
   # Note: In some rare cases, this will delete articles that do not contain length for other reasons
   if(length(which(Ends[1:(length(lengths))]<lengths))>0) {
-    for (i in 1:(length(Beginnings)-length(lengths))){
-      # Which Ends are smaller than length? in those cases length is absent and the article gets neglected.
-      empty.articles <- which(Ends[1:(length(lengths))]<lengths)
-      Beginnings<-Beginnings[-(empty.articles[1]-1)]
-      Ends<-Ends[-(empty.articles[1]-1)]
-      rm(empty.articles)
+      for (n in 1:(length(Beginnings)-length(lengths))){
+        # Which Ends are smaller than length? in those cases length is absent and the article gets neglected.
+        empty.articles <- which(Ends[1:(length(lengths))]<lengths)
+        if(length(empty.articles) > 0){
+          Beginnings <-Beginnings[-(empty.articles[1])]
+          Ends<-Ends[-(empty.articles[1])]
+        }else{
+          if(max(lengths)<max(Beginnings)){
+            Beginnings <- Beginnings[!which.max(Beginnings)]
+            Ends <- Ends[!which.max(Ends)]
+          }
+        }
+        
+        
+      }
     }
-  }
   
   if(!length(Beginnings)==length(lengths)){cat("Warning: Missing or extra instances of Length\n")}
   
