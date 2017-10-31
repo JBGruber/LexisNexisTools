@@ -47,13 +47,6 @@ read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRU
   Ends <- grep("^LANGUAGE: |^SPRACHE: ", articles.v)
   
   ### Debug Beginnings and Ends
-  # if the lines before or after Ends and Beginnings are not empty, the keyword is a coincidence
-  if(length(which(articles.v[Ends+1]!=""|articles.v[Ends-1]!=""))>0) {
-    #Ends <- Ends[-(which(articles.v[Ends+1]!=""|articles.v[Ends-1]!=""))]
-  }
-  if(length(which(articles.v[Beginnings+1]!=""|articles.v[Beginnings-1]!=""))>0) {
-    Beginnings <- Beginnings[-(which(articles.v[Beginnings+1]!=""|articles.v[Beginnings-1]!=""))]
-  }
   if(!length(Beginnings)==length(Ends)){cat("Warning: Beginnings and ends do not match\n")}
   
   ### Find lengths. Length is the last line of meta information before the article starts
