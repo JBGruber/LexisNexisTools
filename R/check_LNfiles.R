@@ -35,7 +35,14 @@ check_LNfiles <- function(x, encoding = "UTF-8", verbose = TRUE){
         if(length(empty.articles) > 0){
           Beginnings <-Beginnings[-(empty.articles[1])]
           Ends<-Ends[-(empty.articles[1])]
+        }else{
+          if(max(lengths)<max(Beginnings)){
+            Beginnings <- Beginnings[!which.max(Beginnings)]
+            Ends <- Ends[!which.max(Ends)]
+          }
         }
+        
+        
       }
     }
     
