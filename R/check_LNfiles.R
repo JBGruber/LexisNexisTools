@@ -32,9 +32,10 @@ check_LNfiles <- function(x, encoding = "UTF-8", verbose = TRUE){
       for (n in 1:(length(Beginnings)-length(lengths))){
         # Which Ends are smaller than length? in those cases length is absent and the article gets neglected.
         empty.articles <- which(Ends[1:(length(lengths))]<lengths)
-        Beginnings<-Beginnings[-(empty.articles[1]-1)]
-        Ends<-Ends[-(empty.articles[1]-1)]
-        rm(empty.articles)
+        if(length(empty.articles) > 0){
+          Beginnings <-Beginnings[-(empty.articles[1])]
+          Ends<-Ends[-(empty.articles[1])]
+        }
       }
     }
     
