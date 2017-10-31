@@ -25,20 +25,20 @@ setClass("LNoutput",
 #' articles.df <- LNoutput@articles
 #' paragraphs.df <- LNoutput@paragraphs
  
-read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRUE, convertDate = TRUE){
+read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRUE, convertDate = FALSE){
   ###' Track the time
   if(verbose){start.time <- Sys.time(); cat("Creating LNoutput from a connection input...\n")}
   
   ### read in file
   if(length(x)>1){
-    articles.v <- unlist(sapply(x, stringi::stri_read_lines, encoding = encoding))
+    articles.v <- unlist(sapply(x, readLines, encoding = encoding))
   } else {
     articles.v <- readLines(x, encoding = encoding)
   }
   if(verbose){cat("\t...files loaded [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
   
   #exclude some lines
-  articles.v[grep("^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIC: ", articles.v)]<-""
+  articles.v[grep("^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIF: ", articles.v)]<-""
   
   ### Find the beginning of each article marked by the expression "Dokument * von *", e.g. "21 of 500 DOCUMENTS"
   Beginnings <- grep("\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$", articles.v)
@@ -58,7 +58,7 @@ read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRU
   
   ### Find lengths. Length is the last line of meta information before the article starts
   lengths <- grep("^LENGTH: |^LÄNGE: ", articles.v)
- 
+  
   
   ### Debug lengths
   # one line before and after length are always empty
@@ -75,7 +75,7 @@ read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRU
       rm(empty.articles)
     }
   }
-
+  
   if(!length(Beginnings)==length(lengths)){cat("Warning: Missing or extra instances of Length\n")}
   
   ### get lengths for meta information
@@ -97,7 +97,7 @@ read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRU
     Newspaper <- ifelse(articles.v[Newspaper]=="",Newspaper+1,Newspaper)
   }
   newspaper.v<-articles.v[Newspaper]
- 
+  
   #remove if newspaper.v contains Date or Beginning                     
   newspaper.v[grep("January|February|March|April|May|June|July|August|September|October|November|December", newspaper.v)] <- ""
   newspaper.v[grep("\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$", newspaper.v)] <- ""
@@ -121,7 +121,7 @@ read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRU
   section.v <- articles.v[lengths-2]
   section.v <- ifelse(grepl("SECTION: |RUBRIK: ",section.v), section.v,"")
   section.v<- gsub("SECTION: |RUBRIK: ", "", section.v)
-
+  
   ### edition (where available)
   edition.v <- sapply(1:length(Beginnings), function(i){
     edition.v <- articles.v[(Newspaper[i]+3):(lengths[i]-1)]
@@ -175,7 +175,7 @@ read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRU
                             }),
                             stringsAsFactors = FALSE)
   if(verbose){cat("\t...articles extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
-
+  
   if(extractParagraphs){
     paragraphs.df <- lapply(1:length(Beginnings), function(i){
       article.lines.v <- articles.v[(lengths[i]+1):(Ends[i]-1)]
