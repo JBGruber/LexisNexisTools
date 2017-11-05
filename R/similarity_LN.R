@@ -54,13 +54,11 @@ similarity_LN <- function(texts, dates, IDs = NULL, threshold = 0.99, Rel.diff.o
         duplicates.df$Rel.diff. <- sapply(1:nrow(dup), function(i) adist(texts[match(dup[i,2],IDs)],texts[match(dup[i,1],IDs)], ignore.case = TRUE)/# string distance
                                             max(c(nchar(texts[match(dup[i,2],IDs)]), nchar(texts[match(dup[i,1],IDs)]))))
       }
-      
-      
-      cat("Processing date ", as.character(dates.d)," ... ", nrow(dup), " duplicates found", "\n", sep="")
+      cat("r\Processing date ", as.character(dates.d)," ... ", nrow(dup), " duplicates found \t\t", sep="")
       duplicates.df
     }
     else
-    {cat("Processing date ", as.character(dates.d)," ... 0 duplicates found", "\n", sep="")}
+    {cat("r\Processing date ", as.character(dates.d)," ... 0 duplicates found \t\t", sep="")}
   })
   #end loop
   duplicates.df <- as.data.frame(rbindlist(duplicates.df))
