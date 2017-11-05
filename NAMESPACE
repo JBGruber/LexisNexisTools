@@ -2,3 +2,4 @@
 
 export(check_LNfiles)
 export(read_LN)
+export(similarity_LN)

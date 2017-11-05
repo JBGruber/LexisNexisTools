@@ -5,7 +5,7 @@
 \title{Read in a LexisNexis TXT file}
 \usage{
 read_LN(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs = TRUE,
-  convertDate = TRUE)
+  convertDate = FALSE, dateFormat = "\%m.\%d.\%Y")
 }
 \arguments{
 \item{x}{Name or names of LexisNexis TXT file to be converted.}
