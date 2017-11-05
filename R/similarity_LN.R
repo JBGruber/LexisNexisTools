@@ -27,8 +27,8 @@ similarity_LN <- function(texts, dates, IDs = NULL, threshold = 0.99, Rel.diff.o
     if(is.null(IDs)){IDs <- 1:length(texts)}
     text.dfm@Dimnames$docs <- IDs[grep(dates.d, dates)]
     #docnames(text.dfm)
-    sample_sim <- as.matrix(textstat_simil(text.dfm, n=NULL , method = "correlation",
-                                           margin="documents", sorted = FALSE))
+    sample_sim <- as.matrix(textstat_simil(text.dfm, selection=NULL , method = "correlation",
+                                           margin="documents"))
     
     # which values are bigger than test_sim but smaller 1 (direct duplicates are already gone)
     dup <- as.data.frame(which(sample_sim > threshold & sample_sim < 1, arr.ind=TRUE))
