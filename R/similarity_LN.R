@@ -5,7 +5,7 @@
 #' @param dates column with dates.
 #' @param IDs IDs of articles.
 #' @param threshold At which threshold of similarity is an article considered a duplicate. 
-#' @param Rel.diff.on Calculate the relative Levenstein distance between two articles if set to TRUE (can take very long).
+#' @param Rel.diff.on Calculate the relative Levenstein distance between two articles if set to TRUE (can take very long). The main difference between the similarity and distance value is that the distance takes word order into account while similarity employs the bag of words approach.
 #' @keywords similarity
 #' @details The function produces a data.frame consisting of information about duplicated articles
 #' @author Johannes B. Gruber
