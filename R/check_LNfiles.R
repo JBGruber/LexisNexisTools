@@ -26,7 +26,7 @@ check_LNfiles <- function(x, encoding = "UTF-8", verbose = TRUE){
     # one line before and after length are always empty
     lengths <-  lengths[!(articles.v[lengths+1]!=""|articles.v[lengths-1]!="")]
     #same for Ends
-    #Ends <-  Ends[!(articles.v[Ends+1]!=""|articles.v[Ends-1]!="")]
+    Ends <-  Ends[!(articles.v[Ends+1]!=""|articles.v[Ends-1]!="")]
     # Note: In some rare cases, this will delete articles that do not contain length for other reasons
     if(length(which(Ends[1:(length(lengths))]<lengths))>0) {
       for (n in 1:(length(Beginnings)-length(lengths))){
