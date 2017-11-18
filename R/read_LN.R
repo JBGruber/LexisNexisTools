@@ -176,6 +176,7 @@ read_LN <- function(x,
     meta.df$Date <- gsub('EDITION[a-zA-Z0-9]$', '', meta.df$Date)
     meta.df$Date <- gsub('[^0-9,.]', '', meta.df$Date)
     meta.df$Date <- gsub('[[:punct:]]$', '', meta.df$Date)
+    meta.df$Date <- gsub('^\\s+|\\s+$', '', meta.df$Date)
     # And finally convert to date
     meta.df$Date <- as.Date(meta.df$Date, format = dateFormat)}
   if(verbose){cat("\t...meta extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
