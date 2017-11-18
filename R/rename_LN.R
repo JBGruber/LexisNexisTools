@@ -10,7 +10,8 @@
 #' @details Can check consistency of LexisNexis txt files. read_LN needs at least Beginning, End and length in each article to work
 #' @author Johannes B. Gruber
 #' @export
-#' @examples 
+#' @examples
+#' report.df <- rename_LNfiles("C:/Test/", recursive = TRUE, report = TRUE)
 
  
 rename_LNfiles <- function(x, encoding = "UTF-8", recursive = TRUE, report = FALSE, verbose = TRUE){

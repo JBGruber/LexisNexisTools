@@ -25,6 +25,7 @@ Give proper names to LN txt files based on search term and period retrieved from
 Can check consistency of LexisNexis txt files. read_LN needs at least Beginning, End and length in each article to work
 }
 \examples{
+report.df <- rename_LNfiles("C:/Test/", recursive = TRUE, report = TRUE)
 Track the time
 }
 \author{
