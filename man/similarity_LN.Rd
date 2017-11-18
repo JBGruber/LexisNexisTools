@@ -16,7 +16,7 @@ similarity_LN(texts, dates, IDs = NULL, threshold = 0.99,
 
 \item{threshold}{At which threshold of similarity is an article considered a duplicate.}
 
-\item{Rel.diff.on}{Calculate the relative Levenstein distance between two articles if set to TRUE (can take very long).}
+\item{Rel.diff.on}{Calculate the relative Levenstein distance between two articles if set to TRUE (can take very long). The main difference between the similarity and distance value is that the distance takes word order into account while similarity employs the bag of words approach.}
 }
 \description{
 Check for higly similar articles by comparing all articles published on the same date.

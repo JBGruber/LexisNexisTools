@@ -2,4 +2,5 @@
 
 export(check_LNfiles)
 export(read_LN)
+export(rename_LNfiles)
 export(similarity_LN)
