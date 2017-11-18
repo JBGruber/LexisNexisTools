@@ -174,7 +174,6 @@ read_LN <- function(x,
                         stringsAsFactors = FALSE)
   if(convertDate){
     meta.df$Date <- gsub('EDITION[a-zA-Z0-9]$', '', meta.df$Date)
-    meta.df$Date <- gsub('[^0-9,.]', '', meta.df$Date)
     meta.df$Date <- gsub('[[:punct:]]$', '', meta.df$Date)
     meta.df$Date <- gsub('^\\s+|\\s+$', '', meta.df$Date)
     # And finally convert to date
