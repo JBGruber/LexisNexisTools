@@ -5,7 +5,7 @@
 \title{Read in a LexisNexis TXT file}
 \usage{
 read_LN(x, encoding = "UTF-8", extractParagraphs = TRUE,
-  convertDate = FALSE, dateFormat = "\%m.\%d.\%Y",
+  convertDate = FALSE, dateFormat = "\%B \%d, \%Y",
   start_keyword = "\\\\d+ of \\\\d+ DOCUMENTS$| Dokument \\\\d+ von \\\\d+$",
   end_keyword = "^LANGUAGE: |^SPRACHE: ",
   length_keyword = "^LENGTH: |^LÄNGE: ", verbose = TRUE)

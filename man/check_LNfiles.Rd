@@ -4,7 +4,10 @@
 \alias{check_LNfiles}
 \title{Check LexisNexis TXT files}
 \usage{
-check_LNfiles(x, encoding = "UTF-8", verbose = TRUE)
+check_LNfiles(x, encoding = "UTF-8",
+  start_keyword = "\\\\d+ of \\\\d+ DOCUMENTS$| Dokument \\\\d+ von \\\\d+$",
+  end_keyword = "^LANGUAGE: |^SPRACHE: ",
+  length_keyword = "^LENGTH: |^LÄNGE: ", verbose = TRUE)
 }
 \arguments{
 \item{x}{Name or names of LexisNexis TXT file to be converted.}
@@ -12,6 +15,8 @@ check_LNfiles(x, encoding = "UTF-8", verbose = TRUE)
 \item{encoding}{Encoding to be assumed for input files. Defaults to UTF-8 (the LexisNexis standard value).}
 
 \item{verbose}{A logical flag indicating whether information should be printed to the screen.}
+
+\item{start_keyword/end_keyword/length_keyword}{see \link[LexisNexisTools]{read_LN}}
 }
 \description{
 Read a LexisNexis TXT file and check consistency.
