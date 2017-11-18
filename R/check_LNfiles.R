@@ -4,6 +4,7 @@
 #' @param x Name or names of LexisNexis TXT file to be converted.
 #' @param encoding Encoding to be assumed for input files. Defaults to UTF-8 (the LexisNexis standard value).
 #' @param verbose A logical flag indicating whether information should be printed to the screen.
+#' @param start_keyword/end_keyword/length_keyword see \link[LexisNexisTools]{read_LN}
 #' @keywords LexisNexis
 #' @details Can check consistency of LexisNexis txt files. read_LN needs at least Beginning, End and length in each article to work
 #' @author Johannes B. Gruber
@@ -11,7 +12,11 @@
 #' @examples 
 
  
-check_LNfiles <- function(x, encoding = "UTF-8", verbose = TRUE){
+check_LNfiles <- function(x, encoding = "UTF-8", 
+                          start_keyword = "\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$",
+                          end_keyword = "^LANGUAGE: |^SPRACHE: ",
+                          length_keyword = "^LENGTH: |^LÄNGE: ",
+                          verbose = TRUE){
   ###' Track the time
   if(verbose){start.time <- Sys.time(); cat("Checking LN files...\n")}
   
@@ -19,9 +24,9 @@ check_LNfiles <- function(x, encoding = "UTF-8", verbose = TRUE){
   out <- lapply(x, function(i){
     if(verbose){cat("\r\tChecking file",i,"...")}
     articles.v <- stringi::stri_read_lines(i, encoding = encoding)
-    Beginnings <- grep("\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$", articles.v)
-    Ends <- grep("^LANGUAGE: |^SPRACHE: ", articles.v)
-    lengths <- grep("^LENGTH: |^LÄNGE: ", articles.v)
+    Beginnings <- grep(start_keyword, articles.v)
+    Ends <- grep(end_keyword, articles.v)
+    lengths <- grep(length_keyword, articles.v)
     ### Debug lengths
     # one line before and after length are always empty
     lengths <-  lengths[!(articles.v[lengths+1]!=""|articles.v[lengths-1]!="")]

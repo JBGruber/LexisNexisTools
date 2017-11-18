@@ -11,12 +11,19 @@ setClass("LNoutput",
 #' Read a LexisNexis TXT file and convert it to a data frame.
 #' @param x Name or names of LexisNexis TXT file to be converted.
 #' @param encoding Encoding to be assumed for input files. Defaults to UTF-8 (the LexisNexis standard value).
-#' @param verbose A logical flag indicating whether information should be printed to the screen.
-#' @param saveevery An integer determining after which number of file reads an interim result is saved as RDS file in the working directory. 
 #' @param extractParagraphs A logical flag indicating if the returened object will include a third data frame with paragrahs.
-#' @param convertDate A logical flag indicating if it should be tried to convert the date of each article into Date format. Fails for non standard dates provided by LexisNexis.
+#' @param convertDate A logical flag indicating if it should be tried to convert the date of each article into Date format. Fails for non standard dates provided by LexisNexis so it might be safer to convert date afterwards.
+#' @param dateFormat If convertDate is set to TRUE will convert all dates using the same pattern. See \link[base]{strptime}.
+#' @param start_keyword Is used to indicate the beginning of an article. All articles need to have same number of Beginnings, ends and lengths (which indicate the the last line of meta-data)
+#' @param end_keyword Is used to indicate the end of an article.
+#' @param length_keyword Is used to indicate the end of the meta-data.
+#' @param verbose A logical flag indicating whether information should be printed to the screen.
 #' @keywords LexisNexis
-#' @details The function can produce a LNoutput S4 object with two data.frame: meta, containing all meta information such as date, author and headline and articles, containing just the article ID and the text of the articles. When extractParagraphs is set to TRUE, the output contains a third data.frame, similar to articles but with articles split into paragraphs.
+#' @return A LNoutput S4 object consisting of 3 data.frames for meta-data, articles and paragraphs.
+#' @details The function can produce a LNoutput S4 object with two data.frame: meta, containing 
+#' all meta information such as date, author and headline and articles, containing just the article ID and the text of the articles. When extractParagraphs is set to TRUE, the output contains a third data.frame, similar to articles but with articles split into paragraphs.
+#' 
+#' Note: All files need to have same number of Beginnings, ends and lengths (which indicate the the last line of meta-data). If this is true can be tested with \link[LexisNexisTools]{check_LN}. In some cases it makes sense to change the keywords for these three important indicators e.g. to "^LANGUAGE: ENGLISH" to narrow down the search for the ends of an article.
 #' @author Johannes B. Gruber
 #' @export
 #' @examples 
@@ -25,7 +32,15 @@ setClass("LNoutput",
 #' articles.df <- LNoutput@articles
 #' paragraphs.df <- LNoutput@paragraphs
  
-read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRUE, convertDate = FALSE, dateFormat = "%m.%d.%Y"){
+read_LN <- function(x, 
+                    encoding = "UTF-8",
+                    extractParagraphs = TRUE, 
+                    convertDate = FALSE, 
+                    dateFormat = "%B %d, %Y", 
+                    start_keyword = "\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$",
+                    end_keyword = "^LANGUAGE: |^SPRACHE: ",
+                    length_keyword = "^LENGTH: |^LÄNGE: ",
+                    verbose = TRUE){
   ###' Track the time
   if(verbose){start.time <- Sys.time(); cat("Creating LNoutput from a connection input...\n")}
   
@@ -41,16 +56,16 @@ read_LN <- function(x, encoding = "UTF-8", verbose = TRUE, extractParagraphs=TRU
   articles.v[grep("^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIC: |^DATELINE: ", articles.v)]<-""
   
   ### Find the beginning of each article marked by the expression "Dokument * von *", e.g. "21 of 500 DOCUMENTS"
-  Beginnings <- grep("\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$", articles.v)
+  Beginnings <- grep(start_keyword, articles.v)
   
   ### Find ends. Language is the last line of the article; use this to mark the end of an article
-  Ends <- grep("^LANGUAGE: |^SPRACHE: ", articles.v)
+  Ends <- grep(end_keyword, articles.v)
   
   ### Debug Beginnings and Ends
   if(!length(Beginnings)==length(Ends)){cat("Warning: Beginnings and ends do not match\n")}
   
   ### Find lengths. Length is the last line of meta information before the article starts
-  lengths <- grep("^LENGTH: |^LÄNGE: ", articles.v)
+  lengths <- grep(length_keyword, articles.v)
   
   
   ### Debug lengths
