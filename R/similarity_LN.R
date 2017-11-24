@@ -65,7 +65,10 @@ similarity_LN <- function(texts, dates, IDs = NULL, threshold = 0.99, Rel.diff.o
   if(Rel.diff.on){colnames(duplicates.df)[7] <- "Rel.diff."}
   end.time <- Sys.time()
   time.elapsed <- end.time - start.time
-    cat(threshold, length(dates.d), "days processed...\n",nrow(duplicates.df[unique(duplicates.df$ID.duplicate),]), "duplicates found...\n", "In", format(time.elapsed, digits = 2, nsmall = 2))
+    cat("\rThreshold = ", threshold, ";", 
+        length(dates.d), " days processed; ", 
+        nrow(duplicates.df[unique(duplicates.df$ID.duplicate),]), " duplicates found;", 
+        " in ", format(time.elapsed, digits = 2, nsmall = 2), sep = "")
 
   return(duplicates.df)
 }
