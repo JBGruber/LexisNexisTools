@@ -33,7 +33,9 @@ check_LNfiles <- function(x, encoding = "UTF-8",
     #same for Ends
     Ends <-  Ends[!(articles.v[Ends+1]!=""|articles.v[Ends-1]!="")]
     # does language appear in metadata before article
-    for (n in 1:length(Beginnings)){if(Beginnings[n] > Ends[n] & Ends[n] < lengths[n]){Ends <- Ends[-n]}}
+    for (n in 1:min(c(length(Beginnings), length(Ends), length(lengths)))){
+      if(Beginnings[n] > Ends[n] & Ends[n] < lengths[n]){Ends <- Ends[-n]}
+      }
     # Note: In some rare cases, this will delete articles that do not contain length for other reasons
     if(length(which(Ends[1:(length(lengths))]<lengths))>0) {
       for (n in 1:(length(Beginnings)-length(lengths))){
