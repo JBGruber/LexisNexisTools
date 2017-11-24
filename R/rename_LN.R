@@ -40,7 +40,7 @@ rename_LNfiles <- function(x, encoding = "UTF-8", recursive = TRUE, report = FAL
   # start renaming files
   for(i in 1:length(files)){
     #read in the articles
-    content.v <- stringi::stri_read_lines(files[i], encoding = encoding)
+    content.v <- readLines(files[i], encoding = encoding, n =50)
     #look for the range of articles
     range.v <- content.v[grep("^Download Request:|^Ausgabeauftrag: Dokument", content.v)]
     # extract the actual range infromation from line
