@@ -23,11 +23,11 @@ similarity_LN <- function(texts, dates, IDs = NULL, threshold = 0.99, Rel.diff.o
   dates.d <-dates.d[order(dates.d)]
   duplicates.df <- lapply(dates.d ,FUN=function(dates.d){
     # convert to quanteda dfm
-    text.dfm <- dfm(texts[grep(dates.d, dates)], verbose = F, tolower = TRUE)
+    text.dfm <- quanteda::dfm(texts[grep(dates.d, dates)], verbose = F, tolower = TRUE)
     if(is.null(IDs)){IDs <- 1:length(texts)}
     text.dfm@Dimnames$docs <- IDs[grep(dates.d, dates)]
     #docnames(text.dfm)
-    sample_sim <- as.matrix(textstat_simil(text.dfm, selection=NULL , method = "correlation",
+    sample_sim <- as.matrix(quanteda::textstat_simil(text.dfm, selection=NULL , method = "correlation",
                                            margin="documents"))
     
     # which values are bigger than test_sim but smaller 1 (direct duplicates are already gone)
@@ -61,7 +61,7 @@ similarity_LN <- function(texts, dates, IDs = NULL, threshold = 0.99, Rel.diff.o
     {cat("\rProcessing date ", as.character(dates.d)," ... 0 duplicates found \t\t", sep="")}
   })
   #end loop
-  duplicates.df <- as.data.frame(rbindlist(duplicates.df))
+  duplicates.df <- as.data.frame(data.table::rbindlist(duplicates.df))
   if(Rel.diff.on){colnames(duplicates.df)[7] <- "Rel.diff."}
   end.time <- Sys.time()
   time.elapsed <- end.time - start.time
