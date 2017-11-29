@@ -22,7 +22,7 @@ check_LNfiles <- function(x, encoding = "UTF-8",
   
   ### read in file
   out <- lapply(x, function(i){
-    if(verbose){cat("\r\tChecking file",i,"...")}
+    if(verbose){cat("\r\tChecking file:",i,"...\t\t",sep="")}
     articles.v <- stringi::stri_read_lines(i, encoding = encoding)
     Beginnings <- grep(start_keyword, articles.v)
     Ends <- grep(end_keyword, articles.v)
