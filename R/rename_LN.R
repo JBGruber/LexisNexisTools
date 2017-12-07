@@ -51,10 +51,11 @@ rename_LNfiles <- function(x, encoding = "UTF-8", recursive = TRUE, report = FAL
     term.v <- content.v[grep("^Terms: |^Begriffe: ", content.v)]
     #erase everything in the line exept the actual range
     term.v <- gsub("^Terms: |^Begriffe: ", "", term.v)
-    term.v <- unlist(strsplit(term.v, split = " and | OR ", fixed = FALSE)) #splits term into elemets seprated by and or OR
-    date.v <- gsub("[^[:digit:]]", "", term.v[1]) # create from start date with everything but numbers (first element is start date)
-    date.v <- paste0(date.v, "-", gsub("[^[:digit:]]", "", term.v[2]))
-    term.v <-  gsub("[^[:alpha:]]", "",term.v[3]) #extract first search term
+    term.v <- unlist(strsplit(term.v, split = " AND | and | OR ", fixed = FALSE)) #splits term into elemets seprated by and or OR
+    date.v <- gsub("[^[:digit:]]", "", grep("date(", term.v, fixed = TRUE, value = TRUE)[1]) # create from start date with everything but numbers (first element is start date)
+    date.v <- paste0(date.v, "-", gsub("[^[:digit:]]", "", na.omit(grep("(date(", term.v, fixed = TRUE, value = TRUE)[2])))
+    date.v <- gsub("-$", "", date.v)
+    term.v <-  gsub("[^[:alpha:]]", "",grep("(date(", term.v, fixed = TRUE, value = TRUE, invert = TRUE)[1]) #extract first search term
     
     file.name <- sub("[^/]+$","",files[i]) #take old filepath
     file.name <- paste0(file.name, term.v, "_", date.v, "_",range.v,".txt")
