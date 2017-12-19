@@ -15,3 +15,6 @@ Since this packages takes in txt files which are unstructured in the sense that 
     check_LNfiles will fail and read_LN will not be able to do its job. In these cases it 
     is recommended to slighly alter the TXT files, e.g. by changing a headline to 
     "language: never stop learning new ones" instead of "LANGUAGE: never stop learning new ones".
+    
+  
+![Alt Text](https://media.giphy.com/media/vFKqnCdLPNOKc/giphy.gif)
