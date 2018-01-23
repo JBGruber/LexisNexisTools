@@ -1,4 +1,4 @@
-bibentry(bibtype = "R Package",
+bibentry(bibtype = "Manual",
          title = "LexisNexisTools",
          author = c(person("Johannes", "Gruber")),
          year = format(Sys.Date(), "%Y"),
