@@ -1,0 +1,7 @@
+bibentry(bibtype = "R Package",
+         title = "LexisNexisTools",
+         author = c(person("Johannes", "Gruber")),
+         year = format(Sys.Date(), "%Y"),
+         url = "https://github.com/JBGruber/LexisNexisTools",
+         note = "R package version 0.0.4"
+)
