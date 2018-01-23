@@ -26,28 +26,32 @@ devtools::install_github("JBGruber/LexisNexisTools")
 ```
 
 ## Demo
-
+###Load package
 ```{r eval = FALSE}
 library("LexisNexisTools")
+```
+### set working directory to location of source files
+```{r eval = FALSE}
 setwd("C:/Test/LNTools test")
-#' set working directory to location of source files
-setwd("C:/Test/LNTools test")
-
-#' look for nexis files
+```
+### Search for nexis files
+```{r eval = FALSE}
 my_files<-list.files(pattern = ".txt",
                      full.names = TRUE, recursive = TRUE, ignore.case = TRUE)
 
-
-#' rename files
-#' rename files to standard format (searchTerm_startDate-endDate_documenRange.txt);
-#' will not rename if files already named correctly
+```
+### rename files
+rename files to standard format (searchTerm_startDate-endDate_documenRange.txt);
+will not rename if files already named correctly
+```{r eval = FALSE}
 report.df <- rename_LNfiles(x = "C:/Test/LNTools test/", recursive = TRUE, report = TRUE)
 
-#' recreate my_files in case names have changed
+recreate my_files in case names have changed
 my_files<-list.files(pattern = ".txt",
                      full.names = TRUE, recursive = TRUE, ignore.case = TRUE)
-
-#' test consistency of files
+```
+### test consistency of files
+```{r eval = FALSE}
 checks.df <- check_LNfiles(my_files)
 #' In how many files do Beginnings and Ends not match? Critical, will not work if some files are FALSE
 table(checks.df$Test1)
@@ -58,12 +62,13 @@ table(checks.df$Test2)
 table(checks.df$Test3)
 #' How many Beginnings, Ends, Lengths and articles are there (range)
 colSums(checks.df[,2:5])
+```
+removed articles can be investigated. Normally only articles were length is
+missing are removed which indicates empty articles ' e.g. when an article only
+showed an image. checks.df_test <- checks.df[checks.df$Test3==FALSE]
 
-#' removed articles can be investigated. Normally only articles were length is
-#' missing are removed which indicates empty articles ' e.g. when an article only
-#' showed an image. checks.df_test <- checks.df[checks.df$Test3==FALSE]
-
-#' read in LexisNexis files to get meta, articles and paragraphs
+### read in LexisNexis files to get meta, articles and paragraphs
+```{r eval = FALSE}
 LNoutput <- read_LN(my_files,
                     encoding = "UTF-8",
                     extractParagraphs = TRUE,
@@ -73,15 +78,26 @@ LNoutput <- read_LN(my_files,
                     end_keyword = "^LANGUAGE: |^SPRACHE: ",
                     length_keyword = "^LENGTH: |^LÄNGE: ",
                     verbose = TRUE)
-                    
-#' convert Output to three seperate data.frames
+```
+### convert Output to three seperate data.frames
+```{r eval = FALSE}                 
 meta.df <- LNoutput@meta
 articles.df <- LNoutput@articles
 paragraphs.df <- LNoutput@paragraphs
 
-#' identify highly similar articles (nexis often delivers many of those)
+```
+### identify highly similar articles (nexis often delivers many of those)
+```{r eval = FALSE}
 duplicates.df <- similarity_LN(texts = LNoutput@articles$Article,
                                dates = LNoutput@meta$Date,
                                IDs = LNoutput@articles$ID,
                                Rel.diff.on = FALSE)
+
+#' generate new dataframes without highly similar duplicates
+meta.df <-
+  LNoutput@meta[!LNoutput@meta$ID %in% duplicates.df$ID.duplicate, ]
+articles.df <-
+  LNoutput@articles[!LNoutput@articles$ID %in% duplicates.df$ID.duplicate, ]
+paragraphs.df <-
+  LNoutput@paragraphs[!LNoutput@paragraphs$ID %in% duplicates.df$ID.duplicate, ]
 ```
