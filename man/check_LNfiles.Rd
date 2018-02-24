@@ -7,25 +7,36 @@
 check_LNfiles(x, encoding = "UTF-8",
   start_keyword = "\\\\d+ of \\\\d+ DOCUMENTS$| Dokument \\\\d+ von \\\\d+$",
   end_keyword = "^LANGUAGE: |^SPRACHE: ",
-  length_keyword = "^LENGTH: |^LÄNGE: ", verbose = TRUE)
+  length_keyword = "^LENGTH: |^LÃ„NGE: ", verbose = TRUE)
 }
 \arguments{
 \item{x}{Name or names of LexisNexis TXT file to be converted.}
 
-\item{encoding}{Encoding to be assumed for input files. Defaults to UTF-8 (the LexisNexis standard value).}
+\item{encoding}{Encoding to be assumed for input files. Defaults to UTF-8
+(the LexisNexis standard value).}
 
-\item{verbose}{A logical flag indicating whether information should be printed to the screen.}
+\item{start_keyword, end_keyword, length_keyword}{see \link{read_LN}.}
 
-\item{start_keyword/end_keyword/length_keyword}{see \link[LexisNexisTools]{read_LN}}
+\item{verbose}{A logical flag indicating whether information should be
+printed to the screen.}
 }
 \description{
 Read a LexisNexis TXT file and check consistency.
 }
 \details{
-Can check consistency of LexisNexis txt files. read_LN needs at least Beginning, End and length in each article to work
+Can check consistency of LexisNexis txt files. read_LN needs at
+  least Beginning, End and length in each article to work.
 }
 \examples{
-Track the time
+\dontrun{
+# search for txt files in working directory
+my_files<-list.files(pattern = ".txt",
+                     full.names = TRUE,
+                     recursive = TRUE,
+                     ignore.case = TRUE)
+# test consistency of files
+checks.df <- check_LNfiles(my_files)
+}
 }
 \author{
 Johannes B. Gruber

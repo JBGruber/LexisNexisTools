@@ -1,27 +1,41 @@
 #' Assign proper names to LexisNexis TXT files
 #'
-#' Give proper names to LN txt files based on search term and period retrieved from each files cover page.
-#' @param x Name or names of LexisNexis TXT file to be renamed or a folder location. If folder location is provided, string must end with /
-#' @param encoding Encoding to be assumed for input files. Defaults to UTF-8 (the LexisNexis standard value).
-#' @param recursive A logical flag indicating whether sub directories are searched for mor txt files
-#' @param report A logical flag indicating whether the function will return a report which files were renamed
-#' @param verbose A logical flag indicating whether information should be printed to the screen.
+#' Give proper names to LN txt files based on search term and period retrieved
+#' from each file cover page. This information is not always delivered by
+#' LexisNexis though. If the information is not present in the file, new file
+#' names will be empty.
+#' @param x Name or names of LexisNexis TXT file to be renamed or a folder
+#'   location. If folder location is provided, string must end with /
+#' @param encoding Encoding to be assumed for input files. Defaults to UTF-8
+#'   (the LexisNexis standard value).
+#' @param recursive A logical flag indicating whether subdirectories are
+#'   searched for more txt files
+#' @param report A logical flag indicating whether the function will return a
+#'   report which files were renamed
+#' @param verbose A logical flag indicating whether information should be
+#'   printed to the screen.
 #' @keywords LexisNexis
-#' @details Can check consistency of LexisNexis txt files. read_LN needs at least Beginning, End and length in each article to work
+#' @details Can check the consistency of LexisNexis txt files. read_LN needs at
+#'   least Beginning, End and length in each article to work
 #' @author Johannes B. Gruber
 #' @export
+#' @importFrom stats na.omit
 #' @examples
-#' report.df <- rename_LNfiles("C:/Test/", recursive = TRUE, report = TRUE)
+#' \dontrun{
+#' # rename files in folder "C:/Test/LNTools test/" and report back if successful
+#' report.df <- rename_LNfiles(x = "C:/Test/LNTools test/",
+#'                             recursive = TRUE,
+#'                             report = TRUE)
+#' }
 
- 
 rename_LNfiles <- function(x, encoding = "UTF-8", recursive = TRUE, report = FALSE, verbose = TRUE){
-  ###' Track the time
+  # Track the time
   if(verbose){start.time <- Sys.time(); cat("Checking LN files...\n")}
   
   if(all(grepl(".txt$", x, ignore.case = TRUE))){files <- x}#all instances of x are txt files
   if(all(grepl("/$", x, ignore.case = TRUE))){# x is a path
     files <- list.files(path = x,
-                        pattern = ".txt$", ignore.case = TRUE, full.names = TRUE, 
+                        pattern = ".txt$", ignore.case = TRUE, full.names = TRUE,
                         recursive = recursive)
   }
   if(mean(grepl(".txt$", x, ignore.case = TRUE)) > 0 &
@@ -29,16 +43,16 @@ rename_LNfiles <- function(x, encoding = "UTF-8", recursive = TRUE, report = FAL
     files <- x[grepl(".txt$", x, ignore.case = TRUE)]
     files <- c(files,
                list.files(path = x[!grepl(".txt$", x, ignore.case = TRUE)],
-                        pattern = ".txt$", ignore.case = TRUE, full.names = TRUE, 
-                        recursive = recursive))
+                          pattern = ".txt$", ignore.case = TRUE, full.names = TRUE,
+                          recursive = recursive))
   }
   files <- unique(files) # remove duplicated file names
-  if(verbose){start.time <- Sys.time(); cat(length(files),"files found to process...\n")} 
+  if(verbose){start.time <- Sys.time(); cat(length(files),"files found to process...\n")}
   
   
   
   # start renaming files
-  for(i in 1:length(files)){
+  for(i in seq_len(length(files))){
     #read in the articles
     content.v <- readLines(files[i], encoding = encoding, n =50)
     #look for the range of articles
@@ -59,11 +73,11 @@ rename_LNfiles <- function(x, encoding = "UTF-8", recursive = TRUE, report = FAL
     
     file.name <- sub("[^/]+$","",files[i]) #take old filepath
     file.name <- paste0(file.name, term.v, "_", date.v, "_",range.v,".txt")
-    if(!exists("renamed")){renamed = data.frame(name.orig = files, 
-                                                name.new = character(length = length(files)), 
-                                                status = character(length = length(files)),
-                                                stringsAsFactors = FALSE)}
-     
+    if(!exists("renamed")){renamed <- data.frame(name.orig = files,
+                                                 name.new = character(length = length(files)),
+                                                 status = character(length = length(files)),
+                                                 stringsAsFactors = FALSE)}
+    
     #rename file
     if(file.exists(file.name)){ #file already exists
       renamed$name.new[i] <- renamed$name.orig[i]
@@ -90,5 +104,5 @@ rename_LNfiles <- function(x, encoding = "UTF-8", recursive = TRUE, report = FAL
     renamed$status[renamed$status==0] <- "not renamed"
     renamed$status[renamed$status==1] <- "not renamed"
     renamed$status[renamed$status==2] <- "renamed"
-    renamed}   
+    renamed}
 }

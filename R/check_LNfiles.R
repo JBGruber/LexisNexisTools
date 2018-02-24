@@ -2,24 +2,37 @@
 #'
 #' Read a LexisNexis TXT file and check consistency.
 #' @param x Name or names of LexisNexis TXT file to be converted.
-#' @param encoding Encoding to be assumed for input files. Defaults to UTF-8 (the LexisNexis standard value).
-#' @param verbose A logical flag indicating whether information should be printed to the screen.
-#' @param start_keyword/end_keyword/length_keyword see \link[LexisNexisTools]{read_LN}
+#' @param encoding Encoding to be assumed for input files. Defaults to UTF-8
+#'   (the LexisNexis standard value).
+#' @param verbose A logical flag indicating whether information should be
+#'   printed to the screen.
+#' @param start_keyword,end_keyword,length_keyword see \link{read_LN}.
 #' @keywords LexisNexis
-#' @details Can check consistency of LexisNexis txt files. read_LN needs at least Beginning, End and length in each article to work
+#' @details Can check consistency of LexisNexis txt files. read_LN needs at
+#'   least Beginning, End and length in each article to work.
 #' @author Johannes B. Gruber
 #' @export
-#' @examples 
+#' @examples
+#' \dontrun{
+#' # search for txt files in working directory
+#' my_files<-list.files(pattern = ".txt",
+#'                      full.names = TRUE,
+#'                      recursive = TRUE,
+#'                      ignore.case = TRUE)
+#' # test consistency of files
+#' checks.df <- check_LNfiles(my_files)
+#' }
 
- 
-check_LNfiles <- function(x, encoding = "UTF-8", 
+
+check_LNfiles <- function(x,
+                          encoding = "UTF-8",
                           start_keyword = "\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$",
                           end_keyword = "^LANGUAGE: |^SPRACHE: ",
-                          length_keyword = "^LENGTH: |^LÄNGE: ",
+                          length_keyword = "^LENGTH: |^L\u00c4NGE: ",
                           verbose = TRUE){
-  ###' Track the time
+  # Track the time
   if(verbose){start.time <- Sys.time(); cat("Checking LN files...\n")}
-  
+
   ### read in file
   out <- lapply(x, function(i){
     if(verbose){cat("\r\tChecking file:",i,"...\t\t",sep="")}
@@ -52,7 +65,7 @@ check_LNfiles <- function(x, encoding = "UTF-8",
         }
       }
     }
-    
+
     # range
     range.v <- articles.v[grep("^Download Request|^Ausgabeauftrag:", articles.v)]
     range.v <- unlist(strsplit(range.v, "-"))
@@ -70,7 +83,7 @@ check_LNfiles <- function(x, encoding = "UTF-8",
     out
   })
   out <- data.table::rbindlist(out)
-  
+
   if(verbose){cat("\nElapsed time: ", format((Sys.time()-start.time), digits = 2, nsmall = 2),"\n", sep = "")}
   out
 }

@@ -8,45 +8,62 @@ read_LN(x, encoding = "UTF-8", extractParagraphs = TRUE,
   convertDate = FALSE, dateFormat = "\%B \%d, \%Y",
   start_keyword = "\\\\d+ of \\\\d+ DOCUMENTS$| Dokument \\\\d+ von \\\\d+$",
   end_keyword = "^LANGUAGE: |^SPRACHE: ",
-  length_keyword = "^LENGTH: |^LÄNGE: ", verbose = TRUE)
+  length_keyword = "^LENGTH: |^LÃ„NGE: ", verbose = TRUE)
 }
 \arguments{
 \item{x}{Name or names of LexisNexis TXT file to be converted.}
 
-\item{encoding}{Encoding to be assumed for input files. Defaults to UTF-8 (the LexisNexis standard value).}
+\item{encoding}{Encoding to be assumed for input files. Defaults to UTF-8
+(the LexisNexis standard value).}
 
-\item{extractParagraphs}{A logical flag indicating if the returened object will include a third data frame with paragrahs.}
+\item{extractParagraphs}{A logical flag indicating if the returned object
+will include a third data frame with paragraphs.}
 
-\item{convertDate}{A logical flag indicating if it should be tried to convert the date of each article into Date format. Fails for non standard dates provided by LexisNexis so it might be safer to convert date afterwards.}
+\item{convertDate}{A logical flag indicating if it should be tried to convert
+the date of each article into Date format. Fails for non standard dates
+provided by LexisNexis so it might be safer to convert date afterwards.}
 
-\item{dateFormat}{If convertDate is set to TRUE will convert all dates using the same pattern. See \link[base]{strptime}.}
+\item{dateFormat}{If convertDate is set to TRUE will convert all dates using
+the same pattern. See \link[base]{strptime}.}
 
-\item{start_keyword}{Is used to indicate the beginning of an article. All articles need to have same number of Beginnings, ends and lengths (which indicate the the last line of meta-data)}
+\item{start_keyword}{Is used to indicate the beginning of an article. All
+articles need to have same number of Beginnings, ends and lengths (which
+indicate the the last line of meta-data).}
 
 \item{end_keyword}{Is used to indicate the end of an article.}
 
 \item{length_keyword}{Is used to indicate the end of the meta-data.}
 
-\item{verbose}{A logical flag indicating whether information should be printed to the screen.}
+\item{verbose}{A logical flag indicating whether information should be
+printed to the screen.}
 }
 \value{
-A LNoutput S4 object consisting of 3 data.frames for meta-data, articles and paragraphs.
+A LNoutput S4 object consisting of 3 data.frames for meta-data,
+  articles and paragraphs.
 }
 \description{
 Read a LexisNexis TXT file and convert it to a data frame.
 }
 \details{
-The function can produce a LNoutput S4 object with two data.frame: meta, containing 
-all meta information such as date, author and headline and articles, containing just the article ID and the text of the articles. When extractParagraphs is set to TRUE, the output contains a third data.frame, similar to articles but with articles split into paragraphs.
+The function can produce a LNoutput S4 object with two data.frame:
+  meta, containing all meta information such as date, author and headline and
+  articles, containing just the article ID and the text of the articles. When
+  extractParagraphs is set to TRUE, the output contains a third data.frame,
+  similar to articles but with articles split into paragraphs.
 
-Note: All files need to have same number of Beginnings, ends and lengths (which indicate the the last line of meta-data). If this is true can be tested with \link[LexisNexisTools]{check_LN}. In some cases it makes sense to change the keywords for these three important indicators e.g. to "^LANGUAGE: ENGLISH" to narrow down the search for the ends of an article.
+  Note: All files need to have same number of Beginnings, ends and lengths
+  (which indicate the the last line of meta-data). If this is true can be
+  tested with \link{check_LNfiles}. In some cases it makes sense
+  to change the keywords for these three important indicators e.g. to
+  "^LANGUAGE: ENGLISH" to narrow down the search for the ends of an article.
 }
 \examples{
+\dontrun{
 LNoutput <- read_LN("myNexisDownload.txt")
 meta.df <- LNoutput@meta
 articles.df <- LNoutput@articles
 paragraphs.df <- LNoutput@paragraphs
-Track the time
+}
 }
 \author{
 Johannes B. Gruber

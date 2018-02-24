@@ -2,7 +2,7 @@
 % Please edit documentation in R/similarity_LN.R
 \name{similarity_LN}
 \alias{similarity_LN}
-\title{Check for higly similar articles.}
+\title{Check for highly similar articles.}
 \usage{
 similarity_LN(texts, dates, IDs = NULL, threshold = 0.99,
   Rel.diff.on = FALSE)
@@ -14,21 +14,34 @@ similarity_LN(texts, dates, IDs = NULL, threshold = 0.99,
 
 \item{IDs}{IDs of articles.}
 
-\item{threshold}{At which threshold of similarity is an article considered a duplicate.}
+\item{threshold}{At which threshold of similarity is an article considered a
+duplicate.}
 
-\item{Rel.diff.on}{Calculate the relative Levenstein distance between two articles if set to TRUE (can take very long). The main difference between the similarity and distance value is that the distance takes word order into account while similarity employs the bag of words approach.}
+\item{Rel.diff.on}{Calculate the relative Levenstein distance between two
+articles if set to TRUE (can take very long). The main difference between
+the similarity and distance value is that the distance takes word order
+into account while similarity employs the bag of words approach.}
 }
 \description{
-Check for higly similar articles by comparing all articles published on the same date.
+Check for highly similar articles by comparing all articles published on the
+same date.
 }
 \details{
-The function produces a data.frame consisting of information about duplicated articles
+The function produces a data.frame consisting of information about
+  duplicated articles
 }
 \examples{
-duplicates.df <- similarity_LN(texts = LNoutput@articles$Article, dates = LNoutput@meta$Date, IDs = LNoutput@articles$ID)
-meta.df <- LNoutput@meta[!LNoutput@meta$ID \%in\% duplicates.df$ID.duplicate,]
-articles.df <- LNoutput@articles[!LNoutput@articles$ID \%in\% duplicates.df$ID.duplicate,]
-paragraphs.df <- LNoutput@paragraphs[!LNoutput@paragraphs$ID \%in\% duplicates.df$ID.duplicate,]
+\dontrun{
+duplicates.df <- similarity_LN(texts = LNoutput@articles$Article,
+                               dates = LNoutput@meta$Date,
+                               IDs = LNoutput@articles$ID)
+meta.df <- LNoutput@meta[!LNoutput@meta$ID \%in\% 
+                           duplicates.df$ID.duplicate,]
+articles.df <- LNoutput@articles[!LNoutput@articles$ID \%in\% 
+                                   duplicates.df$ID.duplicate,]
+paragraphs.df <- LNoutput@paragraphs[!LNoutput@paragraphs$ID \%in\% 
+                                      duplicates.df$ID.duplicate,]
+                                      }
 }
 \author{
 Johannes B. Gruber

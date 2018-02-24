@@ -1,17 +1,37 @@
 Package: LexisNexisTools
 Title: Import text data from LexisNexis
-Version: 0.0.4
-Authors@R: person("Johannes", "Gruber", email = "j.gruber.1@research.gla.ac.uk", role = c("aut", "cre"))
-Description: My PhD supervisor once told me that everyone doing newspaper analysis
-    starts by writing code to read in files from the LexisNexis newspaper archive. However,
-    while this is a nice excercise I do recommend, not everyone has the time. This package takes
-    TXT files downloaded from LexisNexis in English and German. 
-    If you want other languages included, ask me or fork this project :).
-	Since this packages takes in txt files which are unstructured in the sense that beginning and end of an article is not clearly indicated, the main function read_LN relies on certain keywords that signal to R where an article begins, ends and where meta-data is stored. check_LNfiles thus tests if all keywords are in place. Every article in every TXT file should start with "X of X DOCUMENTS" and end with "LANGUAGE:". The end of the meta-data is indicated by "LENGTH:". Some measures were taken to eliminate problems but where these keywords appear inside an article or headline, test1 or test2 from the check_LNfiles will fail and read_LN will not be able to do its job. In these cases it is recommended to slighly alter the TXT files, e.g. by changing a headline to "language: never stop learning new ones" instead of "LANGUAGE: never stop learning new ones".
-Depends: R (>= 3.1.1)
+Version: 0.0.5
+Authors@R: person("Johannes", "Gruber", email = "j.gruber.1@research.gla.ac.uk", 
+  role = c("aut", "cre"))
+Description: My PhD supervisor once told me that everyone doing newspaper
+ analysis starts by writing code to read in files from the LexisNexis newspaper
+ archive. However, while this is a nice exercise I do recommend, not everyone
+ has the time. This package takes TXT files downloaded from LexisNexis in
+ English and German. If you want other languages included, ask me or fork this
+ project! Since this package takes in txt files which are unstructured in the
+ sense that beginning and end of an article are not clearly indicated, the main
+ function read_LN relies on certain keywords that signal to R where an article
+ begins, ends and where meta-data is stored. \code{check_LNfiles} thus tests if
+ all keywords are in place. Every article in every TXT file should start with "X
+ of X DOCUMENTS" and end with "LANGUAGE:". The end of the meta-data is usually
+ indicated by "LENGTH:". Some measures were taken to eliminate problems but
+ where these keywords appear inside an article or headline, test1 or test2 from
+ the \code{check_LNfiles} will fail and read_LN will not be able to do its job.
+ In these cases, it is recommended to slightly alter the TXT files, e.g. by
+ changing a headline to "language: never stop learning new ones" instead of
+ "LANGUAGE: never stop learning new ones"---as "language:" without capital
+ letters is not picked up by the functions.
+Depends: 
+  R (>= 3.1.1)
 License: GPL-3
-Imports: stringi, data.table, quanteda
+Imports: 
+  stringi, 
+  data.table,
+  methods,
+  quanteda,
+  scales,
+  stats,
+  utils
 Encoding: UTF-8
 LazyData: true
-Packaged: 2017-10-01 12:15:11 UTC
 RoxygenNote: 6.0.1
