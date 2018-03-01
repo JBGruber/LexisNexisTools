@@ -2,8 +2,11 @@
 
 language: R
 sudo: false
-cache: packages
+
 r:
   - 3.3
   - devel
   - release
+  
+ install:
+  - Rscript -e 'install.packages("quanteda", repos = "http://cran.rstudio.com")'
