@@ -1,12 +1,7 @@
-# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
-
-language: R
+language: r
 sudo: false
 cache: packages
 
 r:
   - devel
   - release
-  
- install:
-  - Rscript -e 'install.packages("quanteda", repos = "http://cran.rstudio.com")'
