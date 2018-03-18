@@ -3,7 +3,7 @@
 #' make S4 object
 #' @export
 #' @importFrom methods new
-setClass("LNoutput",
+setClass("LNToutput",
          representation(meta = "data.frame", articles = "data.frame", paragraphs = "data.frame"))
 
 
@@ -29,9 +29,9 @@ setClass("LNoutput",
 #' @param verbose A logical flag indicating whether information should be
 #'   printed to the screen.
 #' @keywords LexisNexis
-#' @return A LNoutput S4 object consisting of 3 data.frames for meta-data,
+#' @return A LNToutput S4 object consisting of 3 data.frames for meta-data,
 #'   articles and paragraphs.
-#' @details The function can produce a LNoutput S4 object with two data.frame:
+#' @details The function can produce a LNToutput S4 object with two data.frame:
 #'   meta, containing all meta information such as date, author and headline and
 #'   articles, containing just the article ID and the text of the articles. When
 #'   extractParagraphs is set to TRUE, the output contains a third data.frame,
@@ -39,20 +39,20 @@ setClass("LNoutput",
 #'
 #'   Note: All files need to have same number of Beginnings, ends and lengths
 #'   (which indicate the the last line of meta-data). If this is true can be
-#'   tested with \link{check_LNfiles}. In some cases it makes sense
+#'   tested with \link{lnt_checkFiles}. In some cases it makes sense
 #'   to change the keywords for these three important indicators e.g. to
 #'   "^LANGUAGE: ENGLISH" to narrow down the search for the ends of an article.
 #' @author Johannes B. Gruber
 #' @export
 #' @examples
 #' \dontrun{
-#' LNoutput <- read_LN("myNexisDownload.txt")
-#' meta.df <- LNoutput@meta
-#' articles.df <- LNoutput@articles
-#' paragraphs.df <- LNoutput@paragraphs
+#' LNToutput <- lnt_read("myNexisDownload.txt")
+#' meta.df <- LNToutput@meta
+#' articles.df <- LNToutput@articles
+#' paragraphs.df <- LNToutput@paragraphs
 #' }
 
-read_LN <- function(x,
+lnt_read <- function(x,
                     encoding = "UTF-8",
                     extractParagraphs = TRUE,
                     convertDate = FALSE,
@@ -62,7 +62,7 @@ read_LN <- function(x,
                     length_keyword = "^LENGTH: |^L\u00c4NGE: ",
                     verbose = TRUE){
   # Track the time
-  if(verbose){start.time <- Sys.time(); cat("Creating LNoutput from a connection input...\n")}
+  if(verbose){start.time <- Sys.time(); cat("Creating LNToutput from a connection input...\n")}
 
   ### read in file
   if(length(x)>1){
@@ -252,7 +252,7 @@ read_LN <- function(x,
                                 stringsAsFactors = FALSE)
   }
 
-  out <- new("LNoutput", meta = meta.df, articles = articles.df, paragraphs = paragraphs.df)
+  out <- new("LNToutput", meta = meta.df, articles = articles.df, paragraphs = paragraphs.df)
 
   if(verbose){cat("Elapsed time: ", format((Sys.time()-start.time), digits = 2, nsmall = 2),"\n", sep = "")}
   out

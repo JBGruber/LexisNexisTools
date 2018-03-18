@@ -19,18 +19,18 @@
 #' @importFrom utils adist
 #' @examples
 #' \dontrun{
-#' duplicates.df <- similarity_LN(texts = LNoutput@articles$Article,
-#'                                dates = LNoutput@meta$Date,
-#'                                IDs = LNoutput@articles$ID)
-#' meta.df <- LNoutput@meta[!LNoutput@meta$ID %in% 
+#' duplicates.df <- lnt_similarity(texts = LNToutput@articles$Article,
+#'                                dates = LNToutput@meta$Date,
+#'                                IDs = LNToutput@articles$ID)
+#' meta.df <- LNToutput@meta[!LNToutput@meta$ID %in% 
 #'                            duplicates.df$ID.duplicate,]
-#' articles.df <- LNoutput@articles[!LNoutput@articles$ID %in% 
+#' articles.df <- LNToutput@articles[!LNToutput@articles$ID %in% 
 #'                                    duplicates.df$ID.duplicate,]
-#' paragraphs.df <- LNoutput@paragraphs[!LNoutput@paragraphs$ID %in% 
+#' paragraphs.df <- LNToutput@paragraphs[!LNToutput@paragraphs$ID %in% 
 #'                                       duplicates.df$ID.duplicate,]
 #'                                       }
 
-similarity_LN <- function(texts, dates, IDs = NULL, threshold = 0.99, Rel.diff.on=FALSE) {
+lnt_similarity <- function(texts, dates, IDs = NULL, threshold = 0.99, Rel.diff.on=FALSE) {
   start.time <- Sys.time()
   #first, we need to unique days so we can loop through them
   dates.d <-unique(dates)

@@ -1,14 +1,30 @@
 #' Check LexisNexis TXT files
 #'
-#' Read a LexisNexis TXT file and check consistency.
+#' Read a LexisNexis TXT file and check consistency. 
+#' 
+#' The output will contain three tests:
+#' - test1: 
+#' Indicates whether the number of beginnings and the number of ends
+#' match in a file. It is critical, that this is TRUE. Otherwise \link{lnt_read}
+#' will not be able to seperate individual articles from each other. 
+#' - test2:
+#' Indicates whether the number of beginnings and the number of lengths match.
+#' As 'LENGTH' is used to separate metadata from actual articles, it is
+#' critical, that this is TRUE. Otherwise \link{lnt_read} will fail with an error
+#' when trying to read this file.
+#' - test3:
+#' Indicates whether the number of beginnings equals the number of articles
+#' LexisNexis delivered. It is most likely not a problem if this is FALSE, as
+#' some articles from nexis are empty and therefore get deleted. So far, this
+#' has only been the case when an article contained a photo and nothing else.
 #' @param x Name or names of LexisNexis TXT file to be converted.
 #' @param encoding Encoding to be assumed for input files. Defaults to UTF-8
 #'   (the LexisNexis standard value).
 #' @param verbose A logical flag indicating whether information should be
 #'   printed to the screen.
-#' @param start_keyword,end_keyword,length_keyword see \link{read_LN}.
+#' @param start_keyword,end_keyword,length_keyword see \link{lnt_read}.
 #' @keywords LexisNexis
-#' @details Can check consistency of LexisNexis txt files. read_LN needs at
+#' @details Can check consistency of LexisNexis txt files. lnt_read needs at
 #'   least Beginning, End and length in each article to work.
 #' @author Johannes B. Gruber
 #' @export
@@ -20,11 +36,11 @@
 #'                      recursive = TRUE,
 #'                      ignore.case = TRUE)
 #' # test consistency of files
-#' checks.df <- check_LNfiles(my_files)
+#' checks.df <- lnt_checkFiles(my_files)
 #' }
 
 
-check_LNfiles <- function(x,
+lnt_checkFiles <- function(x,
                           encoding = "UTF-8",
                           start_keyword = "\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$",
                           end_keyword = "^LANGUAGE: |^SPRACHE: ",

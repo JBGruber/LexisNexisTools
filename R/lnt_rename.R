@@ -15,7 +15,7 @@
 #' @param verbose A logical flag indicating whether information should be
 #'   printed to the screen.
 #' @keywords LexisNexis
-#' @details Can check the consistency of LexisNexis txt files. read_LN needs at
+#' @details Can check the consistency of LexisNexis txt files. lnt_read needs at
 #'   least Beginning, End and length in each article to work
 #' @author Johannes B. Gruber
 #' @export
@@ -23,12 +23,12 @@
 #' @examples
 #' \dontrun{
 #' # rename files in folder "C:/Test/LNTools test/" and report back if successful
-#' report.df <- rename_LNfiles(x = "C:/Test/LNTools test/",
+#' report.df <- lnt_rename(x = "C:/Test/LNTools test/",
 #'                             recursive = TRUE,
 #'                             report = TRUE)
 #' }
 
-rename_LNfiles <- function(x, encoding = "UTF-8", recursive = TRUE, report = FALSE, verbose = TRUE){
+lnt_rename <- function(x, encoding = "UTF-8", recursive = TRUE, report = FALSE, verbose = TRUE){
   # Track the time
   if(verbose){start.time <- Sys.time(); cat("Checking LN files...\n")}
   
