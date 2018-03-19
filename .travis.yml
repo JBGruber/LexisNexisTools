@@ -9,8 +9,7 @@ os:
 r:
   - devel
   - release
-  - 3.3.0
-  - 3.2.0
+  - oldrel
 
 script:
   - Rscript -e "install.packages('quanteda')" # can not be found on older versions of R
