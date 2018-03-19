@@ -6,9 +6,6 @@ matrix:
     include:
         - os: linux
           sudo: required
-          r: devel
-        - os: linux
-          sudo: required
           r: release
         - os: linux
           sudo: required
