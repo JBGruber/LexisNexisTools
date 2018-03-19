@@ -6,10 +6,13 @@ matrix:
     include:
         - os: linux
           sudo: required
-          r: 
-          - devel
-          - release
-          - oldrel
+          r: devel
+        - os: linux
+          sudo: required
+          r: release
+        - os: linux
+          sudo: required
+          r: oldrel
         - os: osx
           r: release
 
