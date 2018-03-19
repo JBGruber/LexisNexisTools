@@ -7,12 +7,11 @@ os:
   - osx
 
 r:
-  - devel
+  #- devel
   - release
   - oldrel
 
 script:
   - Rscript -e "install.packages('quanteda')" # can not be found on older versions of R
-  - if [ "${TRAVIS_OS_NAME}" == "osx" ]; Rscript -e "install.packages(c('data.table', 'quanteda', 'scales', 'stringi'), type = 'source')"
   - R CMD build .
   - R CMD check *tar.gz
