@@ -1,15 +1,18 @@
 language: r
 sudo: false
 cache: packages
+  
+matrix:
+    include:
+        - os: linux
+          sudo: required
+          r: 
+          - devel
+          - release
+          - oldrel
+        - os: osx
+          r: release
 
-os:
-  - linux
-  - osx
-
-r:
-  #- devel
-  - release
-  - oldrel
 
 script:
   - Rscript -e "install.packages('quanteda')" # can not be found on older versions of R
