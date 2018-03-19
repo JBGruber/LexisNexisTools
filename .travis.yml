@@ -18,6 +18,6 @@ matrix:
 
 
 script:
-  - Rscript -e "install.packages('quanteda')" # can not be found on older versions of R
+  - Rscript -e "install.packages(c('devtools', 'quanteda'))" # can not be found on older versions of R
   - R CMD build .
   - R CMD check *tar.gz
