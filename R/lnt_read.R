@@ -50,41 +50,41 @@ setClass("LNToutput",
 #' articles.df <- LNToutput@articles
 #' paragraphs.df <- LNToutput@paragraphs
 lnt_read <- function(x,
-                    encoding = "UTF-8",
-                    extract_paragraphs = TRUE,
-                    convert_date = TRUE,
-                    date_format = "%B %d, %Y",
-                    start_keyword = "\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$",
-                    end_keyword = "^LANGUAGE: |^SPRACHE: ",
-                    length_keyword = "^LENGTH: |^L\u00c4NGE: ",
-                    verbose = TRUE){
+                     encoding = "UTF-8",
+                     extract_paragraphs = TRUE,
+                     convert_date = TRUE,
+                     date_format = "%B %d, %Y",
+                     start_keyword = "\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$",
+                     end_keyword = "^LANGUAGE: |^SPRACHE: ",
+                     length_keyword = "^LENGTH: |^L\u00c4NGE: ",
+                     verbose = TRUE){
   # Track the time
   if(verbose){start.time <- Sys.time(); cat("Creating LNToutput from a connection input...\n")}
-
+  
   ### read in file
-  if(length(x)>1){
+  if(length(x) > 1){
     articles.v <- unlist(sapply(x, stringi::stri_read_lines, encoding = encoding))
   } else {
     articles.v <- stringi::stri_read_lines(x, encoding = encoding)
   }
   if(verbose){cat("\t...files loaded [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
-
+  
   #exclude some lines
   articles.v[grep("^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIC: |^DATELINE: ", articles.v)]<-""
-
+  
   ### Find the beginning of each article marked by the expression "Dokument * von *", e.g. "21 of 500 DOCUMENTS"
   Beginnings <- grep(start_keyword, articles.v)
-
+  
   ### Find ends. Language is the last line of the article; use this to mark the end of an article
   Ends <- grep(end_keyword, articles.v)
-
+  
   ### Debug Beginnings and Ends
   if(!length(Beginnings)==length(Ends)){cat("Warning: Beginnings and ends do not match\n")}
-
+  
   ### Find lengths. Length is the last line of meta information before the article starts
   lengths <- grep(length_keyword, articles.v)
-
-
+  
+  
   ### Debug lengths
   # one line before and after length are always empty
   lengths <-  lengths[!(articles.v[lengths+1]!=""|articles.v[lengths-1]!="")]
@@ -96,35 +96,35 @@ lnt_read <- function(x,
   }
   # Note: In some rare cases, this will delete articles that do not contain length for other reasons
   if(length(which(Ends[1:(length(lengths))]<lengths))>0) {
-      for (n in 1:(length(Beginnings)-length(lengths))){
-        # Which Ends are smaller than length? in those cases length is absent and the article gets neglected.
-        empty.articles <- which(Ends[1:(length(lengths))]<lengths)
-        if(length(empty.articles) > 0){
-          Beginnings <-Beginnings[-(empty.articles[1])]
-          Ends<-Ends[-(empty.articles[1])]
-        }else{
-          if(max(lengths)<max(Beginnings)){
-            Beginnings <- Beginnings[-which.max(Beginnings)]
-            Ends <- Ends[-which.max(Ends)]
-          }
+    for (n in 1:(length(Beginnings)-length(lengths))){
+      # Which Ends are smaller than length? in those cases length is absent and the article gets neglected.
+      empty.articles <- which(Ends[1:(length(lengths))]<lengths)
+      if(length(empty.articles) > 0){
+        Beginnings <-Beginnings[-(empty.articles[1])]
+        Ends<-Ends[-(empty.articles[1])]
+      }else{
+        if(max(lengths)<max(Beginnings)){
+          Beginnings <- Beginnings[-which.max(Beginnings)]
+          Ends <- Ends[-which.max(Ends)]
         }
       }
     }
-
+  }
+  
   if(!length(Beginnings)==length(lengths)){cat("Warning: Missing or extra instances of Length\n")}
-
+  
   ### get lengths for meta information
   lengths.v <- articles.v[lengths]
   lengths.v <- gsub("LENGTH: |L\u00e4NGE:|W\u00f6rter|words|\\s+", "", lengths.v)
-
+  
   ### Source file
   if(length(x)>1){
     source.v <- gsub(".txt\\d+$","",names(articles.v[Beginnings]), ignore.case = TRUE)
   } else {
     source.v <- rep(x, times=length(Beginnings))
   }
-
-
+  
+  
   ### Newspaper
   Newspaper <- Beginnings+2
   # if Newspaper is an empty line we look ahead up to 5 lines to see if we find the newspaper name there
@@ -132,31 +132,31 @@ lnt_read <- function(x,
     Newspaper <- ifelse(articles.v[Newspaper]=="",Newspaper+1,Newspaper)
   }
   newspaper.v<-articles.v[Newspaper]
-
+  
   #remove if newspaper.v contains Date or Beginning
   newspaper.v[grep("January|February|March|April|May|June|July|August|September|October|November|December", newspaper.v)] <- ""
   newspaper.v[grep("\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$", newspaper.v)] <- ""
   newspaper.v<-gsub("^\\s+|\\s+$", "", newspaper.v)
-
+  
   ### Date
-
+  
   #The Date is always shown two lines after newspaper
   #To bring this in a more useful form
   dates.v<- gsub("Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag",
                  "", articles.v[Newspaper+2])
-
-
+  
+  
   ### Author (where available)
   author.v <- articles.v[lengths-4]
   # however, not every articles has this information and where it is not available the field should stay blank
   author.v <- ifelse(grepl("AUTOR: |Von|BYLINE: ",author.v),author.v,"")
   author.v <- gsub("AUTOR: |VON |BYLINE: ", "", author.v)
-
+  
   ### section (where available)
   section.v <- articles.v[lengths-2]
   section.v <- ifelse(grepl("SECTION: |RUBRIK: ",section.v), section.v,"")
   section.v<- gsub("SECTION: |RUBRIK: ", "", section.v)
-
+  
   ### edition (where available)
   edition.v <- sapply(seq_len(length(Beginnings)), function(i){
     edition.v <- articles.v[(Newspaper[i]+3):(lengths[i]-1)]
@@ -164,7 +164,7 @@ lnt_read <- function(x,
     edition.v <- paste(edition.v[1:(empties[1]-1)], collapse = " ")
   })
   edition.v <- gsub("^\\s+|\\s+$", "", edition.v)
-
+  
   ### Headline
   headlines.l <- lapply(seq_len(length(Beginnings)), function(i){
     start <- Newspaper[i]+3
@@ -176,7 +176,7 @@ lnt_read <- function(x,
     headline.v[grep("^BYLINE:|^SECTION:|^RUBRIK:|^AUTOR:", headline.v)]<-""
     headline.v <- paste(headline.v, collapse=" ")
     headline.v
-
+    
   })
   headlines.l <- gsub("^\\s+|\\s+$", "", headlines.l)
   headlines.l <- gsub("\\s+", " ", headlines.l)
@@ -210,7 +210,7 @@ lnt_read <- function(x,
                             }),
                             stringsAsFactors = FALSE)
   if(verbose){cat("\t...articles extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
-
+  
   if(extract_paragraphs){
     paragraphs.df <- lapply(seq_len(length(Beginnings)), function(i){
       article.lines.v <- articles.v[(lengths[i]+1):(Ends[i]-1)]
@@ -246,9 +246,9 @@ lnt_read <- function(x,
                                 Paragraph = NA,
                                 stringsAsFactors = FALSE)
   }
-
+  
   out <- new("LNToutput", meta = meta.df, articles = articles.df, paragraphs = paragraphs.df)
-
+  
   if(verbose){cat("Elapsed time: ", format((Sys.time()-start.time), digits = 2, nsmall = 2),"\n", sep = "")}
   out
 }

@@ -131,7 +131,7 @@ lnt_similarity <- function(texts,
   if(rel_dist) {colnames(duplicates.df)[7] <- "rel_dist"}
   end.time <- Sys.time()
   time.elapsed <- end.time - start.time
-  cat("\rThreshold = ", threshold, ";",
+  cat("\rThreshold = ", threshold, "; ",
       length(dates.d), " days processed; ",
       nrow(duplicates.df[unique(duplicates.df$ID_duplicate),]), " duplicates found;",
       " in ", format(time.elapsed, digits = 2, nsmall = 2), sep = "")
