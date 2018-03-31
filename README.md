@@ -2,9 +2,9 @@
 [![Travis-CI Build Status](https://travis-ci.org/JBGruber/LexisNexisTools.svg?branch=master)](https://travis-ci.org/JBGruber/LexisNexisTools)
 
 My PhD supervisor once told me that everyone doing newspaper analysis starts by
-writing code to read in files from the LexisNexis newspaper archive. However,
+writing code to read in files from the 'LexisNexis' newspaper archive. However,
 while I do recommend this excercise, not everyone has the time. This package
-takes TXT files downloaded from LexisNexis in most languages. I you run into any
+takes TXT files downloaded from 'LexisNexis' in most languages. I you run into any
 issues, please file any issue report.
 
 Since this packages takes in txt files which are unstructured in the sense that
@@ -41,6 +41,7 @@ library("LexisNexisTools")
 ```R
 setwd("C:/Test/LNTools test")
 ```
+If you do not have files from 'LexisNexis', you can also use
 ### Search for Nexis Files
 ```R
 my_files <- list.files(pattern = ".txt",
@@ -48,7 +49,7 @@ my_files <- list.files(pattern = ".txt",
 ```
 
 ### Rename Files
-LexisNexis does not give the txt files proper names. This function renames files
+'LexisNexis' does not give the txt files proper names. This function renames files
 to a standard format: searchTerm_startDate-endDate_documenRange.txt. Note, that this will not work if your txt files lack a cover page with this information. Currently it seems, like Nexis only delivers those cover pages when you first create a link to your search ("link to this search" on the results page), follow this link, and then download the txt files from there.
 ```R
 report.df <- lnt_rename(x = my_files, report = TRUE)
@@ -93,7 +94,7 @@ investigate the removed articles. Most commonly, only articles which contain an
 image and nothing else lack the LENGTH informtaion. You can retrieve the names
 of of the files in which this happenswith `checks.df[checks.df$Test3 == FALSE]`.
 
-### Read in LexisNexis Files to Get Meta, Articles and Paragraphs
+### Read in 'LexisNexis' Files to Get Meta, Articles and Paragraphs
 The main function of this package is `lnt_read`. It converts the raw text from the source files into three different data.frames nested in a special S4 object of class `LNToutput`. The three data.frames conatin (1.) the metadata of the artilces (2.) the articles themeselves (3.) paragraphs, you have set the `extractParagraphs` to `TRUE`.
 ```R
 LNToutput <- lnt_read(my_files,
@@ -115,7 +116,7 @@ paragraphs.df <- LNToutput@paragraphs
 
 ```
 ### Identify Highly Similar Articles (Nexis Often Delivers many of Those)
-One common problem when working with LexisNexis data is that many articles appear to be delivered twice or more times. While direct duplicates can be filtered out using `articles.df <- articles.df[!duplicated(articles.df$Article), ]` this does not work for articles with incremental differences from each other. Hence when one comma or whitespace is different between two articles, they are normally treated as different. The function `lnt_similarity` thus creates a dataframe with two similarity measures for every article (if `Rel.diff.on = TRUE`): quanteda's fast `textstat_simil` and the much slower but more accurate Levenshtein distance. Articles are only checked for similarity when they were published on the same day, due to performance reasons.
+One common problem when working with 'LexisNexis' data is that many articles appear to be delivered twice or more times. While direct duplicates can be filtered out using `articles.df <- articles.df[!duplicated(articles.df$Article), ]` this does not work for articles with incremental differences from each other. Hence when one comma or whitespace is different between two articles, they are normally treated as different. The function `lnt_similarity` thus creates a dataframe with two similarity measures for every article (if `Rel.diff.on = TRUE`): quanteda's fast `textstat_simil` and the much slower but more accurate Levenshtein distance. Articles are only checked for similarity when they were published on the same day, due to performance reasons.
 ```R
 duplicates.df <- lnt_similarity(texts = LNToutput@articles$Article,
                                dates = LNToutput@meta$Date,

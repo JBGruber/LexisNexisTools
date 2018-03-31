@@ -28,7 +28,7 @@ The output will contain three tests:
 - test1: 
 Indicates whether the number of beginnings and the number of ends
 match in a file. It is critical, that this is TRUE. Otherwise \link{lnt_read}
-will not be able to seperate individual articles from each other. 
+will not be able to separate individual articles from each other. 
 - test2:
 Indicates whether the number of beginnings and the number of lengths match.
 As 'LENGTH' is used to separate metadata from actual articles, it is
@@ -44,15 +44,17 @@ Can check consistency of LexisNexis txt files. lnt_read needs at
   least Beginning, End and length in each article to work.
 }
 \examples{
-\dontrun{
-# search for txt files in working directory
-my_files<-list.files(pattern = ".txt",
+# Copy sample file to current wd
+lnt_sample()
+
+# Search for txt files in working directory
+my_files<-list.files(pattern = ".TXT",
                      full.names = TRUE,
                      recursive = TRUE,
                      ignore.case = TRUE)
-# test consistency of files
+# Test consistency of files
 checks.df <- lnt_checkFiles(my_files)
-}
+checks.df
 }
 \author{
 Johannes B. Gruber

@@ -4,20 +4,23 @@
 \alias{lnt_similarity}
 \title{Check for highly similar articles.}
 \usage{
-lnt_similarity(texts, dates, IDs = NULL, threshold = 0.99,
-  Rel.diff.on = FALSE)
+lnt_similarity(texts, dates, LNToutput, IDs = NULL, threshold = 0.99,
+  rel_dist = FALSE)
 }
 \arguments{
-\item{texts}{column with articles.}
+\item{texts}{Provide texts to check for similarity.}
 
-\item{dates}{column with dates.}
+\item{dates}{Provide corresponding dates, same length as \code{text}.}
+
+\item{LNToutput}{Alternatively to providing texts an dates individually, you can
+provide a LNToutput object.}
 
 \item{IDs}{IDs of articles.}
 
 \item{threshold}{At which threshold of similarity is an article considered a
 duplicate.}
 
-\item{Rel.diff.on}{Calculate the relative Levenstein distance between two
+\item{rel_dist}{Calculate the relative Levenshtein distance between two
 articles if set to TRUE (can take very long). The main difference between
 the similarity and distance value is that the distance takes word order
 into account while similarity employs the bag of words approach.}
@@ -31,17 +34,24 @@ The function produces a data.frame consisting of information about
   duplicated articles
 }
 \examples{
-\dontrun{
+# Copy sample file to current wd
+lnt_sample()
+
+# Convert raw file to LNToutput object
+LNToutput <- lnt_read(lnt_sample())
+
+# Test similarity of articles
 duplicates.df <- lnt_similarity(texts = LNToutput@articles$Article,
                                dates = LNToutput@meta$Date,
                                IDs = LNToutput@articles$ID)
-meta.df <- LNToutput@meta[!LNToutput@meta$ID \%in\% 
-                           duplicates.df$ID.duplicate,]
-articles.df <- LNToutput@articles[!LNToutput@articles$ID \%in\% 
-                                   duplicates.df$ID.duplicate,]
-paragraphs.df <- LNToutput@paragraphs[!LNToutput@paragraphs$ID \%in\% 
-                                      duplicates.df$ID.duplicate,]
-                                      }
+
+# Create three separate data.frames from cleaned LNToutput object
+meta.df <- LNToutput@meta[!LNToutput@meta$ID \%in\%
+                           duplicates.df$ID_duplicate,]
+articles.df <- LNToutput@articles[!LNToutput@articles$ID \%in\%
+                                   duplicates.df$ID_duplicate,]
+paragraphs.df <- LNToutput@paragraphs[!LNToutput@paragraphs$ID \%in\%
+                                      duplicates.df$ID_duplicate,]
 }
 \author{
 Johannes B. Gruber

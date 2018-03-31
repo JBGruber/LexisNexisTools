@@ -4,7 +4,7 @@
 \alias{lnt_rename}
 \title{Assign proper names to LexisNexis TXT files}
 \usage{
-lnt_rename(x, encoding = "UTF-8", recursive = TRUE, report = FALSE,
+lnt_rename(x, encoding = "UTF-8", recursive = FALSE, report = FALSE,
   verbose = TRUE)
 }
 \arguments{
@@ -24,7 +24,7 @@ report which files were renamed}
 printed to the screen.}
 }
 \description{
-Give proper names to LN txt files based on search term and period retrieved
+Give proper names to LN TXT files based on search term and period retrieved
 from each file cover page. This information is not always delivered by
 LexisNexis though. If the information is not present in the file, new file
 names will be empty.
@@ -34,12 +34,14 @@ Can check the consistency of LexisNexis txt files. lnt_read needs at
   least Beginning, End and length in each article to work
 }
 \examples{
-\dontrun{
-# rename files in folder "C:/Test/LNTools test/" and report back if successful
-report.df <- lnt_rename(x = "C:/Test/LNTools test/",
-                            recursive = TRUE,
-                            report = TRUE)
-}
+# Copy sample file to current wd
+lnt_sample()
+
+# Rename files in folder wd and report back if successful
+report.df <- lnt_rename(x = lnt_sample(),
+                        recursive = FALSE,
+                        report = TRUE)
+report.df
 }
 \author{
 Johannes B. Gruber

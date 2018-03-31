@@ -1,6 +1,6 @@
 #' Assign proper names to LexisNexis TXT files
 #'
-#' Give proper names to LN txt files based on search term and period retrieved
+#' Give proper names to LN TXT files based on search term and period retrieved
 #' from each file cover page. This information is not always delivered by
 #' LexisNexis though. If the information is not present in the file, new file
 #' names will be empty.
@@ -20,22 +20,34 @@
 #' @author Johannes B. Gruber
 #' @export
 #' @importFrom stats na.omit
+#' @importFrom stringi stri_extract_all_regex stri_join
 #' @examples
-#' \dontrun{
-#' # rename files in folder "C:/Test/LNTools test/" and report back if successful
-#' report.df <- lnt_rename(x = "C:/Test/LNTools test/",
-#'                             recursive = TRUE,
-#'                             report = TRUE)
-#' }
-
-lnt_rename <- function(x, encoding = "UTF-8", recursive = TRUE, report = FALSE, verbose = TRUE){
+#' # Copy sample file to current wd
+#' lnt_sample()
+#' 
+#' # Rename files in folder wd and report back if successful
+#' report.df <- lnt_rename(x = lnt_sample(),
+#'                         recursive = FALSE,
+#'                         report = TRUE)
+#' report.df
+lnt_rename <- function(x, encoding = "UTF-8", recursive = FALSE, report = FALSE, verbose = TRUE){
+  if (missing(x)) {
+    if (readline(prompt="No path was given. Should files in working direcotry be renamed? [y/n]") 
+        %in% c("y", "yes", "Y", "Yes")) {
+      x <- paste0(getwd(), "/")
+    } else {
+      stop("Aborted by user")
+    }
+  }
   # Track the time
   if(verbose){start.time <- Sys.time(); cat("Checking LN files...\n")}
   
   if(all(grepl(".txt$", x, ignore.case = TRUE))){files <- x}#all instances of x are txt files
   if(all(grepl("/$", x, ignore.case = TRUE))){# x is a path
     files <- list.files(path = x,
-                        pattern = ".txt$", ignore.case = TRUE, full.names = TRUE,
+                        pattern = ".txt$", 
+                        ignore.case = TRUE, 
+                        full.names = TRUE,
                         recursive = recursive)
   }
   if(mean(grepl(".txt$", x, ignore.case = TRUE)) > 0 &
@@ -48,9 +60,10 @@ lnt_rename <- function(x, encoding = "UTF-8", recursive = TRUE, report = FALSE, 
   }
   files <- unique(files) # remove duplicated file names
   if(verbose){start.time <- Sys.time(); cat(length(files),"files found to process...\n")}
-  
-  
-  
+  renamed <- data.frame(name.orig = files,
+                        name.new = character(length = length(files)),
+                        status = character(length = length(files)),
+                        stringsAsFactors = FALSE)
   # start renaming files
   for(i in seq_len(length(files))){
     #read in the articles
@@ -63,46 +76,58 @@ lnt_rename <- function(x, encoding = "UTF-8", recursive = TRUE, report = FALSE, 
     
     # look for search term
     term.v <- content.v[grep("^Terms: |^Begriffe: ", content.v)]
-    #erase everything in the line exept the actual range
+    # erase everything in the line exept the actual range
     term.v <- gsub("^Terms: |^Begriffe: ", "", term.v)
-    term.v <- unlist(strsplit(term.v, split = " AND | and | OR ", fixed = FALSE)) #splits term into elemets seprated by and or OR
-    date.v <- gsub("[^[:digit:]]", "", grep("date(", term.v, fixed = TRUE, value = TRUE)[1]) # create from start date with everything but numbers (first element is start date)
-    date.v <- paste0(date.v, "-", gsub("[^[:digit:]]", "", na.omit(grep("(date(", term.v, fixed = TRUE, value = TRUE)[2])))
-    date.v <- gsub("-$", "", date.v)
-    term.v <-  gsub("[^[:alpha:]]", "",grep("(date(", term.v, fixed = TRUE, value = TRUE, invert = TRUE)[1]) #extract first search term
+    # split term into elemets seprated by and or OR
+    term.v <- unlist(strsplit(term.v, split = " AND | and | OR ", fixed = FALSE)) 
     
-    file.name <- sub("[^/]+$","",files[i]) #take old filepath
+    date.v <- term.v[grepl("\\d+-\\d+-\\d+", term.v)]
+    if (length(date.v) > 1) {
+      date.v <- paste0(gsub("[^[:digit:]]", 
+                            "",
+                            term.v[1]),
+                       "-",
+                       gsub("[^[:digit:]]", 
+                            "",
+                            term.v[2]))
+      term.v <-  gsub("[^[:alpha:]]", "", term.v[3])
+    } else if (length(date.v) > 0) {
+      date.v <- gsub("[^[:digit:]]", 
+                     "",
+                     term.v)
+      term.v <-  gsub("[^[:alpha:]]", "", term.v[2])
+    } else {
+      date.v <- "NA"
+      term.v <-  gsub("[^[:alpha:]]", "", term.v)
+    }
+    file.name <- sub("[^/]+$", "", files[i]) #take old filepath
     file.name <- paste0(file.name, term.v, "_", date.v, "_",range.v,".txt")
-    if(!exists("renamed")){renamed <- data.frame(name.orig = files,
-                                                 name.new = character(length = length(files)),
-                                                 status = character(length = length(files)),
-                                                 stringsAsFactors = FALSE)}
-    
     #rename file
     if(file.exists(file.name)){ #file already exists
       renamed$name.new[i] <- renamed$name.orig[i]
-      renamed$status[i] <- 0
+      renamed$status[i] <- "not renamed (file exists)"
     }else{
       if(file.name=="__.txt"){ #file name is empty
         renamed$name.new[i] <- file.name
-        renamed$status[i] <- 1
+        renamed$status[i] <- "not renamed (file is empty)"
       }else{
         renamed$name.new[i] <- file.name
-        renamed$status[i] <- 2
+        renamed$status[i] <- "renamed"
         file.rename(files[i], file.name) #rename
       }
     }
-    
-    cat("\r\t...renaming files", scales::percent(i/length(files)), "\t\t")
-    #1. renamed #, 2. not renamed (does already exist), 3. not renamed (no search term or time range found)
+    if (verbose) cat("\r\t...renaming files", scales::percent(i/length(files)), "\t\t")
   }
-  cat("\n", length(which(renamed$status == 2)), "files renamed, ")
-  if(length(which(renamed$status == 0)) > 0){cat(length(which(renamed$status == 0)), "not renamed (file already exists), ")}
-  if(length(which(renamed$status == 1)) > 0){cat(length(which(renamed$status == 1)), "not renamed (no search term or time range found), ")}
-  cat("in", format((Sys.time()-start.time), digits = 2, nsmall = 2))
-  if(report){
-    renamed$status[renamed$status==0] <- "not renamed"
-    renamed$status[renamed$status==1] <- "not renamed"
-    renamed$status[renamed$status==2] <- "renamed"
-    renamed}
+  if (verbose) {
+    cat("\n", sum(grepl("^renamed$", renamed$status)), "files renamed, ")
+    if(sum(grepl("exists", renamed$status, fixed = TRUE)) > 0) {
+      cat(sum(grepl("exists", renamed$status, fixed = TRUE)), "not renamed (file already exists), ")
+    }
+    if(sum(grepl("empty", renamed$status, fixed = TRUE)) > 0) {
+      cat(sum(grepl("empty", renamed$status, fixed = TRUE)), "not renamed (no search term or time range found), ")
+    }
+  }
+  renamed$status <- as.factor(renamed$status)
+  if (verbose) cat("in", format((Sys.time()-start.time), digits = 2, nsmall = 2))
+  if(report) renamed
 }

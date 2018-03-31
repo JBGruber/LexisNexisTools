@@ -4,8 +4,8 @@
 \alias{lnt_read}
 \title{Read in a LexisNexis TXT file}
 \usage{
-lnt_read(x, encoding = "UTF-8", extractParagraphs = TRUE,
-  convertDate = FALSE, dateFormat = "\%B \%d, \%Y",
+lnt_read(x, encoding = "UTF-8", extract_paragraphs = TRUE,
+  convert_date = TRUE, date_format = "\%B \%d, \%Y",
   start_keyword = "\\\\d+ of \\\\d+ DOCUMENTS$| Dokument \\\\d+ von \\\\d+$",
   end_keyword = "^LANGUAGE: |^SPRACHE: ",
   length_keyword = "^LENGTH: |^LÄNGE: ", verbose = TRUE)
@@ -16,14 +16,14 @@ lnt_read(x, encoding = "UTF-8", extractParagraphs = TRUE,
 \item{encoding}{Encoding to be assumed for input files. Defaults to UTF-8
 (the LexisNexis standard value).}
 
-\item{extractParagraphs}{A logical flag indicating if the returned object
+\item{extract_paragraphs}{A logical flag indicating if the returned object
 will include a third data frame with paragraphs.}
 
-\item{convertDate}{A logical flag indicating if it should be tried to convert
+\item{convert_date}{A logical flag indicating if it should be tried to convert
 the date of each article into Date format. Fails for non standard dates
 provided by LexisNexis so it might be safer to convert date afterwards.}
 
-\item{dateFormat}{If convertDate is set to TRUE will convert all dates using
+\item{date_format}{If convert_date is set to TRUE will convert all dates using
 the same pattern. See \link[base]{strptime}.}
 
 \item{start_keyword}{Is used to indicate the beginning of an article. All
@@ -48,7 +48,7 @@ Read a LexisNexis TXT file and convert it to a data frame.
 The function can produce a LNToutput S4 object with two data.frame:
   meta, containing all meta information such as date, author and headline and
   articles, containing just the article ID and the text of the articles. When
-  extractParagraphs is set to TRUE, the output contains a third data.frame,
+  extract_paragraphs is set to TRUE, the output contains a third data.frame,
   similar to articles but with articles split into paragraphs.
 
   Note: All files need to have same number of Beginnings, ends and lengths
@@ -58,12 +58,10 @@ The function can produce a LNToutput S4 object with two data.frame:
   "^LANGUAGE: ENGLISH" to narrow down the search for the ends of an article.
 }
 \examples{
-\dontrun{
-LNToutput <- lnt_read("myNexisDownload.txt")
+LNToutput <- lnt_read(lnt_sample())
 meta.df <- LNToutput@meta
 articles.df <- LNToutput@articles
 paragraphs.df <- LNToutput@paragraphs
-}
 }
 \author{
 Johannes B. Gruber

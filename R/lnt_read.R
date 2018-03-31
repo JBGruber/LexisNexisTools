@@ -14,12 +14,12 @@ setClass("LNToutput",
 #' @param x Name or names of LexisNexis TXT file to be converted.
 #' @param encoding Encoding to be assumed for input files. Defaults to UTF-8
 #'   (the LexisNexis standard value).
-#' @param extractParagraphs A logical flag indicating if the returned object
+#' @param extract_paragraphs A logical flag indicating if the returned object
 #'   will include a third data frame with paragraphs.
-#' @param convertDate A logical flag indicating if it should be tried to convert
+#' @param convert_date A logical flag indicating if it should be tried to convert
 #'   the date of each article into Date format. Fails for non standard dates
 #'   provided by LexisNexis so it might be safer to convert date afterwards.
-#' @param dateFormat If convertDate is set to TRUE will convert all dates using
+#' @param date_format If convert_date is set to TRUE will convert all dates using
 #'   the same pattern. See \link[base]{strptime}.
 #' @param start_keyword Is used to indicate the beginning of an article. All
 #'   articles need to have same number of Beginnings, ends and lengths (which
@@ -34,7 +34,7 @@ setClass("LNToutput",
 #' @details The function can produce a LNToutput S4 object with two data.frame:
 #'   meta, containing all meta information such as date, author and headline and
 #'   articles, containing just the article ID and the text of the articles. When
-#'   extractParagraphs is set to TRUE, the output contains a third data.frame,
+#'   extract_paragraphs is set to TRUE, the output contains a third data.frame,
 #'   similar to articles but with articles split into paragraphs.
 #'
 #'   Note: All files need to have same number of Beginnings, ends and lengths
@@ -45,18 +45,15 @@ setClass("LNToutput",
 #' @author Johannes B. Gruber
 #' @export
 #' @examples
-#' \dontrun{
-#' LNToutput <- lnt_read("myNexisDownload.txt")
+#' LNToutput <- lnt_read(lnt_sample())
 #' meta.df <- LNToutput@meta
 #' articles.df <- LNToutput@articles
 #' paragraphs.df <- LNToutput@paragraphs
-#' }
-
 lnt_read <- function(x,
                     encoding = "UTF-8",
-                    extractParagraphs = TRUE,
-                    convertDate = FALSE,
-                    dateFormat = "%B %d, %Y",
+                    extract_paragraphs = TRUE,
+                    convert_date = TRUE,
+                    date_format = "%B %d, %Y",
                     start_keyword = "\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$",
                     end_keyword = "^LANGUAGE: |^SPRACHE: ",
                     length_keyword = "^LENGTH: |^L\u00c4NGE: ",
@@ -194,12 +191,12 @@ lnt_read <- function(x,
                         Headline = unlist(headlines.l),
                         row.names = seq_len(length(Beginnings)),
                         stringsAsFactors = FALSE)
-  if(convertDate){
+  if(convert_date){
     meta.df$Date <- gsub('EDITION[a-zA-Z0-9]$', '', meta.df$Date)
     meta.df$Date <- gsub('[[:punct:]]$', '', meta.df$Date)
     meta.df$Date <- gsub('^\\s+|\\s+$', '', meta.df$Date)
     # And finally convert to date
-    meta.df$Date <- as.Date(meta.df$Date, format = dateFormat)}
+    meta.df$Date <- as.Date(meta.df$Date, format = date_format)}
   if(verbose){cat("\t...meta extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
   ### Article
   articles.df <- data.frame(ID = seq_len(length(Beginnings)),
@@ -214,7 +211,7 @@ lnt_read <- function(x,
                             stringsAsFactors = FALSE)
   if(verbose){cat("\t...articles extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
 
-  if(extractParagraphs){
+  if(extract_paragraphs){
     paragraphs.df <- lapply(seq_len(length(Beginnings)), function(i){
       article.lines.v <- articles.v[(lengths[i]+1):(Ends[i]-1)]
       empties <- grep("^$", article.lines.v)
@@ -224,8 +221,6 @@ lnt_read <- function(x,
                         Par_ID = 1:pars,
                         Paragraph = NA,
                         stringsAsFactors = FALSE)
-
-
       if(length(empties)>1) {
         out$Paragraph <- sapply(1:pars, function(j){
           out <- paste(article.lines.v[(empties[j]+1):(empties[j+1]-1)], collapse=" ")
@@ -257,3 +252,8 @@ lnt_read <- function(x,
   if(verbose){cat("Elapsed time: ", format((Sys.time()-start.time), digits = 2, nsmall = 2),"\n", sep = "")}
   out
 }
+
+my_files <- list.files(pattern = ".TXT",
+                       full.names = TRUE, 
+                       recursive = TRUE, 
+                       ignore.case = TRUE)

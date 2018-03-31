@@ -6,7 +6,7 @@
 #' - test1: 
 #' Indicates whether the number of beginnings and the number of ends
 #' match in a file. It is critical, that this is TRUE. Otherwise \link{lnt_read}
-#' will not be able to seperate individual articles from each other. 
+#' will not be able to separate individual articles from each other. 
 #' - test2:
 #' Indicates whether the number of beginnings and the number of lengths match.
 #' As 'LENGTH' is used to separate metadata from actual articles, it is
@@ -29,17 +29,17 @@
 #' @author Johannes B. Gruber
 #' @export
 #' @examples
-#' \dontrun{
-#' # search for txt files in working directory
-#' my_files<-list.files(pattern = ".txt",
+#' # Copy sample file to current wd
+#' lnt_sample()
+#' 
+#' # Search for txt files in working directory
+#' my_files<-list.files(pattern = ".TXT",
 #'                      full.names = TRUE,
 #'                      recursive = TRUE,
 #'                      ignore.case = TRUE)
-#' # test consistency of files
+#' # Test consistency of files
 #' checks.df <- lnt_checkFiles(my_files)
-#' }
-
-
+#' checks.df
 lnt_checkFiles <- function(x,
                           encoding = "UTF-8",
                           start_keyword = "\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$",
@@ -51,7 +51,7 @@ lnt_checkFiles <- function(x,
 
   ### read in file
   out <- lapply(x, function(i){
-    if(verbose){cat("\r\tChecking file:",i,"...\t\t",sep="")}
+    if(verbose){cat("\r\tChecking file:",i,"...\r",sep="")}
     articles.v <- stringi::stri_read_lines(i, encoding = encoding)
     Beginnings <- grep(start_keyword, articles.v)
     Ends <- grep(end_keyword, articles.v)
@@ -100,6 +100,7 @@ lnt_checkFiles <- function(x,
   })
   out <- data.table::rbindlist(out)
 
-  if(verbose){cat("\nElapsed time: ", format((Sys.time()-start.time), digits = 2, nsmall = 2),"\n", sep = "")}
+  if(verbose){cat("\nElapsed time: ", format((Sys.time()-start.time), digits = 2, nsmall = 2), ". ", sep = "")}
+  cat(sum(!out$Test1) + sum(!out$Test2), "files with problem(s).\n")
   out
 }
