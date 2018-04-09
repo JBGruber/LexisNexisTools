@@ -24,8 +24,13 @@ learning new ones" instead of "LANGUAGE: never stop learning new ones".
 <a href="https://ibb.co/fj5YjG"><img src="https://preview.ibb.co/fOfNdb/LN.png" alt="LN" border="0"></a>
 
 ## Installation
-The package can currently only be installed from GitHub. A CRAN release will
-follow soon. Install `devtools` first (via `install.packages("devtools")`) then
+Install via:
+
+```R
+install.packages("LexisNexisTools")
+```
+
+Or get development version by installing `devtools` first (via `install.packages("devtools")`) then
 use:
 
 ```R
