@@ -1,5 +1,7 @@
 # LexisNexisTools
 [![Travis-CI Build Status](https://travis-ci.org/JBGruber/LexisNexisTools.svg?branch=master)](https://travis-ci.org/JBGruber/LexisNexisTools)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version-ago/LexisNexisTools)](http://cran.r-project.org/package=LexisNexisTools)
+[![CRAN_Download_Badge](http://cranlogs.r-pkg.org/badges/grand-total/LexisNexisTools)](http://cran.r-project.org/package=LexisNexisTools)
 
 My PhD supervisor once told me that everyone doing newspaper analysis starts by
 writing code to read in files from the 'LexisNexis' newspaper archive. However,
