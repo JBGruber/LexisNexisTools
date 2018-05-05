@@ -16,18 +16,27 @@ setClass("LNToutput",
 #'   (the LexisNexis standard value).
 #' @param extract_paragraphs A logical flag indicating if the returned object
 #'   will include a third data frame with paragraphs.
-#' @param convert_date A logical flag indicating if it should be tried to convert
-#'   the date of each article into Date format. Fails for non standard dates
-#'   provided by LexisNexis so it might be safer to convert date afterwards.
-#' @param date_format If convert_date is set to TRUE will convert all dates using
-#'   the same pattern. See \link[base]{strptime}.
+#' @param convert_date A logical flag indicating if it should be tried to
+#'   convert the date of each article into Date format. Fails for non standard
+#'   dates provided by LexisNexis so it might be safer to convert date
+#'   afterwards.
 #' @param start_keyword Is used to indicate the beginning of an article. All
-#'   articles need to have same number of Beginnings, ends and lengths (which
-#'   indicate the the last line of meta-data).
-#' @param end_keyword Is used to indicate the end of an article.
-#' @param length_keyword Is used to indicate the end of the meta-data.
+#'   articles should have the same number of Beginnings, ends and lengths (which
+#'   indicate the the last line of meta-data). Use regex expression such as
+#'   "\\d+ of \\d+ DOCUMENTS$" (which would catch e.g., the format "2 of 100
+#'   DOCUMENTS") or "auto" to try all common keywords. Keyword search is case
+#'   sensitive.
+#' @param end_keyword Is used to indicate the end of an article. Works the same
+#'   way as start_keyword. A common regex would be "^LANGUAGE: " which catches
+#'   language in all caps at the beginning of the line (usually the last line of
+#'   an article).
+#' @param length_keyword Is used to indicate the end of the meta-data. Works the same
+#'   way as start_keyword and end_keyword. A common regex would be "^LENGTH: " which catches
+#'   length in all caps at the beginning of the line (usually the last line of
+#'   the metadata).
 #' @param verbose A logical flag indicating whether information should be
 #'   printed to the screen.
+#' @param ... Additional arguments passed on to \link{lnt_asDate}.
 #' @keywords LexisNexis
 #' @return A LNToutput S4 object consisting of 3 data.frames for meta-data,
 #'   articles and paragraphs.
@@ -39,9 +48,9 @@ setClass("LNToutput",
 #'
 #'   Note: All files need to have same number of Beginnings, ends and lengths
 #'   (which indicate the the last line of meta-data). If this is true can be
-#'   tested with \link{lnt_checkFiles}. In some cases it makes sense
-#'   to change the keywords for these three important indicators e.g. to
-#'   "^LANGUAGE: ENGLISH" to narrow down the search for the ends of an article.
+#'   tested with \link{lnt_checkFiles}. In some cases it makes sense to change
+#'   the keywords for these three important indicators e.g. to "^LANGUAGE:
+#'   ENGLISH" to narrow down the search for the ends of an article.
 #' @author Johannes B. Gruber
 #' @export
 #' @examples
@@ -49,15 +58,26 @@ setClass("LNToutput",
 #' meta.df <- LNToutput@meta
 #' articles.df <- LNToutput@articles
 #' paragraphs.df <- LNToutput@paragraphs
+#' @importFrom stringi stri_read_lines
 lnt_read <- function(x,
                      encoding = "UTF-8",
                      extract_paragraphs = TRUE,
                      convert_date = TRUE,
-                     date_format = "%B %d, %Y",
-                     start_keyword = "\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$",
-                     end_keyword = "^LANGUAGE: |^SPRACHE: ",
-                     length_keyword = "^LENGTH: |^L\u00c4NGE: ",
-                     verbose = TRUE){
+                     start_keyword = "auto",
+                     end_keyword = "auto",
+                     length_keyword = "^LENGTH: |^L\u00c4NGE: |^LONGUEUR: ",
+                     verbose = TRUE,
+                     ...){
+  if (start_keyword == "auto") {
+    start_keyword <- "\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$| Document \\d+ de \\d+$"
+  }
+  if (end_keyword == "auto") {
+    end_keyword <- "^LANGUAGE: |^SPRACHE: |^LANGUE: "
+  }
+  if (length_keyword == "auto") {
+    length_keyword <- "^LENGTH: |^L\u00c4NGE:  |^LONGUEUR: "
+  }
+  
   # Track the time
   if(verbose){start.time <- Sys.time(); cat("Creating LNToutput from a connection input...\n")}
   
@@ -79,7 +99,10 @@ lnt_read <- function(x,
   Ends <- grep(end_keyword, articles.v)
   
   ### Debug Beginnings and Ends
-  if(!length(Beginnings)==length(Ends)){cat("Warning: Beginnings and ends do not match\n")}
+  if(!length(Beginnings)==length(Ends)){
+    warning("Beginnings and ends do not match. Fall back on safer approach.")
+    Ends <- c(Beginnings[2:length(Beginnings)] - 2, length(articles.v))
+  }
   
   ### Find lengths. Length is the last line of meta information before the article starts
   lengths <- grep(length_keyword, articles.v)
@@ -89,11 +112,11 @@ lnt_read <- function(x,
   # one line before and after length are always empty
   lengths <-  lengths[!(articles.v[lengths+1]!=""|articles.v[lengths-1]!="")]
   #same for Ends
-  Ends <-  Ends[!(articles.v[Ends+1]!=""|articles.v[Ends-1]!="")]
-  #does "Language:" appear at beginning of headline
-  for (n in 1:min(c(length(Beginnings), length(Ends), length(lengths)))){
-    if(Beginnings[n] > Ends[n] & Ends[n] < lengths[n]){Ends <- Ends[-n]}
-  }
+  # Ends <-  Ends[!(articles.v[Ends+1]!=""|articles.v[Ends-1]!="")]
+  # #does "Language:" appear at beginning of headline
+  # for (n in 1:min(c(length(Beginnings), length(Ends), length(lengths)))){
+  #   if(Beginnings[n] > Ends[n] & Ends[n] < lengths[n]){Ends <- Ends[-n]}
+  # }
   # Note: In some rare cases, this will delete articles that do not contain length for other reasons
   if(length(which(Ends[1:(length(lengths))]<lengths))>0) {
     for (n in 1:(length(Beginnings)-length(lengths))){
@@ -139,11 +162,9 @@ lnt_read <- function(x,
   newspaper.v<-gsub("^\\s+|\\s+$", "", newspaper.v)
   
   ### Date
-  
-  #The Date is always shown two lines after newspaper
-  #To bring this in a more useful form
-  dates.v<- gsub("Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag",
-                 "", articles.v[Newspaper+2])
+  dates.v <- ifelse(grepl("http://|https://", articles.v[Newspaper+2]), 
+                    articles.v[Newspaper+4],
+                    articles.v[Newspaper+2])
   
   
   ### Author (where available)
@@ -192,11 +213,8 @@ lnt_read <- function(x,
                         row.names = seq_len(length(Beginnings)),
                         stringsAsFactors = FALSE)
   if(convert_date){
-    meta.df$Date <- gsub('EDITION[a-zA-Z0-9]$', '', meta.df$Date)
-    meta.df$Date <- gsub('[[:punct:]]$', '', meta.df$Date)
-    meta.df$Date <- gsub('^\\s+|\\s+$', '', meta.df$Date)
-    # And finally convert to date
-    meta.df$Date <- as.Date(meta.df$Date, format = date_format)}
+    meta.df$Date <- lnt_asDate(meta.df$Date, ...)
+  }
   if(verbose){cat("\t...meta extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
   ### Article
   articles.df <- data.frame(ID = seq_len(length(Beginnings)),
@@ -252,8 +270,3 @@ lnt_read <- function(x,
   if(verbose){cat("Elapsed time: ", format((Sys.time()-start.time), digits = 2, nsmall = 2),"\n", sep = "")}
   out
 }
-
-my_files <- list.files(pattern = ".TXT",
-                       full.names = TRUE, 
-                       recursive = TRUE, 
-                       ignore.case = TRUE)

@@ -20,6 +20,7 @@
 #' @export
 #' @importFrom utils adist
 #' @importFrom stringdist stringdist
+#' @importFrom quanteda dfm textstat_simil
 #' @examples
 #' # Copy sample file to current wd
 #' lnt_sample()
@@ -72,15 +73,6 @@ lnt_similarity <- function(texts,
   
   duplicates.df <- lapply(dates.d, function(x){
     if (length(grep(x, dates)) > 1) {
-      # convert to quanteda dfm
-      # text.dfm <- quanteda::dfm(texts[grep(x, dates)],
-      #                           tolower = TRUE,
-      #                           remove = "[^[:alnum:]]",
-      #                           valuetype = "regex",
-      #                           verbose = FALSE)
-      # if(is.null(IDs)) IDs <- seq_len(length(texts))
-      # text.dfm@Dimnames$docs <- IDs[grep(x, dates.d)]
-      #docnames(text.dfm)
       sim <- as.matrix(quanteda::textstat_simil(text.dfm[text.dfm@Dimnames$docs %in%
                                                            IDs[grep(x, dates)]], 
                                                 selection = NULL , 

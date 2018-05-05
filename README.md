@@ -111,15 +111,7 @@ the artilces (2.) the articles themeselves (3.) paragraphs, you have set the
 `extractParagraphs` to `TRUE`.
 
 ```R
-LNToutput <- lnt_read(my_files,
-                      encoding = "UTF-8",
-                      extractParagraphs = TRUE,
-                      convertDate = FALSE,
-                      dateFormat = "%B %d, %Y",
-                      start_keyword = "\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$",
-                      end_keyword = "^LANGUAGE: |^SPRACHE: ",
-                      length_keyword = "^LENGTH: |^LÄNGE: ",
-                      verbose = TRUE)
+LNToutput <- lnt_read(my_files)
 ```
 ### Convert Output to Three Seperate data.frames
 Objects of class `LNToutput` can easily be converted:

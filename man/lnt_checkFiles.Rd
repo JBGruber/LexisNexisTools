@@ -4,10 +4,8 @@
 \alias{lnt_checkFiles}
 \title{Check LexisNexis TXT files}
 \usage{
-lnt_checkFiles(x, encoding = "UTF-8",
-  start_keyword = "\\\\d+ of \\\\d+ DOCUMENTS$| Dokument \\\\d+ von \\\\d+$",
-  end_keyword = "^LANGUAGE: |^SPRACHE: ",
-  length_keyword = "^LENGTH: |^LÄNGE: ", verbose = TRUE)
+lnt_checkFiles(x, encoding = "UTF-8", start_keyword = "auto",
+  end_keyword = "auto", length_keyword = "auto", verbose = TRUE)
 }
 \arguments{
 \item{x}{Name or names of LexisNexis TXT file to be converted.}

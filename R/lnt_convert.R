@@ -7,7 +7,6 @@
 #' @param what Either "Articles" or "Paragraph" to use articles or paragraphs as
 #'   text in the output object.
 #'
-#' @return
 #' @export
 #'
 #' @examples

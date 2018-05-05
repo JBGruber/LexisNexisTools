@@ -13,8 +13,9 @@ matrix:
         - os: osx
           r: release
 
+before_install:
+    - Rscript -e 'install.packages(c("devtools", "quanteda"))' # needs to be installed for every version separatly
 
 script:
-  - Rscript -e "install.packages(c('devtools', 'quanteda'), type = 'source')" # can not be found on older versions of R
-  - R CMD build .
-  - R CMD check *tar.gz
+    - R CMD build .
+    - R CMD check *tar.gz

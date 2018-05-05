@@ -5,10 +5,8 @@
 \title{Read in a LexisNexis TXT file}
 \usage{
 lnt_read(x, encoding = "UTF-8", extract_paragraphs = TRUE,
-  convert_date = TRUE, date_format = "\%B \%d, \%Y",
-  start_keyword = "\\\\d+ of \\\\d+ DOCUMENTS$| Dokument \\\\d+ von \\\\d+$",
-  end_keyword = "^LANGUAGE: |^SPRACHE: ",
-  length_keyword = "^LENGTH: |^LÄNGE: ", verbose = TRUE)
+  convert_date = TRUE, start_keyword = "auto", end_keyword = "auto",
+  length_keyword = "^LENGTH: |^LÄNGE: |^LONGUEUR: ", verbose = TRUE, ...)
 }
 \arguments{
 \item{x}{Name or names of LexisNexis TXT file to be converted.}
@@ -19,23 +17,32 @@ lnt_read(x, encoding = "UTF-8", extract_paragraphs = TRUE,
 \item{extract_paragraphs}{A logical flag indicating if the returned object
 will include a third data frame with paragraphs.}
 
-\item{convert_date}{A logical flag indicating if it should be tried to convert
-the date of each article into Date format. Fails for non standard dates
-provided by LexisNexis so it might be safer to convert date afterwards.}
-
-\item{date_format}{If convert_date is set to TRUE will convert all dates using
-the same pattern. See \link[base]{strptime}.}
+\item{convert_date}{A logical flag indicating if it should be tried to
+convert the date of each article into Date format. Fails for non standard
+dates provided by LexisNexis so it might be safer to convert date
+afterwards.}
 
 \item{start_keyword}{Is used to indicate the beginning of an article. All
-articles need to have same number of Beginnings, ends and lengths (which
-indicate the the last line of meta-data).}
+articles should have the same number of Beginnings, ends and lengths (which
+indicate the the last line of meta-data). Use regex expression such as
+"\\d+ of \\d+ DOCUMENTS$" (which would catch e.g., the format "2 of 100
+DOCUMENTS") or "auto" to try all common keywords. Keyword search is case
+sensitive.}
 
-\item{end_keyword}{Is used to indicate the end of an article.}
+\item{end_keyword}{Is used to indicate the end of an article. Works the same
+way as start_keyword. A common regex would be "^LANGUAGE: " which catches
+language in all caps at the beginning of the line (usually the last line of
+an article).}
 
-\item{length_keyword}{Is used to indicate the end of the meta-data.}
+\item{length_keyword}{Is used to indicate the end of the meta-data. Works the same
+way as start_keyword and end_keyword. A common regex would be "^LENGTH: " which catches
+length in all caps at the beginning of the line (usually the last line of
+the metadata).}
 
 \item{verbose}{A logical flag indicating whether information should be
 printed to the screen.}
+
+\item{...}{Additional arguments passed on to \link{lnt_asDate}.}
 }
 \value{
 A LNToutput S4 object consisting of 3 data.frames for meta-data,
@@ -53,9 +60,9 @@ The function can produce a LNToutput S4 object with two data.frame:
 
   Note: All files need to have same number of Beginnings, ends and lengths
   (which indicate the the last line of meta-data). If this is true can be
-  tested with \link{lnt_checkFiles}. In some cases it makes sense
-  to change the keywords for these three important indicators e.g. to
-  "^LANGUAGE: ENGLISH" to narrow down the search for the ends of an article.
+  tested with \link{lnt_checkFiles}. In some cases it makes sense to change
+  the keywords for these three important indicators e.g. to "^LANGUAGE:
+  ENGLISH" to narrow down the search for the ends of an article.
 }
 \examples{
 LNToutput <- lnt_read(lnt_sample())

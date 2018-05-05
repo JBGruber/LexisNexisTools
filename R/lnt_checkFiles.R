@@ -42,10 +42,20 @@
 #' checks.df
 lnt_checkFiles <- function(x,
                           encoding = "UTF-8",
-                          start_keyword = "\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$",
-                          end_keyword = "^LANGUAGE: |^SPRACHE: ",
-                          length_keyword = "^LENGTH: |^L\u00c4NGE: ",
+                          start_keyword = "auto",
+                          end_keyword = "auto",
+                          length_keyword = "auto",
                           verbose = TRUE){
+  
+  if (start_keyword == "auto") {
+    start_keyword <- "\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$| Document \\d+ de \\d+$"
+  }
+  if (end_keyword == "auto") {
+    end_keyword <- "^LANGUAGE: |^SPRACHE: |^LANGUE: "
+  }
+  if (length_keyword == "auto") {
+    length_keyword <- "^LENGTH: |^L\u00c4NGE:  |^LONGUEUR: "
+  }
   # Track the time
   if(verbose){start.time <- Sys.time(); cat("Checking LN files...\n")}
 
@@ -64,7 +74,7 @@ lnt_checkFiles <- function(x,
     # does language appear in metadata before article
     for (n in 1:min(c(length(Beginnings), length(Ends), length(lengths)))){
       if(Beginnings[n] > Ends[n] & Ends[n] < lengths[n]){Ends <- Ends[-n]}
-      }
+    }
     # Note: In some rare cases, this will delete articles that do not contain length for other reasons
     if(length(which(Ends[1:(length(lengths))]<lengths))>0) {
       for (n in 1:(length(Beginnings)-length(lengths))){
