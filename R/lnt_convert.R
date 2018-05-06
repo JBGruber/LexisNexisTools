@@ -6,15 +6,21 @@
 #' @param to Which format to convert into.
 #' @param what Either "Articles" or "Paragraph" to use articles or paragraphs as
 #'   text in the output object.
-#'
+#' @param ... Passed on to different methods.
 #' @export
 #'
 #' @examples
 #' LNToutput <- lnt_read(lnt_sample())
-#' docs <- lnt_convert(LNToutput)
-lnt_convert <- function(x, to = "rDNA", what = "Articles") {
+#' docs <- lnt_convert(LNToutput, to = "rDNA")
+#' corpus <- lnt_convert(LNToutput, to = "quanteda")
+lnt_convert <- function(x, 
+                        to = "rDNA", 
+                        what = "Articles",
+                        ...) {
   if (to == "rDNA") {
     return(lnt2rDNA(x, what = what))
+  } else if (to == "quanteda") {
+    return(lnt2quanteda(x, what = what))
   }
 }
 
@@ -40,7 +46,7 @@ lnt2rDNA <- function(x, what) {
   if (any(grepl("Date", class(dta$date)))) {
     dta$date <- as.POSIXct.Date(dta$date)
   }
-  if (any(is.na(dta$date), !grepl("POSIXct", class(dta$date)))) {
+  if (any(is.na(dta$date), !any(grepl("POSIXct", class(dta$date))))) {
     warning(paste0("One or more (or all) dates could not be converted to POSIXct.",
             "Na entries in 'date' were filled with the system's time and date instead."))
     dta$date <- tryCatch(as.POSIXct(dta$date),
@@ -50,5 +56,29 @@ lnt2rDNA <- function(x, what) {
       dta$date <- as.POSIXct.numeric(dta$date, origin = "1970-01-01")
     }
   }
+  return(dta)
+}
+
+#' @rdname lnt_convert
+#' @export
+#' @importFrom quanteda corpus
+lnt2quanteda <- function(x, what, ...) {
+  if (what == "Articles") {
+    text <- x@articles$Article
+  } else if (what == "Paragraph") {
+    text <- x@paragraphs$Paragraph
+  }
+  names(text) <- x@articles$ID
+  dots <- list(...)
+  if (any(grepl("metacorpus", names(dots)))) {
+    metacorpus <- list(Converted = "LexiNexisTools",
+                    dots$metacorpus)
+  } else {
+    metacorpus <- list(Converted = "LexiNexisTools")
+  }
+  dta <- corpus(x = text, 
+                docvars = x@meta,
+                metacorpus = metacorpus,
+                ...)
   return(dta)
 }

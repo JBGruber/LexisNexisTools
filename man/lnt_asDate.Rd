@@ -17,7 +17,7 @@ format options).}
 \url{https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes}).}
 }
 \value{
-This function returns an object of class \link{date}
+This function returns an object of class \link{date}.
 }
 \description{
 Converts dates from string formats common in LexisNexis to date

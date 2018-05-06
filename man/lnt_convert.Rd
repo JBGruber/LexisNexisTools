@@ -3,11 +3,14 @@
 \name{lnt_convert}
 \alias{lnt_convert}
 \alias{lnt2rDNA}
+\alias{lnt2quanteda}
 \title{Convert LNToutput to other formats}
 \usage{
-lnt_convert(x, to = "rDNA", what = "Articles")
+lnt_convert(x, to = "rDNA", what = "Articles", ...)
 
 lnt2rDNA(x, what)
+
+lnt2quanteda(x, what, ...)
 }
 \arguments{
 \item{x}{An object of class LNToutput}
@@ -16,11 +19,13 @@ lnt2rDNA(x, what)
 
 \item{what}{Either "Articles" or "Paragraph" to use articles or paragraphs as
 text in the output object.}
+
+\item{...}{Passed on to different methods.}
 }
 \description{
 Takes output from \link{lnt_read} and converts it to other formats.
 }
 \examples{
 LNToutput <- lnt_read(lnt_sample())
-docs <- lnt_convert(LNToutput)
+docs <- lnt_convert(LNToutput, to = "quanteda")
 }
