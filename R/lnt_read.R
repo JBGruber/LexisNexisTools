@@ -7,6 +7,42 @@ setClass("LNToutput",
          representation(meta = "data.frame", articles = "data.frame", paragraphs = "data.frame"))
 
 
+setMethod("show",
+          signature = "LNToutput",
+          definition = function(object) {
+            cat("Object of class 'LNToutput':\n")
+            cat(nrow(object@meta), "Articles\n")
+            cat(nrow(object@paragraphs), "Paragraphs\n")
+            
+            
+            meta <- head(object@meta, n = 6)
+            articles <- head(object@articles, n = 6)
+            paragraphs <- head(object@paragraphs, n = 6)
+            trim <- function(object, n, e = "...") {
+              ifelse(nchar(object) > n,
+                     paste0(gsub("\\s+$", "",
+                                 strtrim(object, width = n)),
+                            e),
+                     object)
+            }
+            for (cols in colnames(meta)) {
+              meta[, cols] <- trim(meta[, cols], 8)
+            }
+            for (cols in colnames(articles)) {
+              articles[, cols] <- trim(articles[, cols], 8)
+            }
+            for (cols in colnames(paragraphs)) {
+              paragraphs[, cols] <- trim(paragraphs[, cols], 8)
+            }
+            cat("\n\nMeta (6 of ", nrow(object@meta),"):\n", sep = "")
+            print(meta)
+            cat("\n\nArticles (6 of ", nrow(object@articles),"):\n", sep = "")
+            print(articles)
+            cat("\n\nParagraphs (6 of ", nrow(object@paragraphs),"):\n", sep = "")
+            print(paragraphs)
+          }
+)
+
 
 #' Read in a LexisNexis TXT file
 #'

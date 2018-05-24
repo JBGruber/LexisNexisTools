@@ -1,7 +1,3 @@
-README LNT
-================
-Johannes B. Gruber
-2018-05-24
 
 LexisNexisTools
 ===============
@@ -147,10 +143,10 @@ LNToutput <- lnt_read(x = getwd())
 
     ## Creating LNToutput from a connection input...
     ##  ...files loaded [0.0011 secs]
-    ##  ...meta extracted [0.018 secs]
-    ##  ...articles extracted [0.024 secs]
-    ##  ...paragraphs extracted [0.049 secs]
-    ## Elapsed time: 0.05 secs
+    ##  ...meta extracted [0.027 secs]
+    ##  ...articles extracted [0.033 secs]
+    ##  ...paragraphs extracted [0.061 secs]
+    ## Elapsed time: 0.062 secs
 
 The returned object of class `LNToutput` can easily be converted to regular data.frames using `@` to select the data.frame you want:
 
@@ -258,7 +254,7 @@ duplicates.df <- lnt_similarity(texts = LNToutput@articles$Article,
     Processing date 2010-01-09 ... 0 duplicates found       
     Processing date 2010-01-10 ... 0 duplicates found       
     Processing date 2010-01-11 ... 8 duplicates found       
-    Threshold = 0.99; 4 days processed; 4 duplicates found; in 0.39 secs
+    Threshold = 0.99; 4 days processed; 4 duplicates found; in 0.51 secs
 
 Now you can either remove those duplicates from the LNTOutput object:
 

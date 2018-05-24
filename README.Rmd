@@ -1,7 +1,4 @@
 ---
-title: "README LNT"
-author: "Johannes B. Gruber"
-date: "`r format(Sys.Date())`"
 output: github_document
 ---
 # LexisNexisTools
