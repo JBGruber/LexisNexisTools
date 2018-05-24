@@ -15,7 +15,8 @@ lnt2quanteda(x, what, ...)
 \arguments{
 \item{x}{An object of class LNToutput}
 
-\item{to}{Which format to convert into.}
+\item{to}{Which format to convert into. Possible values are "rDNA" and
+"quanteda".}
 
 \item{what}{Either "Articles" or "Paragraph" to use articles or paragraphs as
 text in the output object.}
@@ -27,5 +28,6 @@ Takes output from \link{lnt_read} and converts it to other formats.
 }
 \examples{
 LNToutput <- lnt_read(lnt_sample())
-docs <- lnt_convert(LNToutput, to = "quanteda")
+docs <- lnt_convert(LNToutput, to = "rDNA")
+corpus <- lnt_convert(LNToutput, to = "quanteda")
 }

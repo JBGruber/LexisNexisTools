@@ -5,7 +5,7 @@
 #' or copied from Wikipedia since real articles from LexisNexis fall under
 #' copyright laws and can not be shared.
 #'
-#' A small sample database to test the functions of LexiNexisTools
+#' A small sample database to test the functions of LexisNexisTools
 #'
 #' @param overwrite Should sample.TXT be overwritten if found in the current
 #'   working directory?

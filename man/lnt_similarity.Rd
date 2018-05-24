@@ -5,7 +5,7 @@
 \title{Check for highly similar articles.}
 \usage{
 lnt_similarity(texts, dates, LNToutput, IDs = NULL, threshold = 0.99,
-  rel_dist = FALSE)
+  rel_dist = TRUE)
 }
 \arguments{
 \item{texts}{Provide texts to check for similarity.}

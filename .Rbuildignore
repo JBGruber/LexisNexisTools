@@ -1,6 +1,5 @@
 ^.*\.Rproj$         # Automatically added by RStudio,
-^\.Rproj\.user$     # used for temporary files. 
-^README\.Rmd$       # An Rmarkdown file used to generate README.md
+^\.Rproj\.user$     # used for temporary files.
 ^cran-comments\.md$ # Comments for CRAN submission
 ^NEWS\.md$          # A news file written in Markdown
 .travis.yml
@@ -12,3 +11,4 @@ LexisNexisTools.Rproj
 Update LN package.R
 cran-comments.md
 test.R
+README.Rmd

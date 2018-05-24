@@ -45,7 +45,7 @@ lnt_similarity <- function(texts,
                            LNToutput,
                            IDs = NULL,
                            threshold = 0.99,
-                           rel_dist = FALSE) {
+                           rel_dist = TRUE) {
   if (any(missing(texts), missing(dates))) {
     texts <- LNToutput@articles$Article
     dates <- LNToutput@meta$Date

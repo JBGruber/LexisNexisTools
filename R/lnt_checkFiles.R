@@ -20,6 +20,8 @@
 #' @param x Name or names of LexisNexis TXT file to be converted.
 #' @param encoding Encoding to be assumed for input files. Defaults to UTF-8
 #'   (the LexisNexis standard value).
+#' @param recursive A logical flag indicating whether subdirectories are
+#'   searched for more txt files.
 #' @param verbose A logical flag indicating whether information should be
 #'   printed to the screen.
 #' @param start_keyword,end_keyword,length_keyword see \link{lnt_read}.
@@ -45,8 +47,40 @@ lnt_checkFiles <- function(x,
                           start_keyword = "auto",
                           end_keyword = "auto",
                           length_keyword = "auto",
+                          recursive = FALSE,
                           verbose = TRUE){
-  
+  if (missing(x)) {
+    if (readline(prompt="No path was given. Should files in working direcotry be checked? [y/n]") 
+        %in% c("y", "yes", "Y", "Yes")) {
+      x <- paste0(getwd(), "/")
+    } else {
+      stop("Aborted by user")
+    }
+  }
+  if (all(grepl(".txt$", x, ignore.case = TRUE))) {
+    files <- x
+  } else if (any(grepl(".txt$", x, ignore.case = TRUE))) {
+    message("Not all provided files were TXT files. Other formats are ignored.")
+    files <- grep(".txt$", x, ignore.case = TRUE, value = TRUE)
+  } else if (any(grepl("\\\\|/", x))) {
+    if (length(x) > 1) {
+      files <- unlist(sapply(x, function(f) {
+        list.files(path = f,
+                   pattern = ".txt$", 
+                   ignore.case = TRUE, 
+                   full.names = TRUE,
+                   recursive = recursive)
+      }, USE.NAMES = FALSE))
+    } else {
+      files <- list.files(path = x,
+                          pattern = ".txt$", 
+                          ignore.case = TRUE, 
+                          full.names = TRUE,
+                          recursive = recursive)
+    }
+  } else {
+    stop("Provide either file name(s) ending on '.txt' or folder name(s) to x or leave black to search wd.")
+  } 
   if (start_keyword == "auto") {
     start_keyword <- "\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$| Document \\d+ de \\d+$"
   }
@@ -60,7 +94,10 @@ lnt_checkFiles <- function(x,
   if(verbose){start.time <- Sys.time(); cat("Checking LN files...\n")}
 
   ### read in file
-  out <- lapply(x, function(i){
+  if (length(files) == 0) {
+    stop("No txt files found!")
+  }
+  out <- lapply(files, function(i){
     if(verbose){cat("\r\tChecking file:",i,"...\r",sep="")}
     articles.v <- stringi::stri_read_lines(i, encoding = encoding)
     Beginnings <- grep(start_keyword, articles.v)
@@ -112,5 +149,5 @@ lnt_checkFiles <- function(x,
 
   if(verbose){cat("\nElapsed time: ", format((Sys.time()-start.time), digits = 2, nsmall = 2), ". ", sep = "")}
   cat(sum(!out$Test1) + sum(!out$Test2), "files with problem(s).\n")
-  out
+  return(out)
 }

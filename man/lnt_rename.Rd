@@ -5,20 +5,24 @@
 \title{Assign proper names to LexisNexis TXT files}
 \usage{
 lnt_rename(x, encoding = "UTF-8", recursive = FALSE, report = FALSE,
-  verbose = TRUE)
+  simulate = TRUE, verbose = TRUE)
 }
 \arguments{
-\item{x}{Name or names of LexisNexis TXT file to be renamed or a folder
-location. If folder location is provided, string must end with /}
+\item{x}{Can be either a character vector of LexisNexis TXT file name(s),
+folder name(s) or can be left blank (see example).}
 
 \item{encoding}{Encoding to be assumed for input files. Defaults to UTF-8
 (the LexisNexis standard value).}
 
 \item{recursive}{A logical flag indicating whether subdirectories are
-searched for more txt files}
+searched for more txt files.}
 
 \item{report}{A logical flag indicating whether the function will return a
-report which files were renamed}
+report which files were renamed.}
+
+\item{simulate}{Should the renaming be simulated instead of actually done?
+This can help prevent accidental renaming of unrelated txt files which
+happen to be in the same directory as the files from 'LexisNexsis'.}
 
 \item{verbose}{A logical flag indicating whether information should be
 printed to the screen.}
@@ -30,17 +34,27 @@ LexisNexis though. If the information is not present in the file, new file
 names will be empty.
 }
 \details{
-Can check the consistency of LexisNexis txt files. lnt_read needs at
-  least Beginning, End and length in each article to work
+Warning: This will rename all txt files in a give folder.
 }
 \examples{
+
 # Copy sample file to current wd
 lnt_sample()
 
-# Rename files in folder wd and report back if successful
-report.df <- lnt_rename(x = lnt_sample(),
+# Rename files in current wd and report back if successful
+ \dontrun{report.df <- lnt_rename(recursive = FALSE,
+                        report = TRUE)}
+
+# Or provide file name(s)
+my_files<-list.files(pattern = ".txt", full.names = TRUE,
+                     recursive = TRUE, ignore.case = TRUE)
+report.df <- lnt_rename(x = my_files,
                         recursive = FALSE,
                         report = TRUE)
+
+# Or provide folder name(s)
+report.df <- lnt_rename(x = getwd())
+
 report.df
 }
 \author{

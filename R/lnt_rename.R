@@ -4,33 +4,57 @@
 #' from each file cover page. This information is not always delivered by
 #' LexisNexis though. If the information is not present in the file, new file
 #' names will be empty.
-#' @param x Name or names of LexisNexis TXT file to be renamed or a folder
-#'   location. If folder location is provided, string must end with /
+#'
+#' Warning: This will rename all txt files in a give folder.
+#'
+#' @param x Can be either a character vector of LexisNexis TXT file name(s),
+#'   folder name(s) or can be left blank (see example).
 #' @param encoding Encoding to be assumed for input files. Defaults to UTF-8
 #'   (the LexisNexis standard value).
 #' @param recursive A logical flag indicating whether subdirectories are
-#'   searched for more txt files
+#'   searched for more txt files.
 #' @param report A logical flag indicating whether the function will return a
-#'   report which files were renamed
+#'   report which files were renamed.
+#' @param simulate Should the renaming be simulated instead of actually done?
+#'   This can help prevent accidental renaming of unrelated txt files which
+#'   happen to be in the same directory as the files from 'LexisNexsis'.
 #' @param verbose A logical flag indicating whether information should be
 #'   printed to the screen.
 #' @keywords LexisNexis
-#' @details Can check the consistency of LexisNexis txt files. lnt_read needs at
-#'   least Beginning, End and length in each article to work
 #' @author Johannes B. Gruber
 #' @export
 #' @importFrom stats na.omit
 #' @importFrom stringi stri_extract_all_regex stri_join
 #' @examples
+#'
 #' # Copy sample file to current wd
 #' lnt_sample()
-#' 
-#' # Rename files in folder wd and report back if successful
-#' report.df <- lnt_rename(x = lnt_sample(),
+#'
+#' # Rename files in current wd and report back if successful
+#'  \dontrun{report.df <- lnt_rename(recursive = FALSE,
+#'                         report = TRUE)}
+#'
+#' # Or provide file name(s)
+#' my_files<-list.files(pattern = ".txt", full.names = TRUE,
+#'                      recursive = TRUE, ignore.case = TRUE)
+#' report.df <- lnt_rename(x = my_files,
 #'                         recursive = FALSE,
 #'                         report = TRUE)
+#'
+#' # Or provide folder name(s)
+#' report.df <- lnt_rename(x = getwd())
+#'
 #' report.df
-lnt_rename <- function(x, encoding = "UTF-8", recursive = FALSE, report = FALSE, verbose = TRUE){
+lnt_rename <- function(x, 
+                       encoding = "UTF-8", 
+                       recursive = FALSE, 
+                       report = FALSE,
+                       simulate = TRUE,
+                       verbose = TRUE) {
+  # Check how files are provided
+  # 1. nothing (search wd)
+  # 2. txt file or files
+  # 3. folder name(s)
   if (missing(x)) {
     if (readline(prompt="No path was given. Should files in working direcotry be renamed? [y/n]") 
         %in% c("y", "yes", "Y", "Yes")) {
@@ -39,27 +63,34 @@ lnt_rename <- function(x, encoding = "UTF-8", recursive = FALSE, report = FALSE,
       stop("Aborted by user")
     }
   }
+  if (all(grepl(".txt$", x, ignore.case = TRUE))) {
+    files <- x
+  } else if (any(grepl(".txt$", x, ignore.case = TRUE))) {
+    message("Not all provided files were TXT files. Other formats are ignored.")
+    files <- grep(".txt$", x, ignore.case = TRUE, value = TRUE)
+  } else if (any(grepl("\\\\|/", x))) {
+    if (length(x) > 1) {
+      files <- unlist(sapply(x, function(f) {
+        list.files(path = f,
+                   pattern = ".txt$", 
+                   ignore.case = TRUE, 
+                   full.names = TRUE,
+                   recursive = recursive)
+      }, USE.NAMES = FALSE))
+    } else {
+      files <- list.files(path = x,
+                          pattern = ".txt$", 
+                          ignore.case = TRUE, 
+                          full.names = TRUE,
+                          recursive = recursive)
+    }
+  } else {
+    stop("Provide either file name(s) ending on '.txt' or folder name(s) to x or leave black to search wd.")
+  } 
   # Track the time
-  if(verbose){start.time <- Sys.time(); cat("Checking LN files...\n")}
-  
-  if(all(grepl(".txt$", x, ignore.case = TRUE))){files <- x}#all instances of x are txt files
-  if(all(grepl("/$", x, ignore.case = TRUE))){# x is a path
-    files <- list.files(path = x,
-                        pattern = ".txt$", 
-                        ignore.case = TRUE, 
-                        full.names = TRUE,
-                        recursive = recursive)
-  }
-  if(mean(grepl(".txt$", x, ignore.case = TRUE)) > 0 &
-     mean(grepl("/$", x, ignore.case = TRUE)) > 0){ # some txt files but also at least one path
-    files <- x[grepl(".txt$", x, ignore.case = TRUE)]
-    files <- c(files,
-               list.files(path = x[!grepl(".txt$", x, ignore.case = TRUE)],
-                          pattern = ".txt$", ignore.case = TRUE, full.names = TRUE,
-                          recursive = recursive))
-  }
-  files <- unique(files) # remove duplicated file names
-  if(verbose){start.time <- Sys.time(); cat(length(files),"files found to process...\n")}
+  if(verbose) {start.time <- Sys.time(); cat("Checking LN files...\n")}
+  files <- unique(files)
+  if (verbose){start.time <- Sys.time(); cat(length(files), "files found to process...\n")}
   renamed <- data.frame(name.orig = files,
                         name.new = character(length = length(files)),
                         status = character(length = length(files)),
@@ -103,20 +134,22 @@ lnt_rename <- function(x, encoding = "UTF-8", recursive = FALSE, report = FALSE,
     file.name <- sub("[^/]+$", "", files[i]) #take old filepath
     file.name <- paste0(file.name, term.v, "_", date.v, "_",range.v,".txt")
     #rename file
-    if(file.exists(file.name)){ #file already exists
-      renamed$name.new[i] <- renamed$name.orig[i]
-      renamed$status[i] <- "not renamed (file exists)"
-    }else{
-      if(file.name=="__.txt"){ #file name is empty
-        renamed$name.new[i] <- file.name
-        renamed$status[i] <- "not renamed (file is empty)"
+    if (!simulate) {
+      if(file.exists(file.name)){ #file already exists
+        renamed$name.new[i] <- renamed$name.orig[i]
+        renamed$status[i] <- "not renamed (file exists)"
       }else{
-        renamed$name.new[i] <- file.name
-        renamed$status[i] <- "renamed"
-        file.rename(files[i], file.name) #rename
+        if(file.name=="__.txt"){ #file name is empty
+          renamed$name.new[i] <- file.name
+          renamed$status[i] <- "not renamed (file is empty)"
+        }else{
+          renamed$name.new[i] <- file.name
+          renamed$status[i] <- "renamed"
+          file.rename(files[i], file.name) #rename
+        }
       }
+      if (verbose) cat("\r\t...renaming files", scales::percent(i/length(files)), "\t\t")
     }
-    if (verbose) cat("\r\t...renaming files", scales::percent(i/length(files)), "\t\t")
   }
   if (verbose) {
     cat("\n", sum(grepl("^renamed$", renamed$status)), "files renamed, ")
@@ -128,6 +161,6 @@ lnt_rename <- function(x, encoding = "UTF-8", recursive = FALSE, report = FALSE,
     }
   }
   renamed$status <- as.factor(renamed$status)
-  if (verbose) cat("in", format((Sys.time()-start.time), digits = 2, nsmall = 2))
+  if (verbose) cat("in", format((Sys.time()-start.time), digits = 2, nsmall = 2), if(simulate) "[cahnges only simulated]")
   if(report) renamed
 }

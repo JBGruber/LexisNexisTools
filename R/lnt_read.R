@@ -1,7 +1,7 @@
 
 
 #' make S4 object
-#' @export
+#' @noRd
 #' @importFrom methods new
 setClass("LNToutput",
          representation(meta = "data.frame", articles = "data.frame", paragraphs = "data.frame"))
@@ -34,10 +34,11 @@ setClass("LNToutput",
 #'   way as start_keyword and end_keyword. A common regex would be "^LENGTH: " which catches
 #'   length in all caps at the beginning of the line (usually the last line of
 #'   the metadata).
+#' @param recursive A logical flag indicating whether subdirectories are
+#'   searched for more txt files.
 #' @param verbose A logical flag indicating whether information should be
 #'   printed to the screen.
 #' @param ... Additional arguments passed on to \link{lnt_asDate}.
-#' @keywords LexisNexis
 #' @return A LNToutput S4 object consisting of 3 data.frames for meta-data,
 #'   articles and paragraphs.
 #' @details The function can produce a LNToutput S4 object with two data.frame:
@@ -66,8 +67,41 @@ lnt_read <- function(x,
                      start_keyword = "auto",
                      end_keyword = "auto",
                      length_keyword = "^LENGTH: |^L\u00c4NGE: |^LONGUEUR: ",
+                     recursive = FALSE,
                      verbose = TRUE,
                      ...){
+  if (missing(x)) {
+    if (readline(prompt="No path was given. Should files in working direcotry be checked? [y/n]") 
+        %in% c("y", "yes", "Y", "Yes")) {
+      x <- paste0(getwd(), "/")
+    } else {
+      stop("Aborted by user")
+    }
+  }
+  if (all(grepl(".txt$", x, ignore.case = TRUE))) {
+    files <- x
+  } else if (any(grepl(".txt$", x, ignore.case = TRUE))) {
+    message("Not all provided files were TXT files. Other formats are ignored.")
+    files <- grep(".txt$", x, ignore.case = TRUE, value = TRUE)
+  } else if (any(grepl("\\\\|/", x))) {
+    if (length(x) > 1) {
+      files <- unlist(sapply(x, function(f) {
+        list.files(path = f,
+                   pattern = ".txt$", 
+                   ignore.case = TRUE, 
+                   full.names = TRUE,
+                   recursive = recursive)
+      }, USE.NAMES = FALSE))
+    } else {
+      files <- list.files(path = x,
+                          pattern = ".txt$", 
+                          ignore.case = TRUE, 
+                          full.names = TRUE,
+                          recursive = recursive)
+    }
+  } else {
+    stop("Provide either file name(s) ending on '.txt' or folder name(s) to x or leave black to search wd.")
+  } 
   if (start_keyword == "auto") {
     start_keyword <- "\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$| Document \\d+ de \\d+$"
   }
@@ -82,10 +116,15 @@ lnt_read <- function(x,
   if(verbose){start.time <- Sys.time(); cat("Creating LNToutput from a connection input...\n")}
   
   ### read in file
-  if(length(x) > 1){
-    articles.v <- unlist(sapply(x, stringi::stri_read_lines, encoding = encoding))
+  if(length(files) > 1){
+    articles.v <- unlist(lapply(files, function(f) {
+      out <- stringi::stri_read_lines(f, encoding = encoding)
+      names(out) <- rep(f, times = length(out))
+      out
+    }))
   } else {
-    articles.v <- stringi::stri_read_lines(x, encoding = encoding)
+    articles.v <- stringi::stri_read_lines(files, encoding = encoding)
+    names(articles.v) <- rep(files, times = length(articles.v))
   }
   if(verbose){cat("\t...files loaded [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
   
@@ -141,10 +180,10 @@ lnt_read <- function(x,
   lengths.v <- gsub("LENGTH: |L\u00e4NGE:|W\u00f6rter|words|\\s+", "", lengths.v)
   
   ### Source file
-  if(length(x)>1){
+  if(length(files)>1){
     source.v <- gsub(".txt\\d+$","",names(articles.v[Beginnings]), ignore.case = TRUE)
   } else {
-    source.v <- rep(x, times=length(Beginnings))
+    source.v <- rep(files, times = length(Beginnings))
   }
   
   

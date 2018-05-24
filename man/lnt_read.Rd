@@ -6,7 +6,8 @@
 \usage{
 lnt_read(x, encoding = "UTF-8", extract_paragraphs = TRUE,
   convert_date = TRUE, start_keyword = "auto", end_keyword = "auto",
-  length_keyword = "^LENGTH: |^LÄNGE: |^LONGUEUR: ", verbose = TRUE, ...)
+  length_keyword = "^LENGTH: |^LÄNGE: |^LONGUEUR: ", recursive = FALSE,
+  verbose = TRUE, ...)
 }
 \arguments{
 \item{x}{Name or names of LexisNexis TXT file to be converted.}
@@ -38,6 +39,9 @@ an article).}
 way as start_keyword and end_keyword. A common regex would be "^LENGTH: " which catches
 length in all caps at the beginning of the line (usually the last line of
 the metadata).}
+
+\item{recursive}{A logical flag indicating whether subdirectories are
+searched for more txt files.}
 
 \item{verbose}{A logical flag indicating whether information should be
 printed to the screen.}
@@ -73,4 +77,3 @@ paragraphs.df <- LNToutput@paragraphs
 \author{
 Johannes B. Gruber
 }
-\keyword{LexisNexis}

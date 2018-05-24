@@ -3,7 +3,8 @@
 #' Takes output from \link{lnt_read} and converts it to other formats.
 #'
 #' @param x An object of class LNToutput
-#' @param to Which format to convert into.
+#' @param to Which format to convert into. Possible values are "rDNA" and
+#'   "quanteda".
 #' @param what Either "Articles" or "Paragraph" to use articles or paragraphs as
 #'   text in the output object.
 #' @param ... Passed on to different methods.

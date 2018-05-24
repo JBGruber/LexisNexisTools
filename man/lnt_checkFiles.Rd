@@ -5,7 +5,8 @@
 \title{Check LexisNexis TXT files}
 \usage{
 lnt_checkFiles(x, encoding = "UTF-8", start_keyword = "auto",
-  end_keyword = "auto", length_keyword = "auto", verbose = TRUE)
+  end_keyword = "auto", length_keyword = "auto", recursive = FALSE,
+  verbose = TRUE)
 }
 \arguments{
 \item{x}{Name or names of LexisNexis TXT file to be converted.}
@@ -14,6 +15,9 @@ lnt_checkFiles(x, encoding = "UTF-8", start_keyword = "auto",
 (the LexisNexis standard value).}
 
 \item{start_keyword, end_keyword, length_keyword}{see \link{lnt_read}.}
+
+\item{recursive}{A logical flag indicating whether subdirectories are
+searched for more txt files.}
 
 \item{verbose}{A logical flag indicating whether information should be
 printed to the screen.}
