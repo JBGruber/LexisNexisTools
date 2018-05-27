@@ -50,7 +50,7 @@ lnt_rename <- function(x,
                        recursive = FALSE, 
                        report = FALSE,
                        simulate = TRUE,
-                       verbose = TRUE) {
+                       verbose = FALSE) {
   # Check how files are provided
   # 1. nothing (search wd)
   # 2. txt file or files
@@ -88,11 +88,12 @@ lnt_rename <- function(x,
     stop("Provide either file name(s) ending on '.txt' or folder name(s) to x or leave black to search wd.")
   } 
   # Track the time
-  if(verbose) {start.time <- Sys.time(); cat("Checking LN files...\n")}
+  start.time <- Sys.time()
+  if(verbose) {cat("Checking LN files...\n")}
   files <- unique(files)
-  if (verbose){start.time <- Sys.time(); cat(length(files), "files found to process...\n")}
-  renamed <- data.frame(name.orig = files,
-                        name.new = character(length = length(files)),
+  if (verbose){cat(length(files), "files found to process...\n")}
+  renamed <- data.frame(name_orig = files,
+                        name_new = character(length = length(files)),
                         status = character(length = length(files)),
                         stringsAsFactors = FALSE)
   # start renaming files
@@ -125,7 +126,7 @@ lnt_rename <- function(x,
     } else if (length(date.v) > 0) {
       date.v <- gsub("[^[:digit:]]", 
                      "",
-                     term.v)
+                     term.v)[1]
       term.v <-  gsub("[^[:alpha:]]", "", term.v[2])
     } else {
       date.v <- "NA"
@@ -134,33 +135,33 @@ lnt_rename <- function(x,
     file.name <- sub("[^/]+$", "", files[i]) #take old filepath
     file.name <- paste0(file.name, term.v, "_", date.v, "_",range.v,".txt")
     #rename file
-    if (!simulate) {
-      if(file.exists(file.name)){ #file already exists
-        renamed$name.new[i] <- renamed$name.orig[i]
-        renamed$status[i] <- "not renamed (file exists)"
+    
+    if(file.exists(file.name)){ #file already exists
+      renamed$name_new[i] <- renamed$name_orig[i]
+      renamed$status[i] <- "not renamed (file exists)"
+    }else{
+      if(file.name=="__.txt"){ #file name is empty
+        renamed$name_new[i] <- file.name
+        renamed$status[i] <- "not renamed (file is empty)"
       }else{
-        if(file.name=="__.txt"){ #file name is empty
-          renamed$name.new[i] <- file.name
-          renamed$status[i] <- "not renamed (file is empty)"
-        }else{
-          renamed$name.new[i] <- file.name
-          renamed$status[i] <- "renamed"
+        renamed$name_new[i] <- file.name
+        renamed$status[i] <- "renamed"
+        if (!simulate) {
           file.rename(files[i], file.name) #rename
         }
       }
-      if (verbose) cat("\r\t...renaming files", scales::percent(i/length(files)), "\t\t")
     }
+    if (verbose) cat("\r\t...renaming files", scales::percent(i/length(files)), "\t\t")
+    
   }
-  if (verbose) {
-    cat("\n", sum(grepl("^renamed$", renamed$status)), "files renamed, ")
-    if(sum(grepl("exists", renamed$status, fixed = TRUE)) > 0) {
-      cat(sum(grepl("exists", renamed$status, fixed = TRUE)), "not renamed (file already exists), ")
-    }
-    if(sum(grepl("empty", renamed$status, fixed = TRUE)) > 0) {
-      cat(sum(grepl("empty", renamed$status, fixed = TRUE)), "not renamed (no search term or time range found), ")
-    }
+  cat("\n", sum(grepl("^renamed$", renamed$status)), "files renamed, ")
+  if(sum(grepl("exists", renamed$status, fixed = TRUE)) > 0) {
+    cat(sum(grepl("exists", renamed$status, fixed = TRUE)), "not renamed (file already exists), ")
+  }
+  if(sum(grepl("empty", renamed$status, fixed = TRUE)) > 0) {
+    cat(sum(grepl("empty", renamed$status, fixed = TRUE)), "not renamed (no search term or time range found), ")
   }
   renamed$status <- as.factor(renamed$status)
-  if (verbose) cat("in", format((Sys.time()-start.time), digits = 2, nsmall = 2), if(simulate) "[cahnges only simulated]")
+  cat("in", format((Sys.time()-start.time), digits = 2, nsmall = 2), if(simulate) "[changes were only simulated]")
   if(report) renamed
 }

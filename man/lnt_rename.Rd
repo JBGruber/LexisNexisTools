@@ -5,7 +5,7 @@
 \title{Assign proper names to LexisNexis TXT files}
 \usage{
 lnt_rename(x, encoding = "UTF-8", recursive = FALSE, report = FALSE,
-  simulate = TRUE, verbose = TRUE)
+  simulate = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{x}{Can be either a character vector of LexisNexis TXT file name(s),

@@ -277,7 +277,7 @@ lnt_read <- function(x,
   headlines.l <- gsub("^\\s+|\\s+$", "", headlines.l)
   headlines.l <- gsub("\\s+", " ", headlines.l)
   meta.df <- data.frame(ID = seq_len(length(Beginnings)),
-                        Source.File = source.v,
+                        Source_File = source.v,
                         Newspaper = newspaper.v,
                         Date = dates.v,
                         Length = lengths.v,
@@ -285,7 +285,7 @@ lnt_read <- function(x,
                         Author = author.v,
                         Edition = edition.v,
                         Headline = unlist(headlines.l),
-                        row.names = seq_len(length(Beginnings)),
+                        row_names = seq_len(length(Beginnings)),
                         stringsAsFactors = FALSE)
   if(convert_date){
     meta.df$Date <- lnt_asDate(meta.df$Date, ...)
