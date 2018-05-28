@@ -107,7 +107,7 @@ lnt_checkFiles <- function(x,
     # one line before and after length are always empty
     lengths <-  lengths[!(articles.v[lengths+1]!=""|articles.v[lengths-1]!="")]
     #same for Ends
-    Ends <-  Ends[!(articles.v[Ends+1]!=""|articles.v[Ends-1]!="")]
+    Ends <-  Ends[!(articles.v[Ends-1]!="")]
     # does language appear in metadata before article
     for (n in 1:min(c(length(Beginnings), length(Ends), length(lengths)))){
       if(Beginnings[n] > Ends[n] & Ends[n] < lengths[n]){Ends <- Ends[-n]}
