@@ -172,31 +172,37 @@ lnt_read5 <- function(x,
   })
   # remove if newspaper.v contains Date or Beginning
   newspaper.v[grep("January|February|March|April|May|June|July|August|September|October|November|December", newspaper.v)] <- ""
-  newspaper.v[grep("\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$", newspaper.v)] <- ""
-  newspaper.v <- gsub("^\\s+|\\s+$", "", newspaper.v)
-  if(verbose){cat("\t...newspapers extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
+  if(verbose) {cat("\t...newspapers extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
   
   ### Date
   date.v <- sapply(df.l, function(i) {
-    . <- stringi::stri_extract_last_regex(str = i$meta[seq_len(5)],
+    . <- stringi::stri_extract_last_regex(str = i$meta[seq_len(10)],
                                      pattern = "\\w+ \\d+, \\d+|\\d+ \\w+ \\d+")
-    .[!is.na(.)][1]
+    na.omit(.)[1]
   })
   if(verbose){cat("\t...dates extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
   
   ### Author (where available)
-  . <- sapply(df.l, function(i) {
-    grep(pattern = "AUTOR: |VON |BYLINE: ", x = i$meta, value = TRUE)[1]
+  author.v <- sapply(df.l, function(i) {
+    a <- head(grep(pattern = "AUTOR: |VON |BYLINE: ", x = i$meta),
+              n = 1)
+    if (length(a) > 0) { 
+      if (!i$meta[a + 1] == "") {
+        a <- c(a:(a + 1))
+      }
+      stringi::stri_join(i$meta[a], collapse = " ")
+    } else {
+      NA
+    }
   })
-  author.v <- gsub("AUTOR: |VON |BYLINE: ", "", .)
+  
   if(verbose){cat("\t...authors extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
   
   
   ### section (where available)
-  . <- sapply(df.l, function(i) {
+  section.v <- sapply(df.l, function(i) {
     grep(pattern = "SECTION: |RUBRIK: ", x = i$meta, value = TRUE)[1]
   })
-  section.v <- gsub("SECTION: |RUBRIK: ", "", .)
   if(verbose){cat("\t...sections extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
   
   
@@ -233,7 +239,7 @@ lnt_read5 <- function(x,
                grep(newspaper.v[i], headline, fixed = TRUE),
                grep(author.v[i], headline, fixed = TRUE),
                grep(section.v[i], headline, fixed = TRUE))] <- ""
-    paste(headline, collapse=" ")
+    stringi::stri_join(headline, collapse = " ")
   })
   if(verbose){cat("\t...headlines extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
   
@@ -241,6 +247,14 @@ lnt_read5 <- function(x,
     date.v <- lnt_asDate(date.v, ...)
     if(verbose){cat("\t...dates converted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
   }
+  
+  # Clean the clutter from objects
+  author.v <- gsub(x = author.v,
+                   pattern = "AUTOR: |VON |BYLINE: ", 
+                   replacement = "")
+  section.v <- gsub(x = section.v,
+                    pattern = "SECTION: |RUBRIK: ", 
+                    replacement = "")
   
   ### make data.frame
   meta.df <- data.frame(ID = seq_len(length(df.l)),
@@ -270,20 +284,19 @@ lnt_read5 <- function(x,
                               stringi::stri_join(i, collapse = "\n")
                             }),
                             stringsAsFactors = FALSE)
+
   if(verbose){cat("\t...article texts extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
 
   if(extract_paragraphs){
     # split paragraphs
     . <- stringi::stri_split_fixed(str = articles.df$Article, 
-                                     pattern = "\n\n", 
-                                     n = -1L, 
-                                     omit_empty = TRUE,
-                                     tokens_only = FALSE, 
-                                     simplify = FALSE, 
-                                     opts_fixed = NULL)
+                                   pattern = "\n\n", 
+                                   n = -1L, 
+                                   omit_empty = TRUE,
+                                   simplify = FALSE)
     paragraphs.df <- data.table::rbindlist(lapply(seq_len(length(.)), function(i) {
       data.frame(Art_ID = i,
-                 Paragraph = out[[i]],
+                 Paragraph = .[[i]][!.[[i]] == "\n"],
                  stringsAsFactors = FALSE)
     }))
     paragraphs.df$Par_ID <- seq_len(nrow(paragraphs.df))
@@ -295,6 +308,16 @@ lnt_read5 <- function(x,
                                 Paragraph = NA,
                                 stringsAsFactors = FALSE)
   }
+  
+  # remove unneccesary whitespace (removes \n as well)
+  articles.df$Article <- stringi::stri_replace_all_regex(str = articles.df$Article,
+                                                         pattern = c("\\s+", "^\\s|\\s$"), 
+                                                         replacement = c(" ", ""),
+                                                         vectorize_all = FALSE)
+  paragraphs.df$Paragraph <- stringi::stri_replace_all_regex(str = paragraphs.df$Paragraph,
+                                                             pattern = c("\\s+", "^\\s|\\s$"), 
+                                                             replacement = c(" ", ""),
+                                                             vectorize_all = FALSE)
   
   if(verbose) cat("Elapsed time: ", format((Sys.time() - start.time), digits = 2, nsmall = 2),"\n", sep = "")
   return(new("LNToutput", meta = meta.df, articles = articles.df, paragraphs = paragraphs.df))

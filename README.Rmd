@@ -87,8 +87,8 @@ report.df
 library(kableExtra)
 unlink("SampleFile_20091201-20100511_1-10.txt")
 report.df <- lnt_rename(x = lnt_sample(overwrite = TRUE), simulate = FALSE, report = TRUE, verbose = FALSE)
-report.df$name.orig <- basename(report.df$name.orig)
-report.df$name.new <- basename(report.df$name.new)
+report.df$name.orig <- basename(report.df$name_orig)
+report.df$name.new <- basename(report.df$name_new)
 kable(report.df, format = "markdown")
 
 ```
@@ -97,54 +97,21 @@ This might be a preferred option if you have a folder in which only some of the 
 If you are unsure what the txt files your chosen folder might contain, use the option `simulate = TRUE` (which is the default).
 The argument `report = TRUE` indicates that the output of the function in `R` will be a data.frame containing a report on which files have been changed on your drive and how.
 
-### Test Consistency of Files
-
-`LexisNexisTools` relies on certain key terms to split the article texts from their metadata. 
-Experience has shown, however, that 'LexisNexis' sometimes fails to provide these properly or the key terms are coincidentally used inside the text.
-`lnt_checkFiles()` provides a quick way to test the consistency of your files before using `lnt_read()` on them---which can take much longer.
-
-```{r}
-checks.df <- lnt_checkFiles(x = getwd())
-
-#' In how many files do Beginnings and Ends not match? Critical, will not work
-#' if some files are FALSE
-table(checks.df$Test1)
-
-#' In how many files do Beginnings and Lengths not match? Critical, will not
-#' work if some files are FALSE
-table(checks.df$Test2)
-
-#' In how many files do Beginnings and the number of articles not match
-#' (unlike the above two a few 'FALSE' instances are okay here)
-table(checks.df$Test3)
-
-#' How many Beginnings, Ends, Lengths and articles are there (range)
-colSums(checks.df[,2:5])
-```
-
-If you find inconsistencies here, there are two possible solutions:
-1. Change `start_keyword`, `end_keyword` and/or `length_keyword`. 
-The start of an article can be found using a regular expression. The default is to look for "\\d+ of \\d+ DOCUMENTS$" and its equivalents ind German and French. 
-The "\\d+" stands for a digit and if you ever looked into a file from 'LexisNexis' you will know that this is how every article starts. 
-You can see the defaults for `end_keyword` and `length_keyword` by looking up the help file of `lnt_read()` (`?lnt_read`).
-While these defaults work in most cases, it can sometimes make sense to change the keywords if you come across a file where they are not present or appear a little bit different.
-2. Sometimes 'LexisNexis' delivers files which are actually inconsistent in their use of these keywords.
-If you have some files where some of the keywords are not in their place or appear in text, you need to change the source file in order to prevent `lnt_read()` from failing.
-For English texts for example, "^LANGUAGE" is the `end_keyword`. 
-The "^" means that it has to be at the the beginning of a line.
-Hence, putting a white space before "LANGUAGE" if it appears in text is sufficient to solve the problem.
-
-Another important keyword is the `length_keyword`.
-Where this is missing, `LexisNexisTools` will regard the article as empty.
-Experience shows that only articles which contain an image and nothing else lack the LENGTH information.
-However, this might not always be the case, so please look at the articles which are ignored by using `checks.df[checks.df$Test3 == FALSE]` to retrieve the file name and check manually where "LENGTH" (or the equivalent in other languages) is missing.
 
 ### Read in 'LexisNexis' Files to Get Meta, Articles and Paragraphs
 
 The main function of this package is `lnt_read()`. 
 It converts the raw text files into three different `data.frames` nested in a special S4 object of class `LNToutput`.
 The three data.frames contain (1.) the metadata of the articles, (2.) the articles themselves, and (3.) the paragraphs (when `extract_paragraphs = TRUE`).
-You can again provide either file name(s), folder name(s) or nothing---to search the current working directory for txt files---as `x` argument:
+
+There are several important keywords that are used to split up the raw articles into article text and metadata.
+Those need to be provided in some form, but can be left to 'auto' to check for default ones in several languages.
+All keywords can be regular expressions and need to be in most cases:
+- `start_keyword`: The English default is "\\d+ of \\d+ DOCUMENTS$" which stand for, for example, "1 of 112 DOCUMENTS". It is used to split up the text in the txt files into individual articles.
+- `end_keyword`: Is used to remove unnecessary information at the end of an article. Usually, this is "^LANGUAGE:". Where the keyword isn't found, the additional information at the ends up in the article text.
+- `length_keyword`: Find the information about the length of an article which comes last in the metadata field and, therefore, separates metadata and article text. There seems to be only one case where this information is missing: if the article consists only of a graphic (which 'LexisNexis' does not retrieve). The final object has a column named `Graphic`, which indicates if this keyword was missing. The article text then contains all metadata as well. In those cases, you should remove the whole article after inspecting it.
+
+To use the function, you can again provide either file name(s), folder name(s) or nothing---to search the current working directory for txt files---as `x` argument:
 
 ```{r}
 LNToutput <- lnt_read(x = getwd())
@@ -166,7 +133,7 @@ meta.df <- LNToutput@meta
 articles.df <- LNToutput@articles
 paragraphs.df <- LNToutput@paragraphs
 
-meta.df$Source.File <- basename(meta.df$Source.File)
+meta.df$Source_File <- basename(meta.df$Source_File)
 # Print meta to get an idea of the data
 kable(head(meta.df, n = 3), format = "markdown")
 
