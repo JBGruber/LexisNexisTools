@@ -50,7 +50,7 @@
 #' articles.df <- LNToutput@articles
 #' paragraphs.df <- LNToutput@paragraphs
 #' @importFrom stringi stri_read_lines
-lnt_read3 <- function(x,
+lnt_read4 <- function(x,
                      encoding = "UTF-8",
                      extract_paragraphs = TRUE,
                      convert_date = TRUE,
@@ -275,14 +275,15 @@ lnt_read3 <- function(x,
   if(extract_paragraphs){
     # split paragraphs
     paragraphs.l <- lapply(df.l, function(i) {
-      art.v <- i
-      par_id <- cumsum(art.v == "")
-      out <- aggregate(art.v, list(par_id), paste, collapse="")
-      colnames(out) <- c("Par_ID", "Paragraph")
-      out <- out[!out$Paragraph == "", ]
+      art.v <- paste(i, collapse = "\n")
+      out <- data.frame(Paragraph = tokenizers::tokenize_paragraphs(art.v, 
+                                                                    paragraph_break = "\n\n", 
+                                                                    simplify = TRUE),
+                        Art_ID = 1,
+                        stringsAsFactors = FALSE)
+      out <- out[!out$Paragraph == " ", ]
       out$Par_ID <- seq_len(nrow(out))
-      out$Art_ID <- 1
-      out$Paragraph <- trimws(out$Paragraph, which = "both")
+      out[, c("Art_ID", "Par_ID", "Paragraph")]
       return(out)
     })
     # relabel IDs

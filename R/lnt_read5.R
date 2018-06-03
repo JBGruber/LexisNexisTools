@@ -50,7 +50,7 @@
 #' articles.df <- LNToutput@articles
 #' paragraphs.df <- LNToutput@paragraphs
 #' @importFrom stringi stri_read_lines
-lnt_read3 <- function(x,
+lnt_read5 <- function(x,
                      encoding = "UTF-8",
                      extract_paragraphs = TRUE,
                      convert_date = TRUE,
@@ -134,6 +134,7 @@ lnt_read3 <- function(x,
       articles.v[beginnings[n]:length(articles.v)]
     } 
   })
+  rm(articles.v)
   df.l <- lapply(articles.l, function(a) {
     len <- grep(length_keyword, a)[1]
     if (!is.na(len)) {
@@ -264,33 +265,29 @@ lnt_read3 <- function(x,
     }
     i$article
   })
-  articles.df <- data.frame(ID = seq_len(length(art.v)),
+  articles.df <- data.frame(ID = seq_len(length(df.l)),
                             Article = sapply(df.l, function(i) {
-                              out <- trimws(paste(i, collapse=" "), which = "both")
-                              gsub(" +", " ", out) 
+                              stringi::stri_join(i, collapse = "\n")
                             }),
                             stringsAsFactors = FALSE)
   if(verbose){cat("\t...article texts extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
 
   if(extract_paragraphs){
     # split paragraphs
-    paragraphs.l <- lapply(df.l, function(i) {
-      art.v <- i
-      par_id <- cumsum(art.v == "")
-      out <- aggregate(art.v, list(par_id), paste, collapse="")
-      colnames(out) <- c("Par_ID", "Paragraph")
-      out <- out[!out$Paragraph == "", ]
-      out$Par_ID <- seq_len(nrow(out))
-      out$Art_ID <- 1
-      out$Paragraph <- trimws(out$Paragraph, which = "both")
-      return(out)
-    })
-    # relabel IDs
-    for(i in seq_len(length(paragraphs.l) - 1)) {
-      paragraphs.l[[i+1]]$Par_ID <- paragraphs.l[[i+1]]$Par_ID + max(paragraphs.l[[i]]$Par_ID)
-      paragraphs.l[[i+1]]$Art_ID <- paragraphs.l[[i+1]]$Art_ID + max(paragraphs.l[[i]]$Art_ID)
-    }
-    paragraphs.df <- data.table::rbindlist(paragraphs.l)
+    . <- stringi::stri_split_fixed(str = articles.df$Article, 
+                                     pattern = "\n\n", 
+                                     n = -1L, 
+                                     omit_empty = TRUE,
+                                     tokens_only = FALSE, 
+                                     simplify = FALSE, 
+                                     opts_fixed = NULL)
+    paragraphs.df <- data.table::rbindlist(lapply(seq_len(length(.)), function(i) {
+      data.frame(Art_ID = i,
+                 Paragraph = out[[i]],
+                 stringsAsFactors = FALSE)
+    }))
+    paragraphs.df$Par_ID <- seq_len(nrow(paragraphs.df))
+    paragraphs.df <- paragraphs.df[, c("Art_ID", "Par_ID", "Paragraph")]
     if(verbose){cat("\t...paragraphs extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
   }else{
     paragraphs.df <- data.frame(Art_ID = NA,
@@ -303,7 +300,3 @@ lnt_read3 <- function(x,
   return(new("LNToutput", meta = meta.df, articles = articles.df, paragraphs = paragraphs.df))
 }
 
-
-  
-  
-  
