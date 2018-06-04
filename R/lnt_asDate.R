@@ -93,11 +93,12 @@ lnt_asDate <- function(x,
     format <- formats[names(formats) == names(most)[input]]
     locale <- locales[names(locales) == names(most)[input]]
   }
-  if (format[1] %in% formats) {
-    x <- stringi::stri_datetime_parse(str = x,
-                                      format = format,
-                                      locale = locale)
-    x <- as.Date(x)
+  if (!format[1] %in% formats) {
+    message("A non-standard format was provided. Conversion is tried but might fail.\n")
   }
+  x <- stringi::stri_datetime_parse(str = x,
+                                    format = format,
+                                    locale = locale)
+  x <- as.Date(x)
   return(x)
 }
