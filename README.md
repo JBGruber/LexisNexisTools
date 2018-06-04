@@ -6,10 +6,6 @@ LexisNexisTools
 
 My PhD supervisor once told me that everyone doing newspaper analysis starts by writing code to read in files from the 'LexisNexis' newspaper archive. However, while I do recommend this exercise, not everyone has the time. This package takes TXT files downloaded from 'LexisNexis' in most languages. If you run into any problems or have an idea about a great new feature? The please file an issue report: <https://github.com/JBGruber/LexisNexisTools/issues>.
 
-Since this package takes in txt files which are unstructured in the sense that beginning and end of an article is not clearly indicated, the main function `lnt_read()` relies on certain keywords that signal to R where an article begins, ends and where meta-data is stored (See picture below). `lnt_checkFiles()` thus tests if all keywords are in place. Every article in every TXT file should start with "X of X DOCUMENTS" and end with "LANGUAGE:" (Or the equivalent in German or French etc.). The end of the meta-data is indicated by "LENGTH:". Some measures were taken to eliminate problems but where these keywords appear inside an article or headline, test1 or test2 from the `lnt_checkFiles()` will fail and `lnt_read()` will not be able to do its job. In these cases it is recommended to slightly alter the source TXT files, e.g. by changing a headline to "language: never stop learning new ones" instead of "LANGUAGE: never stop learning new ones".
-
-<a href="https://ibb.co/fj5YjG"><img src="https://preview.ibb.co/fOfNdb/LN.png" alt="LN" border="0"></a>
-
 Installation
 ------------
 
@@ -73,35 +69,11 @@ report.df
 ```
 
     ## 
-    ##  1 files renamed, in 0.0017 secs
+    ##  1 files renamed, in 0.0013 secs
 
-<table>
-<colgroup>
-<col width="29%" />
-<col width="42%" />
-<col width="4%" />
-<col width="5%" />
-<col width="18%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">name_orig</th>
-<th align="left">name_new</th>
-<th align="left">status</th>
-<th align="left">name.orig</th>
-<th align="left">name.new</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">/home/johannes/Documents/Github 2/LexisNexisTools/sample.TXT</td>
-<td align="left">/home/johannes/Documents/Github 2/LexisNexisTools/SampleFile_20091201-20100511_1-10.txt</td>
-<td align="left">renamed</td>
-<td align="left">sample.TXT</td>
-<td align="left">SampleFile_20091201-20100511_1-10.txt</td>
-</tr>
-</tbody>
-</table>
+| name\_orig | name\_new                               | status  |
+|:-----------|:----------------------------------------|:--------|
+| sample.TXT | SampleFile\_20091201-20100511\_1-10.txt | renamed |
 
 Using `list.files()` instead of the built-in mechanism allows you to specify a file pattern. This might be a preferred option if you have a folder in which only some of the .txt files contain newspaper articles from 'LexisNexis' but other files have the ending .txt as well. If you are unsure what the txt files your chosen folder might contain, use the option `simulate = TRUE` (which is the default). The argument `report = TRUE` indicates that the output of the function in `R` will be a data.frame containing a report on which files have been changed on your drive and how.
 
@@ -109,7 +81,13 @@ Using `list.files()` instead of the built-in mechanism allows you to specify a f
 
 The main function of this package is `lnt_read()`. It converts the raw text files into three different `data.frames` nested in a special S4 object of class `LNToutput`. The three data.frames contain (1.) the metadata of the articles, (2.) the articles themselves, and (3.) the paragraphs (when `extract_paragraphs = TRUE`).
 
-There are several important keywords that are used to split up the raw articles into article text and metadata. Those need to be provided in some form, but can be left to 'auto' to check for default ones in several languages. All keywords can be regular expressions and need to be in most cases: - `start_keyword`: The English default is "\\d+ of \\d+ DOCUMENTS$" which stand for, for example, "1 of 112 DOCUMENTS". It is used to split up the text in the txt files into individual articles. - `end_keyword`: Is used to remove unnecessary information at the end of an article. Usually, this is "^LANGUAGE:". Where the keyword isn't found, the additional information at the ends up in the article text. - `length_keyword`: Find the information about the length of an article which comes last in the metadata field and, therefore, separates metadata and article text. There seems to be only one case where this information is missing: if the article consists only of a graphic (which 'LexisNexis' does not retrieve). The final object has a column named `Graphic`, which indicates if this keyword was missing. The article text then contains all metadata as well. In those cases, you should remove the whole article after inspecting it.
+There are several important keywords that are used to split up the raw articles into article text and metadata. Those need to be provided in some form but can be left to 'auto' to use 'LexisNexis' defaults in several languages. All keywords can be regular expressions and need to be in most cases:
+
+-   `start_keyword`: The English default is "\\d+ of \\d+ DOCUMENTS$" which stands for, for example, "1 of 112 DOCUMENTS". It is used to split up the text in the txt files into individual articles.
+-   `end_keyword`: This keyword is used to remove unnecessary information at the end of an article. Usually, this is "^LANGUAGE:". Where the keyword isn't found, the additional information ends up in the article text.
+-   `length_keyword`: This keyword, which is usually just "^LENGTH:" (or its equivalent in other languages) finds the information about the length of an article. However, since this is always the last line of the metadata, it is used to separate metadata and article text. There seems to be only one type of cases where this information is missing: if the article consists only of a graphic (which 'LexisNexis' does not retrieve). The final output from `lnt_read()` has a column named `Graphic`, which indicates if this keyword was missing. The article text then contains all metadata as well. In those cases, you should remove the whole article after inspecting it.
+
+<a href="https://ibb.co/fj5YjG"><img src="https://preview.ibb.co/fOfNdb/LN.png" alt="LN" border="0"></a>
 
 To use the function, you can again provide either file name(s), folder name(s) or nothing---to search the current working directory for txt files---as `x` argument:
 
@@ -118,11 +96,20 @@ LNToutput <- lnt_read(x = getwd())
 ```
 
     ## Creating LNToutput from a connection input...
-    ##  ...files loaded [0.0015 secs]
-    ##  ...meta extracted [0.02 secs]
-    ##  ...articles extracted [0.027 secs]
-    ##  ...paragraphs extracted [0.06 secs]
-    ## Elapsed time: 0.062 secs
+    ##  ...files loaded [0.0012 secs]
+    ##  ...articles split [0.0093 secs]
+    ##  ...lengths extracted [0.0098 secs]
+    ##  ...newspapers extracted [0.01 secs]
+    ##  ...dates extracted [0.012 secs]
+    ##  ...authors extracted [0.013 secs]
+    ##  ...sections extracted [0.013 secs]
+    ##  ...editions extracted [0.014 secs]
+    ##  ...headlines extracted [0.014 secs]
+    ##  ...dates converted [0.018 secs]
+    ##  ...metadata extracted [0.019 secs]
+    ##  ...article texts extracted [0.021 secs]
+    ##  ...paragraphs extracted [0.029 secs]
+    ## Elapsed time: 0.033 secs
 
 The returned object of class `LNToutput` can easily be converted to regular data.frames using `@` to select the data.frame you want:
 
@@ -135,18 +122,18 @@ paragraphs.df <- LNToutput@paragraphs
 head(meta.df, n = 3)
 ```
 
-<table>
+<table style="width:100%;">
 <colgroup>
 <col width="1%" />
-<col width="18%" />
-<col width="8%" />
-<col width="5%" />
+<col width="14%" />
+<col width="7%" />
+<col width="4%" />
+<col width="4%" />
+<col width="6%" />
+<col width="6%" />
+<col width="21%" />
+<col width="31%" />
 <col width="3%" />
-<col width="8%" />
-<col width="8%" />
-<col width="26%" />
-<col width="13%" />
-<col width="5%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -159,7 +146,7 @@ head(meta.df, n = 3)
 <th align="left">Author</th>
 <th align="left">Edition</th>
 <th align="left">Headline</th>
-<th align="right">row_names</th>
+<th align="left">Graphic</th>
 </tr>
 </thead>
 <tbody>
@@ -168,36 +155,36 @@ head(meta.df, n = 3)
 <td align="left">SampleFile_20091201-20100511_1-10.txt</td>
 <td align="left">Guardian.com</td>
 <td align="left">2010-01-11</td>
-<td align="left">355</td>
-<td align="left"></td>
-<td align="left"></td>
+<td align="left">355 words</td>
+<td align="left">NA</td>
+<td align="left">Andrew Sparrow</td>
 <td align="left"></td>
 <td align="left">Lorem ipsum dolor sit amet</td>
-<td align="right">1</td>
+<td align="left">FALSE</td>
 </tr>
 <tr class="even">
 <td align="right">2</td>
 <td align="left">SampleFile_20091201-20100511_1-10.txt</td>
 <td align="left">Guardian</td>
 <td align="left">2010-01-11</td>
-<td align="left">927</td>
-<td align="left"></td>
-<td align="left"></td>
+<td align="left">927 words</td>
+<td align="left">NA</td>
+<td align="left">Simon Tisdall</td>
 <td align="left"></td>
 <td align="left">Lorem ipsum dolor sit amet</td>
-<td align="right">2</td>
+<td align="left">FALSE</td>
 </tr>
 <tr class="odd">
 <td align="right">3</td>
 <td align="left">SampleFile_20091201-20100511_1-10.txt</td>
 <td align="left">The Sun (England)</td>
 <td align="left">2010-01-11</td>
-<td align="left">677</td>
+<td align="left">677 words</td>
 <td align="left">FEATURES; Pg. 6</td>
 <td align="left">TREVOR Kavanagh</td>
 <td align="left">Edition 1; Scotland</td>
-<td align="left">Lorem ipsum dolor sit amet</td>
-<td align="right">3</td>
+<td align="left">Edition 1; Scotland Lorem ipsum dolor sit amet</td>
+<td align="left">FALSE</td>
 </tr>
 </tbody>
 </table>
@@ -235,7 +222,7 @@ duplicates.df <- lnt_similarity(texts = LNToutput@articles$Article,
     Processing date 2010-01-09 ... 0 duplicates found       
     Processing date 2010-01-10 ... 0 duplicates found       
     Processing date 2010-01-11 ... 8 duplicates found       
-    Threshold = 0.99; 4 days processed; 4 duplicates found; in 0.45 secs
+    Threshold = 0.99; 4 days processed; 4 duplicates found; in 0.35 secs
 
 Now you can either remove those duplicates from the LNTOutput object:
 
@@ -268,15 +255,15 @@ head(meta.df, n = 3)
 <colgroup>
 <col width="1%" />
 <col width="1%" />
-<col width="43%" />
+<col width="41%" />
 <col width="6%" />
 <col width="5%" />
-<col width="3%" />
-<col width="4%" />
-<col width="3%" />
-<col width="4%" />
-<col width="17%" />
 <col width="5%" />
+<col width="4%" />
+<col width="8%" />
+<col width="4%" />
+<col width="16%" />
+<col width="4%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -290,7 +277,7 @@ head(meta.df, n = 3)
 <th align="left">Author</th>
 <th align="left">Edition</th>
 <th align="left">Headline</th>
-<th align="right">row_names</th>
+<th align="left">Graphic</th>
 </tr>
 </thead>
 <tbody>
@@ -300,12 +287,12 @@ head(meta.df, n = 3)
 <td align="left">/home/johannes/Documents/Github 2/LexisNexisTools/SampleFile_20091201-20100511_1-10.txt</td>
 <td align="left">Guardian.com</td>
 <td align="left">2010-01-11</td>
-<td align="left">355</td>
-<td align="left"></td>
-<td align="left"></td>
+<td align="left">355 words</td>
+<td align="left">NA</td>
+<td align="left">Andrew Sparrow</td>
 <td align="left"></td>
 <td align="left">Lorem ipsum dolor sit amet</td>
-<td align="right">1</td>
+<td align="left">FALSE</td>
 </tr>
 <tr class="even">
 <td align="left">2</td>
@@ -313,12 +300,12 @@ head(meta.df, n = 3)
 <td align="left">/home/johannes/Documents/Github 2/LexisNexisTools/SampleFile_20091201-20100511_1-10.txt</td>
 <td align="left">Guardian</td>
 <td align="left">2010-01-11</td>
-<td align="left">927</td>
-<td align="left"></td>
-<td align="left"></td>
+<td align="left">927 words</td>
+<td align="left">NA</td>
+<td align="left">Simon Tisdall</td>
 <td align="left"></td>
 <td align="left">Lorem ipsum dolor sit amet</td>
-<td align="right">2</td>
+<td align="left">FALSE</td>
 </tr>
 <tr class="odd">
 <td align="left">7</td>
@@ -326,12 +313,12 @@ head(meta.df, n = 3)
 <td align="left">/home/johannes/Documents/Github 2/LexisNexisTools/SampleFile_20091201-20100511_1-10.txt</td>
 <td align="left">Guardian</td>
 <td align="left">2010-01-08</td>
-<td align="left">607</td>
-<td align="left"></td>
-<td align="left"></td>
+<td align="left">607 words</td>
+<td align="left">NA</td>
+<td align="left">Allegra Stratton</td>
 <td align="left"></td>
 <td align="left">ranch noble ash voice declaration</td>
-<td align="right">7</td>
+<td align="left">FALSE</td>
 </tr>
 </tbody>
 </table>
