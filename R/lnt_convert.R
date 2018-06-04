@@ -14,8 +14,8 @@
 #' LNToutput <- lnt_read(lnt_sample())
 #' docs <- lnt_convert(LNToutput, to = "rDNA")
 #' corpus <- lnt_convert(LNToutput, to = "quanteda")
-lnt_convert <- function(x, 
-                        to = "rDNA", 
+lnt_convert <- function(x,
+                        to = "rDNA",
                         what = "Articles",
                         ...) {
   if (to == "rDNA") {
@@ -33,15 +33,15 @@ lnt2rDNA <- function(x, what) {
   } else if (what == "Paragraph") {
     text <- x@paragraphs$Paragraph
   }
-  dta <- data.frame(id = x@meta$ID, 
-                    title = x@meta$Headline, 
-                    text = text, 
-                    coder = 1, 
-                    author = x@meta$Author, 
-                    source = x@meta$Newspaper, 
-                    section = x@meta$Section, 
-                    notes = "", 
-                    type = "newspaper", 
+  dta <- data.frame(id = x@meta$ID,
+                    title = x@meta$Headline,
+                    text = text,
+                    coder = 1,
+                    author = x@meta$Author,
+                    source = x@meta$Newspaper,
+                    section = x@meta$Section,
+                    notes = "",
+                    type = "newspaper",
                     date = x@meta$Date,
                     stringsAsFactors = FALSE)
   if (any(grepl("Date", class(dta$date)))) {
@@ -77,7 +77,7 @@ lnt2quanteda <- function(x, what, ...) {
   } else {
     metacorpus <- list(Converted = "LexiNexisTools")
   }
-  dta <- corpus(x = text, 
+  dta <- corpus(x = text,
                 docvars = x@meta,
                 metacorpus = metacorpus,
                 ...)

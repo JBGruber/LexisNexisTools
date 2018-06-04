@@ -69,11 +69,12 @@ setMethod("show",
 #'   way as start_keyword. A common regex would be "^LANGUAGE: " which catches
 #'   language in all caps at the beginning of the line (usually the last line of
 #'   an article).
-#' @param length_keyword Is used to indicate the end of the meta-data. Works the same
-#'   way as start_keyword and end_keyword. A common regex would be "^LENGTH: " which catches
-#'   length in all caps at the beginning of the line (usually the last line of
-#'   the metadata).
+#' @param length_keyword Is used to indicate the end of the meta-data. Works the
+#'   same way as start_keyword and end_keyword. A common regex would be
+#'   "^LENGTH: " which catches length in all caps at the beginning of the line
+#'   (usually the last line of the metadata).
 #' @param exclude_lines Lines in which these keywords are found are excluded.
+#'   Set to \code{character()} if you want to turn off this feature.
 #' @param recursive A logical flag indicating whether subdirectories are
 #'   searched for more txt files.
 #' @param verbose A logical flag indicating whether information should be
@@ -87,11 +88,11 @@ setMethod("show",
 #'   extract_paragraphs is set to TRUE, the output contains a third data.frame,
 #'   similar to articles but with articles split into paragraphs.
 #'
-#'   Note: All files need to have same number of Beginnings, ends and lengths
-#'   (which indicate the the last line of meta-data). If this is true can be
-#'   tested with \link{lnt_checkFiles}. In some cases it makes sense to change
-#'   the keywords for these three important indicators e.g. to "^LANGUAGE:
-#'   ENGLISH" to narrow down the search for the ends of an article.
+#'   When left to 'auto', the keywords will use the following defaults:
+#'   \code{start_keyword = "\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$|
+#'   Document \\d+ de \\d+$"}, \code{end_keyword = "^LANGUAGE: |^SPRACHE:
+#'   |^LANGUE: "}, which should be the standard keywords in all languages used
+#'   by 'LexisNexis'.
 #' @author Johannes B. Gruber
 #' @export
 #' @examples
@@ -99,7 +100,8 @@ setMethod("show",
 #' meta.df <- LNToutput@meta
 #' articles.df <- LNToutput@articles
 #' paragraphs.df <- LNToutput@paragraphs
-#' @importFrom stringi stri_read_lines stri_extract_last_regex stri_join stri_isempty stri_split_fixed stri_replace_all_regex
+#' @importFrom stringi stri_read_lines stri_extract_last_regex stri_join
+#'   stri_isempty stri_split_fixed stri_replace_all_regex
 #' @importFrom utils tail
 lnt_read <- function(x,
                      encoding = "UTF-8",
@@ -168,7 +170,7 @@ lnt_read <- function(x,
     articles.v <- stringi::stri_read_lines(files, encoding = encoding)
     names(articles.v) <- rep(files, times = length(articles.v))
   }
-  if (verbose) cat("\t...files loaded [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")
+  if (verbose) cat("\t...files loaded [", format((Sys.time() - start.time), digits = 2, nsmall = 2), "]\n", sep = "")
 
   #exclude some lines
   if (length(exclude_lines) > 0) {
@@ -203,7 +205,7 @@ lnt_read <- function(x,
            graphic = TRUE)
     }
   })
-  if(verbose){cat("\t...articles split [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
+  if (verbose) {cat("\t...articles split [", format((Sys.time() - start.time), digits = 2, nsmall = 2), "]\n", sep = "")}
 
   # make data.frame
   ### length
@@ -211,7 +213,7 @@ lnt_read <- function(x,
     grep(pattern = length_keyword, x = i$meta, value = TRUE)[1]
   })
   length.v <- gsub(length_keyword, "", .)
-  if(verbose){cat("\t...lengths extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
+  if (verbose) {cat("\t...lengths extracted [", format((Sys.time() - start.time), digits = 2, nsmall = 2), "]\n", sep = "")}
 
   ### Newspaper (first non-emtpy line)
   newspaper.v <- sapply(df.l, function(i) {
@@ -223,7 +225,9 @@ lnt_read <- function(x,
   })
   # remove if newspaper.v contains Date or Beginning
   newspaper.v[grep("January|February|March|April|May|June|July|August|September|October|November|December", newspaper.v)] <- ""
-  if(verbose) {cat("\t...newspapers extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
+  if (verbose) {
+    cat("\t...newspapers extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")
+  }
 
   ### Date
   date.v <- sapply(df.l, function(i) {
@@ -231,7 +235,9 @@ lnt_read <- function(x,
                                           pattern = "\\w+ \\d+, \\d+|\\d+ \\w+ \\d+")
     na.omit(.)[1]
   })
-  if(verbose){cat("\t...dates extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")}
+  if (verbose) {
+    cat("\t...dates extracted [", format((Sys.time()-start.time), digits = 2, nsmall = 2),"]\n", sep = "")
+  }
 
   ### Author (where available)
   author.v <- sapply(df.l, function(i) {
@@ -346,9 +352,15 @@ lnt_read <- function(x,
                                    omit_empty = TRUE,
                                    simplify = FALSE)
     paragraphs.df <- data.table::rbindlist(lapply(seq_len(length(.)), function(i) {
-      data.frame(Art_ID = i,
-                 Paragraph = .[[i]][!.[[i]] == "\n"],
-                 stringsAsFactors = FALSE)
+      if (length(.[[i]][!.[[i]] == "\n"]) > 0) {
+        data.frame(Art_ID = i,
+                   Paragraph = .[[i]][!.[[i]] == "\n"],
+                   stringsAsFactors = FALSE)
+      } else {
+        data.frame(Art_ID = i,
+                   Paragraph = NA,
+                   stringsAsFactors = FALSE)
+      }
     }))
     paragraphs.df$Par_ID <- seq_len(nrow(paragraphs.df))
     paragraphs.df <- paragraphs.df[, c("Art_ID", "Par_ID", "Paragraph")]
