@@ -1,0 +1,953 @@
+# Startup ----------------------------------------------------------------------
+
+#' @importFrom utils packageVersion
+.onAttach <- function(...) {
+  packageStartupMessage("LexisNexisTools Version ",
+                        packageVersion("LexisNexisTools"))
+}
+
+
+# Class and Methods ------------------------------------------------------------
+
+#' make S4 object
+#' @noRd
+#' @importFrom methods new
+setClass("LNToutput",
+         representation(meta = "data.frame",
+                        articles = "data.frame",
+                        paragraphs = "data.frame"))
+
+
+#' Show method for LNToutput class
+#' @noRd
+setMethod("show",
+          signature = "LNToutput",
+          definition = function(object) {
+            cat("Object of class 'LNToutput':\n")
+            cat(nrow(object@meta), "Articles\n")
+            cat(nrow(object@paragraphs), "Paragraphs\n")
+
+
+            meta <- head(object@meta, n = 6)
+            articles <- head(object@articles, n = 6)
+            paragraphs <- head(object@paragraphs, n = 6)
+            trim <- function(object, n, e = "...") {
+              ifelse(nchar(object) > n,
+                     paste0(gsub("\\s+$", "",
+                                 strtrim(object, width = n)),
+                            e),
+                     object)
+            }
+            for (cols in colnames(meta)) {
+              meta[, cols] <- trim(meta[, cols], 8)
+            }
+            for (cols in colnames(articles)) {
+              articles[, cols] <- trim(articles[, cols], 8)
+            }
+            for (cols in colnames(paragraphs)) {
+              paragraphs[, cols] <- trim(paragraphs[, cols], 8)
+            }
+            cat("\n\nMeta (6 of ", nrow(object@meta), "):\n", sep = "")
+            print(meta)
+            cat("\n\nArticles (6 of ", nrow(object@articles), "):\n", sep = "")
+            print(articles)
+            cat("\n\nParagraphs (6 of ", nrow(object@paragraphs), "):\n",
+                sep = "")
+            print(paragraphs)
+          }
+)
+
+
+# Main Functions ------------------------------------------------------------
+
+
+#' Read in a LexisNexis TXT file
+#'
+#' Read a LexisNexis TXT file and convert it to a data frame.
+#' @param x Name or names of LexisNexis TXT file to be converted.
+#' @param encoding Encoding to be assumed for input files. Defaults to UTF-8
+#'   (the LexisNexis standard value).
+#' @param extract_paragraphs A logical flag indicating if the returned object
+#'   will include a third data frame with paragraphs.
+#' @param convert_date A logical flag indicating if it should be tried to
+#'   convert the date of each article into Date format. Fails for non standard
+#'   dates provided by LexisNexis so it might be safer to convert date
+#'   afterwards.
+#' @param start_keyword Is used to indicate the beginning of an article. All
+#'   articles should have the same number of Beginnings, ends and lengths (which
+#'   indicate the the last line of meta-data). Use regex expression such as
+#'   "\\d+ of \\d+ DOCUMENTS$" (which would catch e.g., the format "2 of 100
+#'   DOCUMENTS") or "auto" to try all common keywords. Keyword search is case
+#'   sensitive.
+#' @param end_keyword Is used to indicate the end of an article. Works the same
+#'   way as start_keyword. A common regex would be "^LANGUAGE: " which catches
+#'   language in all caps at the beginning of the line (usually the last line of
+#'   an article).
+#' @param length_keyword Is used to indicate the end of the meta-data. Works the
+#'   same way as start_keyword and end_keyword. A common regex would be
+#'   "^LENGTH: " which catches length in all caps at the beginning of the line
+#'   (usually the last line of the metadata).
+#' @param exclude_lines Lines in which these keywords are found are excluded.
+#'   Set to \code{character()} if you want to turn off this feature.
+#' @param recursive A logical flag indicating whether subdirectories are
+#'   searched for more txt files.
+#' @param verbose A logical flag indicating whether information should be
+#'   printed to the screen.
+#' @param ... Additional arguments passed on to \link{lnt_asDate}.
+#' @return A LNToutput S4 object consisting of 3 data.frames for meta-data,
+#'   articles and paragraphs.
+#' @details The function can produce a LNToutput S4 object with two data.frame:
+#'   meta, containing all meta information such as date, author and headline and
+#'   articles, containing just the article ID and the text of the articles. When
+#'   extract_paragraphs is set to TRUE, the output contains a third data.frame,
+#'   similar to articles but with articles split into paragraphs.
+#'
+#'   When left to 'auto', the keywords will use the following defaults:
+#'   \code{start_keyword = "\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$|
+#'   Document \\d+ de \\d+$"}, \code{end_keyword = "^LANGUAGE: |^SPRACHE:
+#'   |^LANGUE: "}, which should be the standard keywords in all languages used
+#'   by 'LexisNexis'.
+#' @author Johannes B. Gruber
+#' @export
+#' @examples
+#' LNToutput <- lnt_read(lnt_sample())
+#' meta.df <- LNToutput@meta
+#' articles.df <- LNToutput@articles
+#' paragraphs.df <- LNToutput@paragraphs
+#' @importFrom stringi stri_read_lines stri_extract_last_regex stri_join
+#'   stri_isempty stri_split_fixed stri_replace_all_regex
+#' @importFrom utils tail
+lnt_read <- function(x,
+                     encoding = "UTF-8",
+                     extract_paragraphs = TRUE,
+                     convert_date = TRUE,
+                     start_keyword = "auto",
+                     end_keyword = "auto",
+                     length_keyword = "^LENGTH: |^L\u00c4NGE: |^LONGUEUR: ",
+                     exclude_lines = "^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIC: |^DATELINE: ",
+                     recursive = FALSE,
+                     verbose = TRUE,
+                     ...){
+  if (missing(x)) {
+    if (readline(prompt = "No path was given. Should files in working direcotry be read? [y/n]")
+        %in% c("y", "yes", "Y", "Yes")) {
+      x <- paste0(getwd(), "/")
+    } else {
+      stop("Aborted by user")
+    }
+  }
+  if (all(grepl(".txt$", x, ignore.case = TRUE))) {
+    files <- x
+  } else if (any(grepl(".txt$", x, ignore.case = TRUE))) {
+    message("Not all provided files were TXT files. Other formats are ignored.")
+    files <- grep(".txt$", x, ignore.case = TRUE, value = TRUE)
+  } else if (any(grepl("\\\\|/", x))) {
+    if (length(x) > 1) {
+      files <- unlist(sapply(x, function(f) {
+        list.files(path = f,
+                   pattern = ".txt$",
+                   ignore.case = TRUE,
+                   full.names = TRUE,
+                   recursive = recursive)
+      }, USE.NAMES = FALSE))
+    } else {
+      files <- list.files(path = x,
+                          pattern = ".txt$",
+                          ignore.case = TRUE,
+                          full.names = TRUE,
+                          recursive = recursive)
+    }
+  } else {
+    stop("Provide either file name(s) ending on '.txt' or folder name(s) to x or leave black to search wd.")
+  }
+  if (start_keyword == "auto") {
+    start_keyword <- "\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$| Document \\d+ de \\d+$"
+  }
+  if (end_keyword == "auto") {
+    end_keyword <- "^LANGUAGE: |^SPRACHE: |^LANGUE: "
+  }
+  if (length_keyword == "auto") {
+    length_keyword <- "^LENGTH: |^L\u00c4NGE:  |^LONGUEUR: "
+  }
+
+  # Track the time
+  if (verbose) start.time <- Sys.time(); cat("Creating LNToutput from a connection input...\n")
+
+  ### read in file
+  if (length(files) > 1){
+    articles.v <- unlist(lapply(files, function(f) {
+      out <- stringi::stri_read_lines(f, encoding = encoding)
+      names(out) <- rep(f, times = length(out))
+      out
+    }))
+  } else {
+    articles.v <- stringi::stri_read_lines(files, encoding = encoding)
+    names(articles.v) <- rep(files, times = length(articles.v))
+  }
+  if (verbose) cat("\t...files loaded [", format( (Sys.time() - start.time), digits = 2, nsmall = 2), "]\n", sep = "")
+
+  #exclude some lines
+  if (length(exclude_lines) > 0) {
+    articles.v[grep("^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIC: |^DATELINE: ", articles.v)] <- ""
+  }
+
+  beginnings <- grep(start_keyword, articles.v)
+  #beginnings <- stringi::stri_detect_regex(pattern = start_keyword, str = articles.v)
+
+  articles.l <- lapply(seq_len(length(beginnings)), function(n) {
+    if (n < length(beginnings)) {
+      articles.v[beginnings[n]:beginnings[n + 1]]
+    } else {
+      articles.v[beginnings[n]:length(articles.v)]
+    }
+  })
+  rm(articles.v)
+  df.l <- lapply(articles.l, function(a) {
+    len <- grep(length_keyword, a)[1]
+    if (!is.na(len)) {
+      source <- names(a)[1]
+      meta <- unname(a[2:len])
+      article <- unname(a[(len + 1):(length(a) - 1)])
+      list(source = source,
+           meta = meta,
+           article = article,
+           graphic = FALSE)
+    } else {
+      list(source = names(a)[1],
+           meta = NULL,
+           article = a,
+           graphic = TRUE)
+    }
+  })
+  if (verbose) cat("\t...articles split [",
+                   format( (Sys.time() - start.time),
+                          digits = 2,
+                          nsmall = 2),
+                   "]\n",
+                   sep = "")
+
+  # make data.frame
+  ### length
+  . <- sapply(df.l, function(i) {
+    grep(pattern = length_keyword, x = i$meta, value = TRUE)[1]
+  })
+  length.v <- gsub(length_keyword, "", .)
+  if (verbose) cat("\t...lengths extracted [", format( (Sys.time() - start.time), digits = 2, nsmall = 2), "]\n", sep = "")
+
+  ### Newspaper - first non-emtpy line
+  newspaper.v <- sapply(df.l, function(i) {
+    grep(pattern = "^$",
+         x = i$meta,
+         value = TRUE,
+         fixed = FALSE,
+         invert = TRUE)[1]
+  })
+  # remove if newspaper.v contains Date or Beginning
+  newspaper.v[grep("January|February|March|April|May|June|July|August|September|October|November|December",
+                   newspaper.v)] <- ""
+  if (verbose) cat("\t...newspapers extracted [",
+                   format( (Sys.time() - start.time),
+                           digits = 2,
+                           nsmall = 2),
+                   "]\n",
+                   sep = "")
+
+  ### Date
+  date.v <- sapply(df.l, function(i) {
+    . <- stringi::stri_extract_last_regex(str = i$meta[seq_len(10)],
+                                          pattern = "\\w+ \\d+, \\d+|\\d+ \\w+ \\d+")
+    na.omit(.)[1]
+  })
+  if (verbose) cat("\t...dates extracted [", format( (Sys.time() - start.time), digits = 2, nsmall = 2), "]\n", sep = "")
+
+  ### Author (where available)
+  author.v <- sapply(df.l, function(i) {
+    a <- head(grep(pattern = "AUTOR: |VON |BYLINE: ", x = i$meta),
+              n = 1)
+    if (length(a) > 0) {
+      if (!i$meta[a + 1] == "") {
+        a <- c(a:(a + 1))
+      }
+      stringi::stri_join(i$meta[a], collapse = " ")
+    } else {
+      NA
+    }
+  })
+
+  if (verbose) cat("\t...authors extracted [", format( (Sys.time() - start.time), digits = 2, nsmall = 2), "]\n", sep = "")
+
+
+  ### section (where available)
+  section.v <- sapply(df.l, function(i) {
+    grep(pattern = "SECTION: |RUBRIK: ", x = i$meta, value = TRUE)[1]
+  })
+  if (verbose) cat("\t...sections extracted [", format( (Sys.time() - start.time), digits = 2, nsmall = 2), "]\n", sep = "")
+
+
+  ### edition (where available)
+  edition.v <- sapply(seq_len(length(df.l)), function(i) {
+    date <- grep(date.v[i], x = df.l[[i]]$meta, fixed = TRUE)
+    if (length(date) == 1) {
+      d1 <- df.l[[i]]$meta[(date + 1):(date + 2)]
+      if (!d1[1] == "") {
+        edition.v <- d1[1]
+        if (!d1[2] == "") edition.v <- paste(edition.v, d1[2], collapse = "; ")
+        edition.v
+      } else {
+        # alternativly, the edition is sometimes the first non-empty line in the article
+        edition.v <- grep("edition",
+                          df.l[[i]]$article[!stringi::stri_isempty(str = df.l[[i]]$article)][1],
+                          value = TRUE,
+                          ignore.case = TRUE)
+        ifelse(length(edition.v) == 0,
+               "",
+               edition.v)
+      }
+    } else {
+      ""
+    }
+  })
+  if (verbose) cat("\t...editions extracted [", format( (Sys.time() - start.time), digits = 2, nsmall = 2), "]\n", sep = "")
+
+  ### Headline
+  headline.v <- sapply(seq_len(length(df.l)), function(i) {
+    headline <- df.l[[i]]$meta
+    headline[c(grep(length.v[i], headline, fixed = TRUE),
+               grep(date.v[i], headline, fixed = TRUE),
+               grep(newspaper.v[i], headline, fixed = TRUE),
+               grep(author.v[i], headline, fixed = TRUE),
+               grep(section.v[i], headline, fixed = TRUE))] <- ""
+    stringi::stri_join(headline, collapse = " ")
+  })
+  if (verbose) cat("\t...headlines extracted [", format( (Sys.time() - start.time), digits = 2, nsmall = 2), "]\n", sep = "")
+
+  if (convert_date){
+    date.v <- lnt_asDate(date.v, ...)
+    if (verbose) cat("\t...dates converted [", format( (Sys.time() - start.time), digits = 2, nsmall = 2), "]\n", sep = "")
+  }
+
+  # Clean the clutter from objects
+  author.v <- gsub(x = author.v,
+                   pattern = "AUTOR: |VON |BYLINE: ",
+                   replacement = "")
+  section.v <- gsub(x = section.v,
+                    pattern = "SECTION: |RUBRIK: ",
+                    replacement = "")
+
+  ### make data.frame
+  meta.df <- data.frame(ID = seq_len(length(df.l)),
+                        Source_File = unlist(sapply(df.l, function(i) i[["source"]])),
+                        Newspaper = trimws(newspaper.v, which = "both"),
+                        Date = date.v,
+                        Length = trimws(length.v, which = "both"),
+                        Section = trimws(section.v, which = "both"),
+                        Author = trimws(author.v, which = "both"),
+                        Edition = trimws(edition.v, which = "both"),
+                        Headline = trimws(headline.v, which = "both"),
+                        Graphic = unlist(sapply(df.l, function(i) i[["graphic"]])),
+                        stringsAsFactors = FALSE)
+  if (verbose) cat("\t...metadata extracted [", format( (Sys.time() - start.time), digits = 2, nsmall = 2), "]\n", sep = "")
+
+
+  # Cut of after ends in article
+  df.l <- lapply(df.l, function(i) {
+    end <- tail(grep(end_keyword, i$article), n = 1)
+    if (length(end) > 0) {
+      i$article <- i$article[1:end - 1]
+    }
+    i$article
+  })
+  articles.df <- data.frame(ID = seq_len(length(df.l)),
+                            Article = sapply(df.l, function(i) {
+                              stringi::stri_join(i, collapse = "\n")
+                            }),
+                            stringsAsFactors = FALSE)
+
+  if (verbose) cat("\t...article texts extracted [", format( (Sys.time() - start.time), digits = 2, nsmall = 2), "]\n", sep = "")
+
+  if (extract_paragraphs){
+    # split paragraphs
+    . <- stringi::stri_split_fixed(str = articles.df$Article,
+                                   pattern = "\n\n",
+                                   n = -1L,
+                                   omit_empty = TRUE,
+                                   simplify = FALSE)
+    paragraphs.df <- data.table::rbindlist(lapply(seq_len(length(.)), function(i) {
+      if (length(.[[i]][!.[[i]] == "\n"]) > 0) {
+        data.frame(Art_ID = i,
+                   Paragraph = .[[i]][!.[[i]] == "\n"],
+                   stringsAsFactors = FALSE)
+      } else {
+        data.frame(Art_ID = i,
+                   Paragraph = NA,
+                   stringsAsFactors = FALSE)
+      }
+    }))
+    paragraphs.df$Par_ID <- seq_len(nrow(paragraphs.df))
+    paragraphs.df <- paragraphs.df[, c("Art_ID", "Par_ID", "Paragraph")]
+    if (verbose) cat("\t...paragraphs extracted [", format( (Sys.time() - start.time), digits = 2, nsmall = 2), "]\n", sep = "")
+  }else{
+    paragraphs.df <- data.frame(Art_ID = NA,
+                                Par_ID = NA,
+                                Paragraph = NA,
+                                stringsAsFactors = FALSE)
+  }
+
+  # remove unneccesary whitespace (removes \n as well)
+  articles.df$Article <- stringi::stri_replace_all_regex(str = articles.df$Article,
+                                                         pattern = c("\\s+", "^\\s|\\s$"),
+                                                         replacement = c(" ", ""),
+                                                         vectorize_all = FALSE)
+  paragraphs.df$Paragraph <- stringi::stri_replace_all_regex(str = paragraphs.df$Paragraph,
+                                                             pattern = c("\\s+", "^\\s|\\s$"),
+                                                             replacement = c(" ", ""),
+                                                             vectorize_all = FALSE)
+
+  if (verbose) cat("Elapsed time: ", format( (Sys.time() - start.time), digits = 2, nsmall = 2), "\n", sep = "")
+  out <- new("LNToutput", meta = meta.df, articles = articles.df, paragraphs = paragraphs.df)
+  attributes(out)$created <- list(time = Sys.time(),
+                                  Version = packageVersion("LexisNexisTools"))
+  return(out)
+}
+
+
+#' Check LexisNexis TXT files (deprecated)
+#'
+#' @param ... No functionality as this was deprecated.
+#' @export
+lnt_checkFiles <- function(...){
+  .Deprecated(msg = "lnt_checkFiles() has been deprecated as it is no longer necessary to check files. Simply run lnt_read().")
+}
+
+
+#' Assign proper names to LexisNexis TXT files
+#'
+#' Give proper names to LN TXT files based on search term and period retrieved
+#' from each file cover page. This information is not always delivered by
+#' LexisNexis though. If the information is not present in the file, new file
+#' names will be empty.
+#'
+#' Warning: This will rename all txt files in a give folder.
+#'
+#' @param x Can be either a character vector of LexisNexis TXT file name(s),
+#'   folder name(s) or can be left blank (see example).
+#' @param encoding Encoding to be assumed for input files. Defaults to UTF-8
+#'   (the LexisNexis standard value).
+#' @param recursive A logical flag indicating whether subdirectories are
+#'   searched for more txt files.
+#' @param report A logical flag indicating whether the function will return a
+#'   report which files were renamed.
+#' @param simulate Should the renaming be simulated instead of actually done?
+#'   This can help prevent accidental renaming of unrelated txt files which
+#'   happen to be in the same directory as the files from 'LexisNexsis'.
+#' @param verbose A logical flag indicating whether information should be
+#'   printed to the screen.
+#' @keywords LexisNexis
+#' @author Johannes B. Gruber
+#' @export
+#' @importFrom stats na.omit
+#' @importFrom stringi stri_extract_all_regex stri_join
+#' @examples
+#'
+#' # Copy sample file to current wd
+#' lnt_sample()
+#'
+#' # Rename files in current wd and report back if successful
+#'  \dontrun{report.df <- lnt_rename(recursive = FALSE,
+#'                         report = TRUE)}
+#'
+#' # Or provide file name(s)
+#' my_files<-list.files(pattern = ".txt", full.names = TRUE,
+#'                      recursive = TRUE, ignore.case = TRUE)
+#' report.df <- lnt_rename(x = my_files,
+#'                         recursive = FALSE,
+#'                         report = TRUE)
+#'
+#' # Or provide folder name(s)
+#' report.df <- lnt_rename(x = getwd())
+#'
+#' report.df
+lnt_rename <- function(x,
+                       encoding = "UTF-8",
+                       recursive = FALSE,
+                       report = FALSE,
+                       simulate = TRUE,
+                       verbose = FALSE) {
+  # Check how files are provided
+  # 1. nothing (search wd)
+  # 2. txt file or files
+  # 3. folder name(s)
+  if (missing(x)) {
+    if (readline(prompt = "No path was given. Should files in working direcotry be renamed? [y/n]")
+        %in% c("y", "yes", "Y", "Yes")) {
+      x <- paste0(getwd(), "/")
+    } else {
+      stop("Aborted by user")
+    }
+  }
+  if (all(grepl(".txt$", x, ignore.case = TRUE))) {
+    files <- x
+  } else if (any(grepl(".txt$", x, ignore.case = TRUE))) {
+    message("Not all provided files were TXT files. Other formats are ignored.")
+    files <- grep(".txt$", x, ignore.case = TRUE, value = TRUE)
+  } else if (any(grepl("\\\\|/", x))) {
+    if (length(x) > 1) {
+      files <- unlist(sapply(x, function(f) {
+        list.files(path = f,
+                   pattern = ".txt$",
+                   ignore.case = TRUE,
+                   full.names = TRUE,
+                   recursive = recursive)
+      }, USE.NAMES = FALSE))
+    } else {
+      files <- list.files(path = x,
+                          pattern = ".txt$",
+                          ignore.case = TRUE,
+                          full.names = TRUE,
+                          recursive = recursive)
+    }
+  } else {
+    stop("Provide either file name(s) ending on '.txt' or folder name(s) to x or leave black to search wd.")
+  }
+  # Track the time
+  start.time <- Sys.time()
+  if (verbose) cat("Checking LN files...\n")
+  files <- unique(files)
+  if (verbose) cat(length(files), "files found to process...\n")
+  renamed <- data.frame(name_orig = files,
+                        name_new = character(length = length(files)),
+                        status = character(length = length(files)),
+                        stringsAsFactors = FALSE)
+  # start renaming files
+  for (i in seq_len(length(files))){
+    #read in the articles
+    content.v <- readLines(files[i], encoding = encoding, n = 50)
+    #look for the range of articles
+    range.v <- content.v[grep("^Download Request:|^Ausgabeauftrag: Dokument", content.v)]
+    # extract the actual range infromation from line
+    range.v <- stringi::stri_extract_all_regex(range.v, pattern = "[[:digit:]]|-", simplify = TRUE)
+    range.v <- stringi::stri_join(range.v, sep = "", collapse = "")
+
+    # look for search term
+    term.v <- content.v[grep("^Terms: |^Begriffe: ", content.v)]
+    # erase everything in the line exept the actual range
+    term.v <- gsub("^Terms: |^Begriffe: ", "", term.v)
+    # split term into elemets seprated by and or OR
+    term.v <- unlist(strsplit(term.v, split = " AND | and | OR ", fixed = FALSE))
+
+    date.v <- term.v[grepl("\\d+-\\d+-\\d+", term.v)]
+    if (length(date.v) > 1) {
+      date.v <- paste0(gsub("[^[:digit:]]",
+                            "",
+                            term.v[1]),
+                       "-",
+                       gsub("[^[:digit:]]",
+                            "",
+                            term.v[2]))
+      term.v <-  gsub("[^[:alpha:]]", "", term.v[3])
+    } else if (length(date.v) > 0) {
+      date.v <- gsub("[^[:digit:]]",
+                     "",
+                     term.v)[1]
+      term.v <-  gsub("[^[:alpha:]]", "", term.v[2])
+    } else {
+      date.v <- "NA"
+      term.v <-  gsub("[^[:alpha:]]", "", term.v)
+    }
+    file.name <- sub("[^/]+$", "", files[i]) #take old filepath
+    file.name <- paste0(file.name, term.v, "_", date.v, "_", range.v, ".txt")
+    #rename file
+
+    if (file.exists(file.name)) { #file already exists
+      renamed$name_new[i] <- renamed$name_orig[i]
+      renamed$status[i] <- "not renamed (file exists)"
+    }else{
+      if (file.name == "__.txt") { #file name is empty
+        renamed$name_new[i] <- file.name
+        renamed$status[i] <- "not renamed (file is empty)"
+      } else {
+        renamed$name_new[i] <- file.name
+        renamed$status[i] <- "renamed"
+        if (!simulate) {
+          file.rename(files[i], file.name) #rename
+        }
+      }
+    }
+    if (verbose) cat("\r\t...renaming files", scales::percent(i / length(files)), "\t\t")
+
+  }
+  cat("\n", sum(grepl("^renamed$", renamed$status)), "files renamed, ")
+  if (sum(grepl("exists", renamed$status, fixed = TRUE)) > 0) {
+    cat(sum(grepl("exists", renamed$status, fixed = TRUE)), "not renamed (file already exists), ")
+  }
+  if (sum(grepl("empty", renamed$status, fixed = TRUE)) > 0) {
+    cat(sum(grepl("empty", renamed$status, fixed = TRUE)), "not renamed (no search term or time range found), ")
+  }
+  renamed$status <- as.factor(renamed$status)
+  cat("in", format( (Sys.time() - start.time), digits = 2, nsmall = 2), if (simulate) "[changes were only simulated]")
+  if (report) renamed
+}
+
+
+#' Check for highly similar articles.
+#'
+#' Check for highly similar articles by comparing all articles published on the
+#' same date.
+#' @param texts Provide texts to check for similarity.
+#' @param dates Provide corresponding dates, same length as \code{text}.
+#' @param LNToutput Alternatively to providing texts an dates individually, you can
+#'   provide a LNToutput object.
+#' @param IDs IDs of articles.
+#' @param threshold At which threshold of similarity is an article considered a
+#'   duplicate.
+#' @param rel_dist Calculate the relative Levenshtein distance between two
+#'   articles if set to TRUE (can take very long). The main difference between
+#'   the similarity and distance value is that the distance takes word order
+#'   into account while similarity employs the bag of words approach.
+#' @keywords similarity
+#' @details The function produces a data.frame consisting of information about
+#'   duplicated articles
+#' @author Johannes B. Gruber
+#' @export
+#' @importFrom utils adist
+#' @importFrom stringdist stringdist
+#' @importFrom quanteda dfm textstat_simil
+#' @examples
+#' # Copy sample file to current wd
+#' lnt_sample()
+#'
+#' # Convert raw file to LNToutput object
+#' LNToutput <- lnt_read(lnt_sample())
+#'
+#' # Test similarity of articles
+#' duplicates.df <- lnt_similarity(texts = LNToutput@articles$Article,
+#'                                dates = LNToutput@meta$Date,
+#'                                IDs = LNToutput@articles$ID)
+#'
+#' # Create three separate data.frames from cleaned LNToutput object
+#' meta.df <- LNToutput@meta[!LNToutput@meta$ID %in%
+#'                            duplicates.df$ID_duplicate,]
+#' articles.df <- LNToutput@articles[!LNToutput@articles$ID %in%
+#'                                    duplicates.df$ID_duplicate,]
+#' paragraphs.df <- LNToutput@paragraphs[!LNToutput@paragraphs$ID %in%
+#'                                       duplicates.df$ID_duplicate,]
+lnt_similarity <- function(texts,
+                           dates,
+                           LNToutput,
+                           IDs = NULL,
+                           threshold = 0.99,
+                           rel_dist = TRUE) {
+  if (any(missing(texts), missing(dates))) {
+    texts <- LNToutput@articles$Article
+    dates <- LNToutput@meta$Date
+    if (is.null(IDs)) {
+      IDs <- LNToutput@articles$ID
+    }
+  } else {
+    if (missing(LNToutput)) {
+      LNToutput <- character()
+    }
+  }
+  start.time <- Sys.time()
+  #first, we need to unique days so we can loop through them
+  dates.d <- unique(dates)
+  dates.d <- dates.d[order(dates.d)]
+
+  text.dfm <- quanteda::dfm(texts,
+                            tolower = TRUE,
+                            remove = "[^[:alnum:]]",
+                            valuetype = "regex",
+                            verbose = FALSE)
+  if (is.null(IDs)) IDs <- seq_len(length(texts))
+  text.dfm@Dimnames$docs <- IDs
+
+
+  duplicates.df <- lapply(dates.d, function(x){
+    if (length(grep(x, dates)) > 1) {
+      sim <- as.matrix(quanteda::textstat_simil(text.dfm[text.dfm@Dimnames$docs %in%
+                                                           IDs[grep(x, dates)]],
+                                                selection = NULL,
+                                                method = "correlation",
+                                                margin = "documents"))
+      diag(sim) <- 0
+      dup <- as.data.frame(which(sim > threshold, arr.ind = TRUE), check.names = FALSE)
+      # every pair of duplicates is in here twice. This doesn't make sense of course so let's get rid of them
+      if (nrow(dup) > 0){
+        dup[, 3] <- dup[, 1] + dup[, 2]
+        dup <- dup[!duplicated(dup[, 3]), ]
+        dup <- dup[, -3]
+        # now the row/colnumbers are replaced by article IDs (which were stored as docnames)
+        dup[, 1] <- sapply(seq_len(nrow(dup)), function(i) dup[i, 1] <- rownames(sim)[dup[i, 1]])
+        dup[, 2] <- sapply(seq_len(nrow(dup)), function(i) dup[i, 2] <- rownames(sim)[dup[i, 2]])
+        #now we can store duplicates along orignil, similarity and ID in data frame
+        duplicates.df <- data.frame(Date = rep(x, nrow(dup)),
+                                    ID_original = dup[, 2],
+                                    Original = texts[match(dup[, 2], IDs)],
+                                    ID_duplicate = dup[, 1],
+                                    Duplicate = texts[match(dup[, 1], IDs)],
+                                    Similarity = sim[as.matrix(dup)],
+                                    stringsAsFactors = FALSE)
+        # additionally to the similarity the relative distance (original text from duplicate divided by character
+        #length of longer text) can be added
+        if (rel_dist){
+          duplicates.df$rel_dist <- sapply(seq_len(nrow(dup)), function(i) {
+            adist(texts[match(dup[i, 2], IDs)], texts[match(dup[i, 1], IDs)], ignore.case = TRUE)
+            stringdist(a = texts[match(dup[i, 2], IDs)],
+                       b = texts[match(dup[i, 1], IDs)],
+                       method = "lv",
+                       useBytes = FALSE,
+                       nthread = getOption("sd_num_thread")) / # string distance
+              max(c(nchar(texts[match(dup[i, 2], IDs)]), nchar(texts[match(dup[i, 1], IDs)]))) # by length of string
+          })
+        }
+        cat("\rProcessing date ", as.character(x), " ... ", nrow(dup), " duplicates found \t\t", sep = "")
+        duplicates.df
+      } else {
+        cat("\rProcessing date ", as.character(x), " ... 0 duplicates found \t\t", sep = "")
+      }
+    } else {
+      cat("\rProcessing date ", as.character(x), " ... 0 duplicates found \t\t", sep = "")
+    }
+  })
+  #end loop
+  duplicates.df <- as.data.frame(data.table::rbindlist(duplicates.df))
+  if (rel_dist) colnames(duplicates.df)[7] <- "rel_dist"
+  end.time <- Sys.time()
+  time.elapsed <- end.time - start.time
+  cat("\rThreshold = ", threshold, "; ",
+      length(dates.d), " days processed; ",
+      nrow(duplicates.df[unique(duplicates.df$ID_duplicate), ]), " duplicates found;",
+      " in ", format(time.elapsed, digits = 2, nsmall = 2), sep = "")
+  return(duplicates.df)
+}
+
+
+#' Convert Strings to dates
+#'
+#' Converts dates from string formats common in LexisNexis to date
+#'
+#' @param x A character object to be converted.
+#' @param format Either "auto" to guess the format based on common order of day,
+#'   month and year or provide (see \link[stringi]{stri_datetime_format} for
+#'   format options).
+#' @param locale A ISO 639-1 locale code (see
+#'   \url{https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes}).
+#'
+#' @return This function returns an object of class \link{date}.
+#' @export
+#'
+#' @examples
+#' LNToutput <- lnt_read(lnt_sample(), convert_date = FALSE)
+#' d <- lnt_asDate(LNToutput@meta$Date)
+#' d
+#' @importFrom stringi stri_replace_all_fixed stri_replace_all_regex
+#'   stri_datetime_parse stri_opts_fixed stri_datetime_symbols
+#'   stri_datetime_format
+#' @importFrom utils head
+lnt_asDate <- function(x,
+                       format = "auto",
+                       locale = "auto") {
+  formats <- c(English = "MMMM d,yyyy",
+               German = "d MMMM yyyy",
+               Spanish = "d MMMM yyyy",
+               Dutch = "d MMMM yyyy",
+               French = "d MMMM yyyy",
+               Portuguese = "d MMMM yyyy",
+               Russian = "d MMMM yyyy")
+  locales <- c(English = "en",
+               German = "de",
+               Spanish = "es",
+               Dutch = "nl",
+               French = "fr",
+               Portuguese = "pt",
+               Russian = "ru")
+
+  for (loc in locales) {
+    x <- stri_replace_all_fixed(str = x,
+                                pattern = c(stri_datetime_symbols(locale = loc)$Weekday,
+                                            "PM", "AM"),
+                                replacement = "",
+                                vectorize_all = FALSE,
+                                opts_fixed = stri_opts_fixed(case_insensitive = TRUE))
+  }
+  x <- stri_replace_all_regex(str = x,
+                              pattern = c("[A-Z]{3}$",
+                                          "((?:(?:[0-1][0-9])|(?:[2][0-3])|(?:[0-9])):(?:[0-5][0-9])(?::[0-5][0-9])?(?:\\s?(?:am|AM|pm|PM))?)"),
+                              replacement = "",
+                              vectorize_all = FALSE)
+
+  if (any(format == "auto",
+          locale == "auto")) {
+    correct <- mapply(function(format, locale) {
+      out <- stringi::stri_datetime_parse(str = x,
+                                          format = format,
+                                          locale = locale)
+      out <- 1 - sum(is.na(out)) / length(x)
+      out * 100
+    }, formats, locales)
+    most <- head(sort(correct[correct > 0.01], decreasing = TRUE), n = 3)
+    if (most[1] < 100) {
+      if (length(most) > 1) {
+        if (length(most) == 2) {
+          input <- readline(prompt = paste0("Most likely languages for dates: ", names(most)[1],
+                                            " (", most[1], "%", "), ", names(most)[2],
+                                            " (", most[2], "%", "). Select language",
+                                            " for date conversion (1/2) or 'abort':"))
+        } else if (length(most) == 3) {
+          input <- readline(prompt = paste0("Most likely languages for dates: ", names(most)[1],
+                                            " (", most[1], "%", "), ", names(most)[2],
+                                            " (", most[2], "%", "), ", names(most)[3],
+                                            " (", most[3], "%", "). Select language",
+                                            " for date conversion (1/2/3) or 'abort':"))
+        }
+        if (grepl("1|2|3", input)) {
+          input <- as.numeric(input)
+        } else {
+          input <- FALSE
+        }
+      } else {
+        input <- readline(prompt = paste0("Most likely language for dates: ", names(most),
+                                          " (", most, "%", "). Proceed date ",
+                                          "conversion with this language? (y/n)"))
+        input <- grepl("y|yes", input, ignore.case = TRUE)
+      }
+    } else {
+      input <- 1
+    }
+    format <- formats[names(formats) == names(most)[input]]
+    locale <- locales[names(locales) == names(most)[input]]
+  }
+  if (!format[1] %in% formats) {
+    message("A non-standard format was provided. Conversion is tried but might fail.\n")
+  }
+  x <- stringi::stri_datetime_parse(str = x,
+                                    format = format,
+                                    locale = locale)
+  x <- as.Date(x)
+  return(x)
+}
+
+
+# Conversion ------------------------------------------------------------
+
+#' Convert LNToutput to other formats
+#'
+#' Takes output from \link{lnt_read} and converts it to other formats.
+#'
+#' @param x An object of class LNToutput
+#' @param to Which format to convert into. Possible values are "rDNA" and
+#'   "quanteda".
+#' @param what Either "Articles" or "Paragraph" to use articles or paragraphs as
+#'   text in the output object.
+#' @param ... Passed on to different methods.
+#' @export
+#'
+#' @examples
+#' LNToutput <- lnt_read(lnt_sample())
+#' docs <- lnt_convert(LNToutput, to = "rDNA")
+#' corpus <- lnt_convert(LNToutput, to = "quanteda")
+lnt_convert <- function(x,
+                        to = "rDNA",
+                        what = "Articles",
+                        ...) {
+  if (to == "rDNA") {
+    return(lnt2rDNA(x, what = what))
+  } else if (to == "quanteda") {
+    return(lnt2quanteda(x, what = what))
+  }
+}
+
+#' @rdname lnt_convert
+#' @export
+lnt2rDNA <- function(x, what) {
+  if (what == "Articles") {
+    text <- x@articles$Article
+  } else if (what == "Paragraph") {
+    text <- x@paragraphs$Paragraph
+  }
+  dta <- data.frame(id = x@meta$ID,
+                    title = x@meta$Headline,
+                    text = text,
+                    coder = 1,
+                    author = x@meta$Author,
+                    source = x@meta$Newspaper,
+                    section = x@meta$Section,
+                    notes = "",
+                    type = "newspaper",
+                    date = x@meta$Date,
+                    stringsAsFactors = FALSE)
+  if (any(grepl("Date", class(dta$date)))) {
+    dta$date <- as.POSIXct.Date(dta$date)
+  }
+  if (any(is.na(dta$date), !any(grepl("POSIXct", class(dta$date))))) {
+    warning(paste0("One or more (or all) dates could not be converted to POSIXct.",
+                   "Na entries in 'date' were filled with the system's time and date instead."))
+    dta$date <- tryCatch(as.POSIXct(dta$date),
+                         error = function(e) NA)
+    dta$date[is.na(dta$date)] <- Sys.time()
+    if (class(dta$date) == "numeric") {
+      dta$date <- as.POSIXct.numeric(dta$date, origin = "1970-01-01")
+    }
+  }
+  return(dta)
+}
+
+#' @rdname lnt_convert
+#' @export
+#' @importFrom quanteda corpus
+lnt2quanteda <- function(x, what, ...) {
+  if (what == "Articles") {
+    text <- x@articles$Article
+  } else if (what == "Paragraph") {
+    text <- x@paragraphs$Paragraph
+  }
+  names(text) <- x@articles$ID
+  dots <- list(...)
+  if (any(grepl("metacorpus", names(dots)))) {
+    metacorpus <- list(Converted = "LexiNexisTools",
+                       dots$metacorpus)
+  } else {
+    metacorpus <- list(Converted = "LexiNexisTools")
+  }
+  dta <- corpus(x = text,
+                docvars = x@meta,
+                metacorpus = metacorpus,
+                ...)
+  return(dta)
+}
+
+
+# Miscellaneous ------------------------------------------------------------
+
+#' Provides a small sample TXT file
+#'
+#' Copies a small TXT sample file to the current working directory and returns
+#' the location of this newly created file. The content of the file is made up
+#' or copied from Wikipedia since real articles from LexisNexis fall under
+#' copyright laws and can not be shared.
+#'
+#' A small sample database to test the functions of LexisNexisTools
+#'
+#' @param overwrite Should sample.TXT be overwritten if found in the current
+#'   working directory?
+#' @param verbose Display warning message if file exists in current wd.
+#'
+#' @examples
+#' lnt_sample()
+#' @author Johannes Gruber
+#' @export
+lnt_sample <- function(overwrite = FALSE,
+                       verbose = TRUE) {
+  if (all(file.exists(paste0(getwd(), "/sample.TXT")), !overwrite)) {
+    if (verbose){
+      warning(
+        "Sample file exists in wd. Use overwrite = TRUE to create fresh sample file."
+      )
+    }
+  } else {
+    file.copy(from = system.file("extdata", "sample.TXT", package = "LexisNexisTools"),
+              to = paste0(getwd(), "/sample.TXT"),
+              overwrite = TRUE)
+  }
+  return(paste0(getwd(), "/sample.TXT"))
+}

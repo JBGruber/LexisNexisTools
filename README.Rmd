@@ -9,7 +9,7 @@ output: github_document
 My PhD supervisor once told me that everyone doing newspaper analysis starts by writing code to read in files from the 'LexisNexis' newspaper archive. 
 However, while I do recommend this exercise, not everyone has the time. 
 This package takes TXT files downloaded from 'LexisNexis' in most languages. 
-If you run into any problems or have an idea about a great new feature? The please file an issue report: <https://github.com/JBGruber/LexisNexisTools/issues>.
+If you run into any problems or have an idea about a great new feature? Then please file an issue report: <https://github.com/JBGruber/LexisNexisTools/issues>.
 
 ## Installation
 Install via:

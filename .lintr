@@ -1,0 +1,4 @@
+linters: with_defaults(
+    line_length_linter = line_length_linter(220),
+    absolute_path_linter = NULL
+  )
