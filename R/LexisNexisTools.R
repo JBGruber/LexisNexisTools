@@ -9,8 +9,15 @@
 
 # Class and Methods ------------------------------------------------------------
 
-#' make S4 object
-#' @noRd
+#' An S4 class to store the three data.frames created with \link{lnt_read}.
+#'
+#' This S4 class stores the output from \link{lnt_read}. Objects consist of
+#' three data.frames which you can select using \code{@}.
+#'
+#' @slot meta The metadata of the articles read in.
+#' @slot articles The article texts and respective IDs.
+#' @slot paragraphs The paragraphs (if the data.frame exists) and respective
+#'   article and paragraph IDs.
 #' @importFrom methods new
 setClass("LNToutput",
          representation(meta = "data.frame",
@@ -18,8 +25,18 @@ setClass("LNToutput",
                         paragraphs = "data.frame"))
 
 
-#' Show method for LNToutput class
-#' @noRd
+#' Methods for LNToutput output objects
+#'
+#' @param x,object An LNToutput object.
+#' @param i Rows of the meta data.frame (default) or values of j.
+#' @param j The a column you want to use to subset the LNToutput object. Takes
+#'   character strings.
+#' @param invert Invert the selection of i.
+#' @name LNToutput_methods
+NULL
+
+
+#' @rdname LNToutput_methods
 setMethod("show",
           signature = "LNToutput",
           definition = function(object) {
@@ -54,6 +71,36 @@ setMethod("show",
             cat("\n\nParagraphs (6 of ", nrow(object@paragraphs), "):\n",
                 sep = "")
             print(paragraphs)
+          }
+)
+
+
+#' @rdname LNToutput_methods
+setMethod("[",
+          signature = "LNToutput",
+          definition = function(x, i, j, invert = FALSE) {
+            if (missing(j)) {
+              x@meta <- x@meta[i, ]
+              x@articles <- x@articles[i, ]
+              x@paragraphs <- x@paragraphs[x@paragraphs$Art_ID %in% x@meta$ID, ]
+            } else {
+              if (j %in% colnames(x@meta)) {
+                select <- x@meta$ID[x@meta[, j] %in% i]
+              } else if (j %in% colnames(x@articles)) {
+                select <- x@articles$ID[x@articles[, j] %in% i, ]
+              } else if (j %in% colnames(x@paragraphs)) {
+                select <- x@paragraphs$Art_ID[x@paragraphs[, j] %in% i]
+              } else {
+                stop("'j' was not found to be a valid column name.")
+              }
+              if (invert) {
+                select <- x@meta$ID[!x@meta$ID %in% select]
+              }
+              x@meta <- x@meta[x@meta$ID %in% select, ]
+              x@articles <- x@articles[x@articles$ID %in% select, ]
+              x@paragraphs <- x@paragraphs[x@paragraphs$Art_ID %in% select, ]
+            }
+            return(x)
           }
 )
 
@@ -171,7 +218,7 @@ lnt_read <- function(x,
   }
 
   # Track the time
-  if (verbose) start.time <- Sys.time(); cat("Creating LNToutput from a connection input...\n")
+  if (verbose) start_time <- Sys.time(); cat("Creating LNToutput from a connection input...\n")
 
   ### read in file
   if (length(files) > 1){
@@ -184,7 +231,7 @@ lnt_read <- function(x,
     articles.v <- stringi::stri_read_lines(files, encoding = encoding)
     names(articles.v) <- rep(files, times = length(articles.v))
   }
-  if (verbose) cat("\t...files loaded [", format( (Sys.time() - start.time), digits = 2, nsmall = 2), "]\n", sep = "")
+  if (verbose) cat("\t...files loaded [", format( (Sys.time() - start_time), digits = 2, nsmall = 2), "]\n", sep = "")
 
   #exclude some lines
   if (length(exclude_lines) > 0) {
@@ -192,8 +239,6 @@ lnt_read <- function(x,
   }
 
   beginnings <- grep(start_keyword, articles.v)
-  #beginnings <- stringi::stri_detect_regex(pattern = start_keyword, str = articles.v)
-
   articles.l <- lapply(seq_len(length(beginnings)), function(n) {
     if (n < length(beginnings)) {
       articles.v[beginnings[n]:beginnings[n + 1]]
@@ -220,7 +265,7 @@ lnt_read <- function(x,
     }
   })
   if (verbose) cat("\t...articles split [",
-                   format( (Sys.time() - start.time),
+                   format( (Sys.time() - start_time),
                           digits = 2,
                           nsmall = 2),
                    "]\n",
@@ -232,7 +277,7 @@ lnt_read <- function(x,
     grep(pattern = length_keyword, x = i$meta, value = TRUE)[1]
   })
   length.v <- gsub(length_keyword, "", .)
-  if (verbose) cat("\t...lengths extracted [", format( (Sys.time() - start.time), digits = 2, nsmall = 2), "]\n", sep = "")
+  if (verbose) cat("\t...lengths extracted [", format( (Sys.time() - start_time), digits = 2, nsmall = 2), "]\n", sep = "")
 
   ### Newspaper - first non-emtpy line
   newspaper.v <- sapply(df.l, function(i) {
@@ -246,7 +291,7 @@ lnt_read <- function(x,
   newspaper.v[grep("January|February|March|April|May|June|July|August|September|October|November|December",
                    newspaper.v)] <- ""
   if (verbose) cat("\t...newspapers extracted [",
-                   format( (Sys.time() - start.time),
+                   format( (Sys.time() - start_time),
                            digits = 2,
                            nsmall = 2),
                    "]\n",
@@ -258,7 +303,7 @@ lnt_read <- function(x,
                                           pattern = "\\w+ \\d+, \\d+|\\d+ \\w+ \\d+")
     na.omit(.)[1]
   })
-  if (verbose) cat("\t...dates extracted [", format( (Sys.time() - start.time), digits = 2, nsmall = 2), "]\n", sep = "")
+  if (verbose) cat("\t...dates extracted [", format( (Sys.time() - start_time), digits = 2, nsmall = 2), "]\n", sep = "")
 
   ### Author (where available)
   author.v <- sapply(df.l, function(i) {
@@ -274,14 +319,14 @@ lnt_read <- function(x,
     }
   })
 
-  if (verbose) cat("\t...authors extracted [", format( (Sys.time() - start.time), digits = 2, nsmall = 2), "]\n", sep = "")
+  if (verbose) cat("\t...authors extracted [", format( (Sys.time() - start_time), digits = 2, nsmall = 2), "]\n", sep = "")
 
 
   ### section (where available)
   section.v <- sapply(df.l, function(i) {
     grep(pattern = "SECTION: |RUBRIK: ", x = i$meta, value = TRUE)[1]
   })
-  if (verbose) cat("\t...sections extracted [", format( (Sys.time() - start.time), digits = 2, nsmall = 2), "]\n", sep = "")
+  if (verbose) cat("\t...sections extracted [", format( (Sys.time() - start_time), digits = 2, nsmall = 2), "]\n", sep = "")
 
 
   ### edition (where available)
@@ -307,7 +352,7 @@ lnt_read <- function(x,
       ""
     }
   })
-  if (verbose) cat("\t...editions extracted [", format( (Sys.time() - start.time), digits = 2, nsmall = 2), "]\n", sep = "")
+  if (verbose) cat("\t...editions extracted [", format( (Sys.time() - start_time), digits = 2, nsmall = 2), "]\n", sep = "")
 
   ### Headline
   headline.v <- sapply(seq_len(length(df.l)), function(i) {
@@ -319,11 +364,11 @@ lnt_read <- function(x,
                grep(section.v[i], headline, fixed = TRUE))] <- ""
     stringi::stri_join(headline, collapse = " ")
   })
-  if (verbose) cat("\t...headlines extracted [", format( (Sys.time() - start.time), digits = 2, nsmall = 2), "]\n", sep = "")
+  if (verbose) cat("\t...headlines extracted [", format( (Sys.time() - start_time), digits = 2, nsmall = 2), "]\n", sep = "")
 
   if (convert_date){
     date.v <- lnt_asDate(date.v, ...)
-    if (verbose) cat("\t...dates converted [", format( (Sys.time() - start.time), digits = 2, nsmall = 2), "]\n", sep = "")
+    if (verbose) cat("\t...dates converted [", format( (Sys.time() - start_time), digits = 2, nsmall = 2), "]\n", sep = "")
   }
 
   # Clean the clutter from objects
@@ -346,7 +391,7 @@ lnt_read <- function(x,
                         Headline = trimws(headline.v, which = "both"),
                         Graphic = unlist(sapply(df.l, function(i) i[["graphic"]])),
                         stringsAsFactors = FALSE)
-  if (verbose) cat("\t...metadata extracted [", format( (Sys.time() - start.time), digits = 2, nsmall = 2), "]\n", sep = "")
+  if (verbose) cat("\t...metadata extracted [", format( (Sys.time() - start_time), digits = 2, nsmall = 2), "]\n", sep = "")
 
 
   # Cut of after ends in article
@@ -363,7 +408,7 @@ lnt_read <- function(x,
                             }),
                             stringsAsFactors = FALSE)
 
-  if (verbose) cat("\t...article texts extracted [", format( (Sys.time() - start.time), digits = 2, nsmall = 2), "]\n", sep = "")
+  if (verbose) cat("\t...article texts extracted [", format( (Sys.time() - start_time), digits = 2, nsmall = 2), "]\n", sep = "")
 
   if (extract_paragraphs){
     # split paragraphs
@@ -385,7 +430,7 @@ lnt_read <- function(x,
     }))
     paragraphs.df$Par_ID <- seq_len(nrow(paragraphs.df))
     paragraphs.df <- paragraphs.df[, c("Art_ID", "Par_ID", "Paragraph")]
-    if (verbose) cat("\t...paragraphs extracted [", format( (Sys.time() - start.time), digits = 2, nsmall = 2), "]\n", sep = "")
+    if (verbose) cat("\t...paragraphs extracted [", format( (Sys.time() - start_time), digits = 2, nsmall = 2), "]\n", sep = "")
   }else{
     paragraphs.df <- data.frame(Art_ID = NA,
                                 Par_ID = NA,
@@ -403,7 +448,7 @@ lnt_read <- function(x,
                                                              replacement = c(" ", ""),
                                                              vectorize_all = FALSE)
 
-  if (verbose) cat("Elapsed time: ", format( (Sys.time() - start.time), digits = 2, nsmall = 2), "\n", sep = "")
+  if (verbose) cat("Elapsed time: ", format( (Sys.time() - start_time), digits = 2, nsmall = 2), "\n", sep = "")
   out <- new("LNToutput", meta = meta.df, articles = articles.df, paragraphs = paragraphs.df)
   attributes(out)$created <- list(time = Sys.time(),
                                   Version = packageVersion("LexisNexisTools"))
@@ -510,7 +555,7 @@ lnt_rename <- function(x,
     stop("Provide either file name(s) ending on '.txt' or folder name(s) to x or leave black to search wd.")
   }
   # Track the time
-  start.time <- Sys.time()
+  start_time <- Sys.time()
   if (verbose) cat("Checking LN files...\n")
   files <- unique(files)
   if (verbose) cat(length(files), "files found to process...\n")
@@ -584,7 +629,7 @@ lnt_rename <- function(x,
     cat(sum(grepl("empty", renamed$status, fixed = TRUE)), "not renamed (no search term or time range found), ")
   }
   renamed$status <- as.factor(renamed$status)
-  cat("in", format( (Sys.time() - start.time), digits = 2, nsmall = 2), if (simulate) "[changes were only simulated]")
+  cat("in", format( (Sys.time() - start_time), digits = 2, nsmall = 2), if (simulate) "[changes were only simulated]")
   if (report) renamed
 }
 
@@ -595,22 +640,34 @@ lnt_rename <- function(x,
 #' same date.
 #' @param texts Provide texts to check for similarity.
 #' @param dates Provide corresponding dates, same length as \code{text}.
-#' @param LNToutput Alternatively to providing texts an dates individually, you can
-#'   provide a LNToutput object.
+#' @param LNToutput Alternatively to providing texts an dates individually, you
+#'   can provide a LNToutput object.
 #' @param IDs IDs of articles.
 #' @param threshold At which threshold of similarity is an article considered a
-#'   duplicate.
+#'   duplicate. Note that lower threshold values will increase the time to
+#'   calculate the relative difference (as more articles are considered).
 #' @param rel_dist Calculate the relative Levenshtein distance between two
 #'   articles if set to TRUE (can take very long). The main difference between
 #'   the similarity and distance value is that the distance takes word order
 #'   into account while similarity employs the bag of words approach.
+#' @param length_diff Before calculating the relative distance between articles,
+#'   the length of the articles in characters is calculated. If the difference
+#'   surpasses this value, calculation is omitted and the distance will set to
+#'   NA.
+#' @param nthread Maximum number of threads to use (see
+#'   \link[stringdist]{stringdist-parallelization}).
+#' @param max_length If the article is too long, calculation of the relative distance
+#'   can crash the process (see
+#'   \url{https://github.com/markvanderloo/stringdist/issues/59}). To prevent
+#'   this you can set a maximum length (longer articles will not be evaluated).
+#' @param verbose A logical flag indicating whether information should be
+#'   printed to the screen.
 #' @keywords similarity
-#' @details The function produces a data.frame consisting of information about
-#'   duplicated articles
+#' @return A data.frame consisting of information about duplicated articles.
 #' @author Johannes B. Gruber
 #' @export
-#' @importFrom utils adist
 #' @importFrom stringdist stringdist
+#' @importFrom reshape2 melt
 #' @importFrom quanteda dfm textstat_simil
 #' @examples
 #' # Copy sample file to current wd
@@ -636,31 +693,40 @@ lnt_similarity <- function(texts,
                            LNToutput,
                            IDs = NULL,
                            threshold = 0.99,
-                           rel_dist = TRUE) {
-  if (any(missing(texts), missing(dates))) {
-    texts <- LNToutput@articles$Article
-    dates <- LNToutput@meta$Date
-    if (is.null(IDs)) {
-      IDs <- LNToutput@articles$ID
+                           rel_dist = TRUE,
+                           length_diff = 0.2,
+                           nthread = getOption("sd_num_thread"),
+                           max_length = Inf,
+                           verbose = TRUE) {
+  call <- match.call(expand.dots = TRUE)
+  start_time <- Sys.time()
+  if (missing(LNToutput)) {
+    if (any(missing(texts), missing(dates))) {
+      stop("Supply either 'LNToutput' or 'texts' and 'dates'.")
     }
-  } else {
-    if (missing(LNToutput)) {
-      LNToutput <- character()
-    }
+    if (is.null(IDs)) IDs <- seq_len(length(texts))
+  } else if (!missing(LNToutput)) {
+    if (missing(texts)) texts <- LNToutput@articles$Article
+    if (missing(dates)) dates <- LNToutput@meta$Date
+    if (is.null(IDs)) IDs <- LNToutput@articles$ID
   }
-  start.time <- Sys.time()
-  #first, we need to unique days so we can loop through them
+  if (!all.equal(length(texts),
+                 length(dates),
+                 length(IDs))) {
+    stop("'texts', 'dates' and 'IDs' need to have the same length.")
+  }
+
+  # get unique dates
   dates.d <- unique(dates)
   dates.d <- dates.d[order(dates.d)]
+  if (verbose) cat("Checking similiarity for", length(dates), "articles over", length(dates.d), "dates...\n")
 
   text.dfm <- quanteda::dfm(texts,
                             tolower = TRUE,
                             remove = "[^[:alnum:]]",
                             valuetype = "regex",
                             verbose = FALSE)
-  if (is.null(IDs)) IDs <- seq_len(length(texts))
   text.dfm@Dimnames$docs <- IDs
-
 
   duplicates.df <- lapply(dates.d, function(x){
     if (length(grep(x, dates)) > 1) {
@@ -670,54 +736,61 @@ lnt_similarity <- function(texts,
                                                 method = "correlation",
                                                 margin = "documents"))
       diag(sim) <- 0
-      dup <- as.data.frame(which(sim > threshold, arr.ind = TRUE), check.names = FALSE)
-      # every pair of duplicates is in here twice. This doesn't make sense of course so let's get rid of them
-      if (nrow(dup) > 0){
-        dup[, 3] <- dup[, 1] + dup[, 2]
-        dup <- dup[!duplicated(dup[, 3]), ]
-        dup <- dup[, -3]
-        # now the row/colnumbers are replaced by article IDs (which were stored as docnames)
-        dup[, 1] <- sapply(seq_len(nrow(dup)), function(i) dup[i, 1] <- rownames(sim)[dup[i, 1]])
-        dup[, 2] <- sapply(seq_len(nrow(dup)), function(i) dup[i, 2] <- rownames(sim)[dup[i, 2]])
-        #now we can store duplicates along orignil, similarity and ID in data frame
-        duplicates.df <- data.frame(Date = rep(x, nrow(dup)),
-                                    ID_original = dup[, 2],
-                                    Original = texts[match(dup[, 2], IDs)],
-                                    ID_duplicate = dup[, 1],
-                                    Duplicate = texts[match(dup[, 1], IDs)],
-                                    Similarity = sim[as.matrix(dup)],
-                                    stringsAsFactors = FALSE)
-        # additionally to the similarity the relative distance (original text from duplicate divided by character
-        #length of longer text) can be added
+      . <- reshape2::melt(sim)
+      . <- .[.$value > threshold, ]
+      if (nrow(.) > 0){
+        . <- data.frame(t(apply(., 1, sort)))
+        . <- .[!duplicated(.), ]
+        colnames(.) <- c("Similarity", "ID_original", "ID_duplicate")
+        .$text_original <- texts[match(.$ID_original, IDs)]
+        .$text_duplicate <- texts[match(.$ID_duplicate, IDs)]
+        .$Date <- dates[match(.$ID_duplicate, IDs)]
+        duplicates.df <- .[, c("Date",
+                               "ID_original",
+                               "text_original",
+                               "ID_duplicate",
+                               "text_duplicate",
+                               "Similarity")]
+        #
         if (rel_dist){
-          duplicates.df$rel_dist <- sapply(seq_len(nrow(dup)), function(i) {
-            adist(texts[match(dup[i, 2], IDs)], texts[match(dup[i, 1], IDs)], ignore.case = TRUE)
-            stringdist(a = texts[match(dup[i, 2], IDs)],
-                       b = texts[match(dup[i, 1], IDs)],
-                       method = "lv",
-                       useBytes = FALSE,
-                       nthread = getOption("sd_num_thread")) / # string distance
-              max(c(nchar(texts[match(dup[i, 2], IDs)]), nchar(texts[match(dup[i, 1], IDs)]))) # by length of string
+          duplicates.df$rel_dist <- sapply(seq_len(nrow(duplicates.df)), function(i) {
+            # length of longer string
+            mxln <- max(c(nchar(duplicates.df$text_original[i]), nchar(duplicates.df$text_duplicate[i])))
+            if (abs(nchar(duplicates.df$text_original[i]) - nchar(duplicates.df$text_duplicate[i])) /
+                mxln <
+                length_diff &
+                max_length > mxln) {
+              stringdist::stringdist(a = duplicates.df$text_original[i],
+                                     b = duplicates.df$text_duplicate[i],
+                                     method = "lv",
+                                     useBytes = FALSE,
+                                     nthread = nthread) / # string distance
+                mxln # by length of string
+            } else {
+              NA
+            }
           })
         }
-        cat("\rProcessing date ", as.character(x), " ... ", nrow(dup), " duplicates found \t\t", sep = "")
+        cat("\r\t...processing date ", as.character(x), ": ", nrow(duplicates.df), " duplicates found [",
+            format( (Sys.time() - start_time), digits = 2, nsmall = 2), "]. \t\t", sep = "")
         duplicates.df
       } else {
-        cat("\rProcessing date ", as.character(x), " ... 0 duplicates found \t\t", sep = "")
+        cat("\r\t...processing date ", as.character(x), ": 0 duplicates found [",
+            format( (Sys.time() - start_time), digits = 2, nsmall = 2), "]. \t\t", sep = "")
       }
     } else {
-      cat("\rProcessing date ", as.character(x), " ... 0 duplicates found \t\t", sep = "")
+      cat("\r\t...processing date ", as.character(x), ": 0 duplicates found [",
+          format( (Sys.time() - start_time), digits = 2, nsmall = 2), "]. \t\t", sep = "")
     }
   })
   #end loop
   duplicates.df <- as.data.frame(data.table::rbindlist(duplicates.df))
-  if (rel_dist) colnames(duplicates.df)[7] <- "rel_dist"
-  end.time <- Sys.time()
-  time.elapsed <- end.time - start.time
-  cat("\rThreshold = ", threshold, "; ",
+  time.elapsed <- Sys.time() - start_time
+  cat("\r\nThreshold = ", threshold, "; ",
       length(dates.d), " days processed; ",
       nrow(duplicates.df[unique(duplicates.df$ID_duplicate), ]), " duplicates found;",
       " in ", format(time.elapsed, digits = 2, nsmall = 2), sep = "")
+  attributes(duplicates.df)$call <- call
   return(duplicates.df)
 }
 

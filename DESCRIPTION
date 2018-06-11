@@ -1,7 +1,7 @@
 Package: LexisNexisTools
 Title: Working with Files from 'LexisNexis'
-Version: 0.1.37.9000
-Date: 2018-06-10
+Version: 0.1.38.9000
+Date: 2018-06-11
 Authors@R: person("Johannes", "Gruber", email = "j.gruber.1@research.gla.ac.uk", 
   role = c("aut", "cre"))
 Description: My PhD supervisor once told me that everyone doing newspaper
@@ -21,7 +21,8 @@ Imports:
   scales (>= 0.5.0),
   stats (>= 3.3.0),
   utils (>= 3.3.0),
-  stringdist (>= 0.9.4.0)
+  stringdist (>= 0.9.4.0),
+  reshape2 (>= 1.4.3)
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1

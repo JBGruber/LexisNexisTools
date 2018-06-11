@@ -5,33 +5,50 @@
 \title{Check for highly similar articles.}
 \usage{
 lnt_similarity(texts, dates, LNToutput, IDs = NULL, threshold = 0.99,
-  rel_dist = TRUE)
+  rel_dist = TRUE, length_diff = 0.2,
+  nthread = getOption("sd_num_thread"), max_length = Inf, verbose = TRUE)
 }
 \arguments{
 \item{texts}{Provide texts to check for similarity.}
 
 \item{dates}{Provide corresponding dates, same length as \code{text}.}
 
-\item{LNToutput}{Alternatively to providing texts an dates individually, you can
-provide a LNToutput object.}
+\item{LNToutput}{Alternatively to providing texts an dates individually, you
+can provide a LNToutput object.}
 
 \item{IDs}{IDs of articles.}
 
 \item{threshold}{At which threshold of similarity is an article considered a
-duplicate.}
+duplicate. Note that lower threshold values will increase the time to
+calculate the relative diffrence (as more articles are considered).}
 
 \item{rel_dist}{Calculate the relative Levenshtein distance between two
 articles if set to TRUE (can take very long). The main difference between
 the similarity and distance value is that the distance takes word order
 into account while similarity employs the bag of words approach.}
+
+\item{length_diff}{Before calculating the relative distance between articles,
+the length of the articles in characters is calculated. If the difference
+surpasses this value, calculation is omitted and the distance will set to
+NA.}
+
+\item{nthread}{Maximum number of threads to use (see
+\link[stringdist]{stringdist-parallelization}).}
+
+\item{max_length}{If the article is too long, calculation of the relative distance
+can crash the process (see
+\url{https://github.com/markvanderloo/stringdist/issues/59}). To prevent
+this you can set a maximum length (longer articles will not be evaluated).}
+
+\item{verbose}{A logical flag indicating whether information should be
+printed to the screen.}
+}
+\value{
+A data.frame consisting of information about duplicated articles.
 }
 \description{
 Check for highly similar articles by comparing all articles published on the
 same date.
-}
-\details{
-The function produces a data.frame consisting of information about
-  duplicated articles
 }
 \examples{
 # Copy sample file to current wd
