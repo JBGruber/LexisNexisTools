@@ -784,7 +784,7 @@ lnt_similarity <- function(texts,
     }
   })
   #end loop
-  duplicates.df <- as.data.frame(data.table::rbindlist(duplicates.df))
+  duplicates.df <- data.table::rbindlist(duplicates.df)
   time.elapsed <- Sys.time() - start_time
   cat("\r\nThreshold = ", threshold, "; ",
       length(dates.d), " days processed; ",
