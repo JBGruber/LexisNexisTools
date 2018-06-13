@@ -719,6 +719,10 @@ lnt_similarity <- function(texts,
   # get unique dates
   dates.d <- unique(dates)
   dates.d <- dates.d[order(dates.d)]
+  if (any(is.na(dates.d))) {
+    warning("You supplied NA values to 'dates'. Those will be ignored.")
+    dates.d <- dates.d[!is.na(dates.d)]
+  }
   if (verbose) cat("Checking similiarity for", length(dates), "articles over", length(dates.d), "dates...\n")
 
   text.dfm <- quanteda::dfm(texts,

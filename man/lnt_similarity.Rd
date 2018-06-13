@@ -20,7 +20,7 @@ can provide a LNToutput object.}
 
 \item{threshold}{At which threshold of similarity is an article considered a
 duplicate. Note that lower threshold values will increase the time to
-calculate the relative diffrence (as more articles are considered).}
+calculate the relative difference (as more articles are considered).}
 
 \item{rel_dist}{Calculate the relative Levenshtein distance between two
 articles if set to TRUE (can take very long). The main difference between
