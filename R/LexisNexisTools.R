@@ -279,7 +279,7 @@ lnt_read <- function(x,
   length.v <- gsub(length_keyword, "", .)
   if (verbose) cat("\t...lengths extracted [", format( (Sys.time() - start_time), digits = 2, nsmall = 2), "]\n", sep = "")
 
-  ### Newspaper - first non-emtpy line
+  ### Newspaper. First non-emtpy line
   newspaper.v <- sapply(df.l, function(i) {
     grep(pattern = "^$",
          x = i$meta,
@@ -637,7 +637,21 @@ lnt_rename <- function(x,
 #' Check for highly similar articles.
 #'
 #' Check for highly similar articles by comparing all articles published on the
-#' same date.
+#' same date. This function implements two measures to test if articles are
+#' almost identical. The \link[quanteda]{textstat_simil}, which compares the
+#' word similarity of two given texts; and a relative modification of the
+#' generalized Levenshtein (edit) distance implementation in
+#' \link[stringdist]{stringdist}. The relative distance is calculated by
+#' dividing the string distance by the number of characters in the longer
+#' article (resulting in a minimum of 0 if articles are exactly alike and 1 if
+#' strings are completely different). Using both methods cancels out the
+#' disadvantages of each method: the similarity measure is fast but does not
+#' take the word order into account. Two widely different texts could,
+#' therefore, be identified as the same, if they employ the exact same words for
+#' some reason. The generalized Levenshtein is more accurate but is very
+#' computationally demanding, especially if more than two texts are compared at
+#' once.
+#'
 #' @param texts Provide texts to check for similarity.
 #' @param dates Provide corresponding dates, same length as \code{text}.
 #' @param LNToutput Alternatively to providing texts an dates individually, you
@@ -656,14 +670,19 @@ lnt_rename <- function(x,
 #'   NA.
 #' @param nthread Maximum number of threads to use (see
 #'   \link[stringdist]{stringdist-parallelization}).
-#' @param max_length If the article is too long, calculation of the relative distance
-#'   can crash the process (see
+#' @param max_length If the article is too long, calculation of the relative
+#'   distance can crash the process (see
 #'   \url{https://github.com/markvanderloo/stringdist/issues/59}). To prevent
 #'   this you can set a maximum length (longer articles will not be evaluated).
 #' @param verbose A logical flag indicating whether information should be
 #'   printed to the screen.
 #' @keywords similarity
-#' @return A data.frame consisting of information about duplicated articles.
+#' @return A data.table consisting of information about duplicated
+#'   articles.Articles with a lower similarity than the threshold will be
+#'   removed, while all relative distances are still in the returned object.
+#'   Before you use the duplicated information to subset your dataset, you
+#'   should, therefore, filter out results with a high relative distance (e.g.
+#'   larger than 0.2).
 #' @author Johannes B. Gruber
 #' @export
 #' @importFrom stringdist stringdist
@@ -672,22 +691,24 @@ lnt_rename <- function(x,
 #' @examples
 #' # Copy sample file to current wd
 #' lnt_sample()
-#'
+#' 
 #' # Convert raw file to LNToutput object
 #' LNToutput <- lnt_read(lnt_sample())
-#'
+#' 
 #' # Test similarity of articles
 #' duplicates.df <- lnt_similarity(texts = LNToutput@articles$Article,
-#'                                dates = LNToutput@meta$Date,
-#'                                IDs = LNToutput@articles$ID)
-#'
+#'                                 dates = LNToutput@meta$Date,
+#'                                 IDs = LNToutput@articles$ID)
+#' 
+#' # Remove instances with a high relative distance
+#' duplicates.df <- duplicates.df[duplicates.df$rel_dist < 0.2]
+#' 
 #' # Create three separate data.frames from cleaned LNToutput object
-#' meta.df <- LNToutput@meta[!LNToutput@meta$ID %in%
-#'                            duplicates.df$ID_duplicate,]
-#' articles.df <- LNToutput@articles[!LNToutput@articles$ID %in%
-#'                                    duplicates.df$ID_duplicate,]
-#' paragraphs.df <- LNToutput@paragraphs[!LNToutput@paragraphs$ID %in%
-#'                                       duplicates.df$ID_duplicate,]
+#' LNToutput <- LNToutput[!LNToutput@meta$ID %in%
+#'                          duplicates.df$ID_duplicate]
+#' meta.df <- LNToutput@meta
+#' articles.df <- LNToutput@articles
+#' paragraphs.df <- LNToutput@paragraphs
 lnt_similarity <- function(texts,
                            dates,
                            LNToutput,

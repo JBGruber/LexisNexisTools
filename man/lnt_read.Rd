@@ -6,7 +6,7 @@
 \usage{
 lnt_read(x, encoding = "UTF-8", extract_paragraphs = TRUE,
   convert_date = TRUE, start_keyword = "auto", end_keyword = "auto",
-  length_keyword = "^LENGTH: |^LÄNGE: |^LONGUEUR: ",
+  length_keyword = "^LENGTH: |^LÃ„NGE: |^LONGUEUR: ",
   exclude_lines = "^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIC: |^DATELINE: ",
   recursive = FALSE, verbose = TRUE, ...)
 }
