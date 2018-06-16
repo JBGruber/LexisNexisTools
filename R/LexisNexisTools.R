@@ -932,12 +932,11 @@ lnt_asDate <- function(x,
 #' Takes output from \link{lnt_read} and converts it to other formats.
 #'
 #' @param x An object of class LNToutput
-#' @param to Which format to convert into. Possible values are "rDNA", "SQLite"
-#'   and "quanteda".
+#' @param to Which format to convert into. Possible values are "rDNA",
+#'   "corpustools", "SQLite" and "quanteda".
 #' @param what Either "Articles" or "Paragraph" to use articles or paragraphs as
 #'   text in the output object.
-#' @param file The name of the database to be written to (for lnt2SQLite
-#'   only).
+#' @param file The name of the database to be written to (for lnt2SQLite only).
 #' @param ... Passed on to different methods.
 #' @export
 #'
@@ -946,6 +945,7 @@ lnt_asDate <- function(x,
 #' docs <- lnt_convert(LNToutput, to = "rDNA")
 #' corpus <- lnt_convert(LNToutput, to = "quanteda")
 #' dbloc <- lnt_convert(LNToutput, to = "lnt2SQLite")
+#' tCorpus <- lnt_convert(LNToutput, to = "corpustools")
 lnt_convert <- function(x,
                         to = "rDNA",
                         what = "Articles",
@@ -957,6 +957,8 @@ lnt_convert <- function(x,
     return(lnt2quanteda(x, what = what, ...))
   } else if (to == "SQLite") {
     return(lnt2SQLite(x, file = file, ...))
+  } else if (to == "corpustools") {
+    return(lnt2cptools(x, what = what, ...))
   }
 }
 
@@ -1001,10 +1003,21 @@ lnt2rDNA <- function(x, what) {
 lnt2quanteda <- function(x, what, ...) {
   if (what == "Articles") {
     text <- x@articles$Article
+    ID <- x@meta$ID
+    meta <- x@meta
   } else if (what == "Paragraph") {
     text <- x@paragraphs$Paragraph
+    ID <- x@paragraphs$Par_ID
+    meta <- merge(
+      x@meta, 
+      x@paragraphs[, c("Art_ID", "Par_ID")], 
+      by.x = "ID", 
+      by.y = "Art_ID", 
+      all.x = FALSE, 
+      all.y = TRUE
+    )
   }
-  names(text) <- x@articles$ID
+  names(text) <- ID
   dots <- list(...)
   if (any(grepl("metacorpus", names(dots)))) {
     metacorpus <- list(Converted = "LexiNexisTools",
@@ -1013,10 +1026,43 @@ lnt2quanteda <- function(x, what, ...) {
     metacorpus <- list(Converted = "LexiNexisTools")
   }
   dta <- corpus(x = text,
-                docvars = x@meta,
+                docvars = meta,
                 metacorpus = metacorpus,
                 ...)
   return(dta)
+}
+
+
+#' @rdname lnt_convert
+#' @export
+#' @importFrom methods slot slotNames
+lnt2cptools <- function(x, what, ...) {
+  if (!requireNamespace("corpustools", quietly = TRUE)) {
+    stop("Package \"corpustools\" is needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
+  if (what == "Articles") {
+    text <- x@articles$Article
+    ID <- x@meta$ID
+    meta <- x@meta
+  } else if (what == "Paragraph") {
+    text <- x@paragraphs$Paragraph
+    ID <- x@paragraphs$Par_ID
+    meta <- merge(
+      x@meta, 
+      x@paragraphs[, c("Art_ID", "Par_ID")], 
+      by.x = "ID", 
+      by.y = "Art_ID", 
+      all.x = FALSE, 
+      all.y = TRUE
+    )
+  }
+  tCorpus <- corpustools::create_tcorpus(
+    x = text,
+    doc_id = ID, 
+    meta = meta, 
+    ...)
+  return(tCorpus)
 }
 
 

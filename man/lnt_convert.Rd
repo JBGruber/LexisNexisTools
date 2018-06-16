@@ -4,6 +4,7 @@
 \alias{lnt_convert}
 \alias{lnt2rDNA}
 \alias{lnt2quanteda}
+\alias{lnt2cptools}
 \alias{lnt2SQLite}
 \title{Convert LNToutput to other formats}
 \usage{
@@ -13,19 +14,20 @@ lnt2rDNA(x, what)
 
 lnt2quanteda(x, what, ...)
 
+lnt2cptools(x, what, ...)
+
 lnt2SQLite(x, file = "LNT.sqlite", ...)
 }
 \arguments{
 \item{x}{An object of class LNToutput}
 
-\item{to}{Which format to convert into. Possible values are "rDNA", "SQLite"
-and "quanteda".}
+\item{to}{Which format to convert into. Possible values are "rDNA",
+"corpustools", "SQLite" and "quanteda".}
 
 \item{what}{Either "Articles" or "Paragraph" to use articles or paragraphs as
 text in the output object.}
 
-\item{file}{The name of the database to be written to (for lnt2SQLite
-only).}
+\item{file}{The name of the database to be written to (for lnt2SQLite only).}
 
 \item{...}{Passed on to different methods.}
 }
@@ -37,4 +39,5 @@ LNToutput <- lnt_read(lnt_sample())
 docs <- lnt_convert(LNToutput, to = "rDNA")
 corpus <- lnt_convert(LNToutput, to = "quanteda")
 dbloc <- lnt_convert(LNToutput, to = "lnt2SQLite")
+tCorpus <- lnt_convert(LNToutput, to = "corpustools")
 }
