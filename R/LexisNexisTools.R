@@ -11,8 +11,9 @@
 
 #' An S4 class to store the three data.frames created with \link{lnt_read}.
 #'
-#' This S4 class stores the output from \link{lnt_read}. Objects consist of
-#' three data.frames which you can select using \code{@}.
+#' This S4 class stores the output from \link{lnt_read}. Just like a spreadsheet
+#' with multiple worksheets, a LNToutput object consist of three data.frames
+#' which you can select using \code{@}.
 #'
 #' @slot meta The metadata of the articles read in.
 #' @slot articles The article texts and respective IDs.
@@ -691,18 +692,18 @@ lnt_rename <- function(x,
 #' @examples
 #' # Copy sample file to current wd
 #' lnt_sample()
-#' 
+#'
 #' # Convert raw file to LNToutput object
 #' LNToutput <- lnt_read(lnt_sample())
-#' 
+#'
 #' # Test similarity of articles
 #' duplicates.df <- lnt_similarity(texts = LNToutput@articles$Article,
 #'                                 dates = LNToutput@meta$Date,
 #'                                 IDs = LNToutput@articles$ID)
-#' 
+#'
 #' # Remove instances with a high relative distance
 #' duplicates.df <- duplicates.df[duplicates.df$rel_dist < 0.2]
-#' 
+#'
 #' # Create three separate data.frames from cleaned LNToutput object
 #' LNToutput <- LNToutput[!LNToutput@meta$ID %in%
 #'                          duplicates.df$ID_duplicate]
@@ -736,7 +737,6 @@ lnt_similarity <- function(texts,
                  length(IDs))) {
     stop("'texts', 'dates' and 'IDs' need to have the same length.")
   }
-
   # get unique dates
   dates.d <- unique(dates)
   dates.d <- dates.d[order(dates.d)]
@@ -744,15 +744,14 @@ lnt_similarity <- function(texts,
     warning("You supplied NA values to 'dates'. Those will be ignored.")
     dates.d <- dates.d[!is.na(dates.d)]
   }
+  if (exists("LNToutput")) rm(LNToutput)
   if (verbose) cat("Checking similiarity for", length(dates), "articles over", length(dates.d), "dates...\n")
-
   text.dfm <- quanteda::dfm(texts,
                             tolower = TRUE,
                             remove = "[^[:alnum:]]",
                             valuetype = "regex",
                             verbose = FALSE)
   text.dfm@Dimnames$docs <- IDs
-
   duplicates.df <- lapply(dates.d, function(x){
     if (length(grep(x, dates)) > 1) {
       sim <- as.matrix(quanteda::textstat_simil(text.dfm[text.dfm@Dimnames$docs %in%
@@ -933,10 +932,12 @@ lnt_asDate <- function(x,
 #' Takes output from \link{lnt_read} and converts it to other formats.
 #'
 #' @param x An object of class LNToutput
-#' @param to Which format to convert into. Possible values are "rDNA" and
-#'   "quanteda".
+#' @param to Which format to convert into. Possible values are "rDNA", "SQLite"
+#'   and "quanteda".
 #' @param what Either "Articles" or "Paragraph" to use articles or paragraphs as
 #'   text in the output object.
+#' @param file The name of the database to be written to (for lnt2SQLite
+#'   only).
 #' @param ... Passed on to different methods.
 #' @export
 #'
@@ -944,14 +945,18 @@ lnt_asDate <- function(x,
 #' LNToutput <- lnt_read(lnt_sample())
 #' docs <- lnt_convert(LNToutput, to = "rDNA")
 #' corpus <- lnt_convert(LNToutput, to = "quanteda")
+#' dbloc <- lnt_convert(LNToutput, to = "lnt2SQLite")
 lnt_convert <- function(x,
                         to = "rDNA",
                         what = "Articles",
+                        file = "LNT.sqlite",
                         ...) {
   if (to == "rDNA") {
     return(lnt2rDNA(x, what = what))
   } else if (to == "quanteda") {
-    return(lnt2quanteda(x, what = what))
+    return(lnt2quanteda(x, what = what, ...))
+  } else if (to == "SQLite") {
+    return(lnt2SQLite(x, file = file, ...))
   }
 }
 
@@ -1012,6 +1017,25 @@ lnt2quanteda <- function(x, what, ...) {
                 metacorpus = metacorpus,
                 ...)
   return(dta)
+}
+
+
+#' @rdname lnt_convert
+#' @export
+#' @importFrom methods slot slotNames
+lnt2SQLite <- function(x, file = "LNT.sqlite", ...) {
+  if (!requireNamespace("RSQLite", quietly = TRUE)) {
+    stop("Package \"RSQLite\" is needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
+  db <- RSQLite::dbConnect(RSQLite::SQLite(), file)
+  for (i in slotNames(x)) {
+    RSQLite::dbWriteTable(conn = db,
+                          name = i,
+                          value = slot(x, i),
+                          ...)
+  }
+  return(db)
 }
 
 

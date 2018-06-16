@@ -5,8 +5,9 @@
 \alias{LNToutput-class}
 \title{An S4 class to store the three data.frames created with \link{lnt_read}.}
 \description{
-This S4 class stores the output from \link{lnt_read}. Objects consist of
-three data.frames which you can select using \code{@}.
+This S4 class stores the output from \link{lnt_read}. Just like a spreadsheet
+with multiple worksheets, a LNToutput object consist of three data.frames
+which you can select using \code{@}.
 }
 \section{Slots}{
 
