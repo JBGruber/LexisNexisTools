@@ -751,6 +751,8 @@ lnt_similarity <- function(texts,
                             remove = "[^[:alnum:]]",
                             valuetype = "regex",
                             verbose = FALSE)
+  if (verbose) cat("\t...quanteda dfm construced for similarity comparison [",
+      format( (Sys.time() - start_time), digits = 2, nsmall = 2), "].", sep = "")
   text.dfm@Dimnames$docs <- IDs
   duplicates.df <- lapply(dates.d, function(x){
     if (length(grep(x, dates)) > 1) {
@@ -780,10 +782,12 @@ lnt_similarity <- function(texts,
           duplicates.df$rel_dist <- sapply(seq_len(nrow(duplicates.df)), function(i) {
             # length of longer string
             mxln <- max(c(nchar(duplicates.df$text_original[i]), nchar(duplicates.df$text_duplicate[i])))
-            if (abs(nchar(duplicates.df$text_original[i]) - nchar(duplicates.df$text_duplicate[i])) /
-                mxln <
-                length_diff &
-                max_length > mxln) {
+            if (isTRUE(
+              abs(nchar(duplicates.df$text_original[i]) - nchar(duplicates.df$text_duplicate[i])) /
+              mxln <
+              length_diff &
+              max_length > mxln
+            )) {
               stringdist::stringdist(a = duplicates.df$text_original[i],
                                      b = duplicates.df$text_duplicate[i],
                                      method = "lv",
