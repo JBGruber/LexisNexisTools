@@ -816,7 +816,7 @@ lnt_similarity <- function(texts,
   time.elapsed <- Sys.time() - start_time
   cat("\r\nThreshold = ", threshold, "; ",
       length(dates.d), " days processed; ",
-      nrow(duplicates.df[unique(duplicates.df$ID_duplicate), ]), " duplicates found;",
+      length(unique(duplicates.df$ID_duplicate)), " duplicates found;",
       " in ", format(time.elapsed, digits = 2, nsmall = 2), sep = "")
   attributes(duplicates.df)$call <- call
   return(duplicates.df)
@@ -998,6 +998,7 @@ lnt2rDNA <- function(x, what) {
       dta$date <- as.POSIXct.numeric(dta$date, origin = "1970-01-01")
     }
   }
+  dta[is.na(dta)] <- ""
   return(dta)
 }
 
