@@ -27,3 +27,4 @@ LNToutput <- lnt_read(lnt_sample(), convert_date = FALSE)
 d <- lnt_asDate(LNToutput@meta$Date)
 d
 }
+

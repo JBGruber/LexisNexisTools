@@ -33,6 +33,7 @@ setClass("LNToutput",
 #' @param j The a column you want to use to subset the LNToutput object. Takes
 #'   character strings.
 #' @param invert Invert the selection of i.
+#' @param e1,e2 LNToutput objects which will be combined.
 #' @name LNToutput_methods
 NULL
 
@@ -102,6 +103,18 @@ setMethod("[",
               x@paragraphs <- x@paragraphs[x@paragraphs$Art_ID %in% select, ]
             }
             return(x)
+          }
+)
+
+
+#' @rdname LNToutput_methods
+setMethod("+",
+          signature = c("LNToutput", "LNToutput"),
+          definition = function(e1, e2) {
+            e1@meta <- rbind(e1@meta, e2@meta)
+            e1@articles <- rbind(e1@articles, e2@articles)
+            e1@paragraphs <- rbind(e1@paragraphs, e2@paragraphs)
+            return(e1)
           }
 )
 

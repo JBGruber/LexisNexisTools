@@ -1,31 +1,31 @@
 Package: LexisNexisTools
 Title: Working with Files from 'LexisNexis'
-Version: 0.1.44.9000
-Date: 2018-06-19
+Version: 0.1.45.9000
+Date: 2018-06-24
 Authors@R: person("Johannes", "Gruber", email = "j.gruber.1@research.gla.ac.uk", 
   role = c("aut", "cre"))
 Description: My PhD supervisor once told me that everyone doing newspaper
- analysis starts by writing code to read in files from the 'LexisNexis'
- newspaper archive (retrieved e.g., from <http://www.nexis.com/> or any of the 
- partner sites). However, while this is a nice exercise I do recommend, not
- everyone has the time. This package takes TXT files downloaded from the
- newspaper archive of 'LexisNexis' and read them into R for further processing.
-Depends: 
-  R (>= 3.3.0)
+    analysis starts by writing code to read in files from the 'LexisNexis' newspaper
+    archive (retrieved e.g., from <http://www.nexis.com/> or any of the partner
+    sites). However, while this is a nice exercise I do recommend, not everyone has
+    the time. This package takes TXT files downloaded from the newspaper archive of
+    'LexisNexis' and read them into R for further processing.
+Depends:
+    R (>= 3.3.0)
 License: GPL-3
-Imports: 
-  stringi (>= 1.1.7), 
-  data.table (>= 1.10.4.3),
-  methods (>= 3.3.0),
-  quanteda (>= 1.1.0),
-  scales (>= 0.5.0),
-  stats (>= 3.3.0),
-  utils (>= 3.3.0),
-  stringdist (>= 0.9.4.0),
-  reshape2 (>= 1.4.3)
+Imports:
+    stringi (>= 1.1.7),
+    data.table (>= 1.10.4.3),
+    methods (>= 3.3.0),
+    quanteda (>= 1.1.0),
+    scales (>= 0.5.0),
+    stats (>= 3.3.0),
+    utils (>= 3.3.0),
+    stringdist (>= 0.9.4.0),
+    reshape2 (>= 1.4.3)
 Suggests:
     RSQLite,
     corpustools
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.0.1
+RoxygenNote: 6.0.1.9000

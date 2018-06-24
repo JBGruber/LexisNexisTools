@@ -2,14 +2,17 @@
 % Please edit documentation in R/LexisNexisTools.R
 \docType{methods}
 \name{LNToutput_methods}
+\alias{+,LNToutput,LNToutput-method}
 \alias{LNToutput_methods}
-\alias{show,LNToutput-method}
 \alias{[,LNToutput,ANY,ANY,ANY-method}
+\alias{show,LNToutput-method}
 \title{Methods for LNToutput output objects}
 \usage{
 \S4method{show}{LNToutput}(object)
 
 \S4method{[}{LNToutput,ANY,ANY,ANY}(x, i, j, invert = FALSE)
+
+\S4method{+}{LNToutput,LNToutput}(e1, e2)
 }
 \arguments{
 \item{x, object}{An LNToutput object.}
@@ -20,7 +23,10 @@
 character strings.}
 
 \item{invert}{Invert the selection of i.}
+
+\item{e1, e2}{LNToutput objects which will be combined.}
 }
 \description{
 Methods for LNToutput output objects
 }
+
