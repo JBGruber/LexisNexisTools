@@ -111,9 +111,27 @@ setMethod("[",
 setMethod("+",
           signature = c("LNToutput", "LNToutput"),
           definition = function(e1, e2) {
+            IDs <- c(e1@meta$ID, (e2@meta$ID + max(e1@meta$ID)))
+            Par_IDs <- c(
+              e1@paragraphs$Par_ID, 
+              (e2@paragraphs$Par_ID + max(e1@paragraphs$Par_ID))
+            )
+            Art_IDs <- c(
+              e1@paragraphs$Art_ID, 
+              (e2@paragraphs$Art_ID + max(e1@paragraphs$Art_ID))
+            )
             e1@meta <- rbind(e1@meta, e2@meta)
             e1@articles <- rbind(e1@articles, e2@articles)
             e1@paragraphs <- rbind(e1@paragraphs, e2@paragraphs)
+            
+            if (any(duplicated(e1@meta$ID))|
+                any(duplicated(e1@paragraphs$Par_ID))) {
+              message("After objects were merged, there were duplicated IDs. This was fixed.")
+              e1@meta$ID <- IDs
+              e1@articles$ID <- IDs
+              e1@paragraphs$Art_ID <- Art_IDs
+              e1@paragraphs$Par_ID <- Par_IDs
+            }
             return(e1)
           }
 )
@@ -232,7 +250,7 @@ lnt_read <- function(x,
   }
 
   # Track the time
-  if (verbose) start_time <- Sys.time(); cat("Creating LNToutput from a connection input...\n")
+  if (verbose) start_time <- Sys.time(); cat("Creating LNToutput from input", length(files), "files...\n")
 
   ### read in file
   if (length(files) > 1){
@@ -457,11 +475,12 @@ lnt_read <- function(x,
                                                          pattern = c("\\s+", "^\\s|\\s$"),
                                                          replacement = c(" ", ""),
                                                          vectorize_all = FALSE)
+  if (verbose) cat("\t...superfluous whitespace removed from articles [", format( (Sys.time() - start_time), digits = 2, nsmall = 2), "]\n", sep = "")
   paragraphs.df$Paragraph <- stringi::stri_replace_all_regex(str = paragraphs.df$Paragraph,
                                                              pattern = c("\\s+", "^\\s|\\s$"),
                                                              replacement = c(" ", ""),
                                                              vectorize_all = FALSE)
-
+  if (verbose) cat("\t...superfluous whitespace removed from paragraphs [", format( (Sys.time() - start_time), digits = 2, nsmall = 2), "]\n", sep = "")
   if (verbose) cat("Elapsed time: ", format( (Sys.time() - start_time), digits = 2, nsmall = 2), "\n", sep = "")
   out <- new("LNToutput", meta = meta.df, articles = articles.df, paragraphs = paragraphs.df)
   attributes(out)$created <- list(time = Sys.time(),

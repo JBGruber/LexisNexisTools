@@ -94,4 +94,3 @@ paragraphs.df <- LNToutput@paragraphs
 Johannes B. Gruber
 }
 \keyword{similarity}
-

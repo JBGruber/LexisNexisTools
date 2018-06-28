@@ -12,4 +12,3 @@ lnt_checkFiles(...)
 \description{
 Check LexisNexis TXT files (deprecated)
 }
-

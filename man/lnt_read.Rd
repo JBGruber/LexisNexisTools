@@ -81,4 +81,3 @@ paragraphs.df <- LNToutput@paragraphs
 \author{
 Johannes B. Gruber
 }
-

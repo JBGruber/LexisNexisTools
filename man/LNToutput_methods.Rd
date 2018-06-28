@@ -2,10 +2,10 @@
 % Please edit documentation in R/LexisNexisTools.R
 \docType{methods}
 \name{LNToutput_methods}
-\alias{+,LNToutput,LNToutput-method}
 \alias{LNToutput_methods}
-\alias{[,LNToutput,ANY,ANY,ANY-method}
 \alias{show,LNToutput-method}
+\alias{[,LNToutput,ANY,ANY,ANY-method}
+\alias{+,LNToutput,LNToutput-method}
 \title{Methods for LNToutput output objects}
 \usage{
 \S4method{show}{LNToutput}(object)
@@ -29,4 +29,3 @@ character strings.}
 \description{
 Methods for LNToutput output objects
 }
-
