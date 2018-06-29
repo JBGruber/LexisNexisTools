@@ -113,18 +113,17 @@ setMethod("+",
           definition = function(e1, e2) {
             IDs <- c(e1@meta$ID, (e2@meta$ID + max(e1@meta$ID)))
             Par_IDs <- c(
-              e1@paragraphs$Par_ID, 
+              e1@paragraphs$Par_ID,
               (e2@paragraphs$Par_ID + max(e1@paragraphs$Par_ID))
             )
             Art_IDs <- c(
-              e1@paragraphs$Art_ID, 
+              e1@paragraphs$Art_ID,
               (e2@paragraphs$Art_ID + max(e1@paragraphs$Art_ID))
             )
             e1@meta <- rbind(e1@meta, e2@meta)
             e1@articles <- rbind(e1@articles, e2@articles)
             e1@paragraphs <- rbind(e1@paragraphs, e2@paragraphs)
-            
-            if (any(duplicated(e1@meta$ID))|
+            if (any(duplicated(e1@meta$ID)) |
                 any(duplicated(e1@paragraphs$Par_ID))) {
               message("After objects were merged, there were duplicated IDs. This was fixed.")
               e1@meta$ID <- IDs
@@ -1046,11 +1045,11 @@ lnt2quanteda <- function(x, what, ...) {
     text <- x@paragraphs$Paragraph
     ID <- x@paragraphs$Par_ID
     meta <- merge(
-      x@meta, 
-      x@paragraphs[, c("Art_ID", "Par_ID")], 
-      by.x = "ID", 
-      by.y = "Art_ID", 
-      all.x = FALSE, 
+      x@meta,
+      x@paragraphs[, c("Art_ID", "Par_ID")],
+      by.x = "ID",
+      by.y = "Art_ID",
+      all.x = FALSE,
       all.y = TRUE
     )
   }
@@ -1086,18 +1085,18 @@ lnt2cptools <- function(x, what, ...) {
     text <- x@paragraphs$Paragraph
     ID <- x@paragraphs$Par_ID
     meta <- merge(
-      x@meta, 
-      x@paragraphs[, c("Art_ID", "Par_ID")], 
-      by.x = "ID", 
-      by.y = "Art_ID", 
-      all.x = FALSE, 
+      x@meta,
+      x@paragraphs[, c("Art_ID", "Par_ID")],
+      by.x = "ID",
+      by.y = "Art_ID",
+      all.x = FALSE,
       all.y = TRUE
     )
   }
   tCorpus <- corpustools::create_tcorpus(
     x = text,
-    doc_id = ID, 
-    meta = meta, 
+    doc_id = ID,
+    meta = meta,
     ...)
   return(tCorpus)
 }
@@ -1123,6 +1122,72 @@ lnt2SQLite <- function(x, file = "LNT.sqlite", ...) {
 
 
 # Miscellaneous ------------------------------------------------------------
+
+#' Adds or replaces articles
+#'
+#' This functions adds a dataframe to a slot in an LNToutput object or overwrite
+#' existing entries. The main use of the function is to add an extract of one of
+#' the data.frames back to an LNToutput object after operations were performed
+#' on it.
+#'
+#' @param to A LNToutput object to which something should be added.
+#' @param what A data.frame which is added.
+#' @param where Either "meta", "articles" or "paragraphs" to indicate the slot to which data is added.
+#' @param replace If TRUE, will overwrite entries which have the same ID as
+#'
+#' @examples
+#' lnt_sample()
+#' # LNToutput <- lnt_add(to = LNToutput, what = ups, where = "meta", replace = TRUE)
+#' @author Johannes Gruber
+#' @export
+#' @importFrom methods slot
+lnt_add <- function(to,
+                    what,
+                    where = "meta",
+                    replace = TRUE) {
+  if (where %in% c("meta", "articles")) {
+    temp <- slot(to, where)
+    if (any(what$ID %in% temp$ID)) {
+      if (replace) {
+        update <- what$ID %in% temp$ID
+        temp <- temp[!temp$ID %in% what$ID, ]
+        temp <- rbind(temp,
+                                 what[update, ])
+        temp <- temp[order(temp$ID), ]
+        message(sum(update), " entries in ", where, " replaced, ", sum(!update), " newly added.")
+      } else {
+        update <- !what$ID %in% temp$ID
+        temp <- rbind(temp,
+                                 what[update, ])
+        temp <- temp[order(temp$ID), ]
+        message(sum(update), " entries added to ", where, ", ", sum(!update), " already present.")
+      }
+    } else {
+      temp <- rbind(temp,
+                               what[update, ])
+      temp <- temp[order(temp$ID), ]
+      message(nrow(what), " entries added to ", where, ".")
+    }
+  } else if (where %in% "paragraphs") {
+    stop("feature added soon")
+  } else {
+    stop("Choose either 'meta', 'articles' or 'paragraphs' as 'to' argument.")
+  }
+  if (where %in% "meta") {
+    to@meta <- temp
+  } else if (where %in% "articles") {
+    to@articles <- temp
+  } else if (where %in% "paragraphs") {
+    to@paragraphs <- temp
+  }
+  if (!isTRUE(
+    all.equal(length(to@meta$ID), length(to@articles$ID), length(unique(to@paragraphs$Art_ID)))
+  )) {
+    warning("Returned object is out of balnace (one slot has more or less entries than another.")
+  }
+  return(to)
+}
+
 
 #' Provides a small sample TXT file
 #'
