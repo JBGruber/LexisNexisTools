@@ -14,7 +14,7 @@ lnt_similarity(texts, dates, LNToutput, IDs = NULL, threshold = 0.99,
 \item{dates}{Provide corresponding dates, same length as \code{text}.}
 
 \item{LNToutput}{Alternatively to providing texts an dates individually, you
-can provide a LNToutput object.}
+can provide an LNToutput object.}
 
 \item{IDs}{IDs of articles.}
 

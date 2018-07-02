@@ -19,7 +19,7 @@
 
 \item{i}{Rows of the meta data.frame (default) or values of j.}
 
-\item{j}{The a column you want to use to subset the LNToutput object. Takes
+\item{j}{The column you want to use to subset the LNToutput object. Takes
 character strings.}
 
 \item{invert}{Invert the selection of i.}

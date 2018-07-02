@@ -20,13 +20,13 @@ lnt_read(x, encoding = "UTF-8", extract_paragraphs = TRUE,
 will include a third data frame with paragraphs.}
 
 \item{convert_date}{A logical flag indicating if it should be tried to
-convert the date of each article into Date format. Fails for non standard
-dates provided by LexisNexis so it might be safer to convert date
-afterwards.}
+convert the date of each article into Date format. For non-standard
+dates provided by LexisNexis it might be safer to convert dates
+afterwards (see \link{lnt_asDate}).}
 
 \item{start_keyword}{Is used to indicate the beginning of an article. All
 articles should have the same number of Beginnings, ends and lengths (which
-indicate the the last line of meta-data). Use regex expression such as
+indicate the last line of metadata). Use regex expression such as
 "\\d+ of \\d+ DOCUMENTS$" (which would catch e.g., the format "2 of 100
 DOCUMENTS") or "auto" to try all common keywords. Keyword search is case
 sensitive.}
@@ -36,7 +36,7 @@ way as start_keyword. A common regex would be "^LANGUAGE: " which catches
 language in all caps at the beginning of the line (usually the last line of
 an article).}
 
-\item{length_keyword}{Is used to indicate the end of the meta-data. Works the
+\item{length_keyword}{Is used to indicate the end of the metadata. Works the
 same way as start_keyword and end_keyword. A common regex would be
 "^LENGTH: " which catches length in all caps at the beginning of the line
 (usually the last line of the metadata).}
@@ -53,14 +53,14 @@ printed to the screen.}
 \item{...}{Additional arguments passed on to \link{lnt_asDate}.}
 }
 \value{
-A LNToutput S4 object consisting of 3 data.frames for meta-data,
+an LNToutput S4 object consisting of 3 data.frames for metadata,
   articles and paragraphs.
 }
 \description{
 Read a LexisNexis TXT file and convert it to a data frame.
 }
 \details{
-The function can produce a LNToutput S4 object with two data.frame:
+The function can produce an LNToutput S4 object with two data.frame:
   meta, containing all meta information such as date, author and headline and
   articles, containing just the article ID and the text of the articles. When
   extract_paragraphs is set to TRUE, the output contains a third data.frame,

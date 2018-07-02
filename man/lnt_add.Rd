@@ -7,23 +7,36 @@
 lnt_add(to, what, where = "meta", replace = TRUE)
 }
 \arguments{
-\item{to}{A LNToutput object to which something should be added.}
+\item{to}{an LNToutput object to which something should be added.}
 
 \item{what}{A data.frame which is added.}
 
-\item{where}{Either "meta", "articles" or "paragraphs" to indicate the slot to which data is added.}
+\item{where}{Either "meta", "articles" or "paragraphs" to indicate the slot
+to which data is added.}
 
 \item{replace}{If TRUE, will overwrite entries which have the same ID as}
 }
 \description{
-This functions adds a dataframe to a slot in an LNToutput object or overwrite
-existing entries. The main use of the function is to add an extract of one of
-the data.frames back to an LNToutput object after operations were performed
-on it.
+This functions adds a dataframe to a slot in an LNToutput object
+  or overwrite existing entries. The main use of the function is to add an
+  extract of one of the data.frames back to an LNToutput object after
+  operations were performed on it.
+}
+\details{
+Note, that when adding paragraphs, the Par_ID column is used to
+  determine if entries are already present in the set. For the other data
+  frames the article ID is used.
 }
 \examples{
-lnt_sample()
-# LNToutput <- lnt_add(to = LNToutput, what = ups, where = "meta", replace = TRUE)
+# Make LNToutput object from sample
+LNToutput <- lnt_read(lnt_sample())
+
+# extract meta and make corrections
+correction <- LNToutput@meta[grepl("Wikipedia", LNToutput@meta$Headline), ]
+correction$Newspaper <- "Wikipedia"
+
+# replace corrected meta information
+LNToutput <- lnt_add(to = LNToutput, what = correction, where = "meta", replace = TRUE)
 }
 \author{
 Johannes Gruber

@@ -12,7 +12,7 @@
 #' An S4 class to store the three data.frames created with \link{lnt_read}.
 #'
 #' This S4 class stores the output from \link{lnt_read}. Just like a spreadsheet
-#' with multiple worksheets, a LNToutput object consist of three data.frames
+#' with multiple worksheets, an LNToutput object consist of three data.frames
 #' which you can select using \code{@}.
 #'
 #' @slot meta The metadata of the articles read in.
@@ -30,7 +30,7 @@ setClass("LNToutput",
 #'
 #' @param x,object An LNToutput object.
 #' @param i Rows of the meta data.frame (default) or values of j.
-#' @param j The a column you want to use to subset the LNToutput object. Takes
+#' @param j The column you want to use to subset the LNToutput object. Takes
 #'   character strings.
 #' @param invert Invert the selection of i.
 #' @param e1,e2 LNToutput objects which will be combined.
@@ -148,12 +148,12 @@ setMethod("+",
 #' @param extract_paragraphs A logical flag indicating if the returned object
 #'   will include a third data frame with paragraphs.
 #' @param convert_date A logical flag indicating if it should be tried to
-#'   convert the date of each article into Date format. Fails for non standard
-#'   dates provided by LexisNexis so it might be safer to convert date
-#'   afterwards.
+#'   convert the date of each article into Date format. For non-standard
+#'   dates provided by LexisNexis it might be safer to convert dates
+#'   afterwards (see \link{lnt_asDate}).
 #' @param start_keyword Is used to indicate the beginning of an article. All
 #'   articles should have the same number of Beginnings, ends and lengths (which
-#'   indicate the the last line of meta-data). Use regex expression such as
+#'   indicate the last line of metadata). Use regex expression such as
 #'   "\\d+ of \\d+ DOCUMENTS$" (which would catch e.g., the format "2 of 100
 #'   DOCUMENTS") or "auto" to try all common keywords. Keyword search is case
 #'   sensitive.
@@ -161,7 +161,7 @@ setMethod("+",
 #'   way as start_keyword. A common regex would be "^LANGUAGE: " which catches
 #'   language in all caps at the beginning of the line (usually the last line of
 #'   an article).
-#' @param length_keyword Is used to indicate the end of the meta-data. Works the
+#' @param length_keyword Is used to indicate the end of the metadata. Works the
 #'   same way as start_keyword and end_keyword. A common regex would be
 #'   "^LENGTH: " which catches length in all caps at the beginning of the line
 #'   (usually the last line of the metadata).
@@ -172,9 +172,9 @@ setMethod("+",
 #' @param verbose A logical flag indicating whether information should be
 #'   printed to the screen.
 #' @param ... Additional arguments passed on to \link{lnt_asDate}.
-#' @return A LNToutput S4 object consisting of 3 data.frames for meta-data,
+#' @return an LNToutput S4 object consisting of 3 data.frames for metadata,
 #'   articles and paragraphs.
-#' @details The function can produce a LNToutput S4 object with two data.frame:
+#' @details The function can produce an LNToutput S4 object with two data.frame:
 #'   meta, containing all meta information such as date, author and headline and
 #'   articles, containing just the article ID and the text of the articles. When
 #'   extract_paragraphs is set to TRUE, the output contains a third data.frame,
@@ -221,13 +221,13 @@ lnt_read <- function(x,
     files <- grep(".txt$", x, ignore.case = TRUE, value = TRUE)
   } else if (any(grepl("\\\\|/", x))) {
     if (length(x) > 1) {
-      files <- unlist(sapply(x, function(f) {
+      files <- unlist(sapply(x, USE.NAMES = FALSE, function(f) {
         list.files(path = f,
                    pattern = ".txt$",
                    ignore.case = TRUE,
                    full.names = TRUE,
                    recursive = recursive)
-      }, USE.NAMES = FALSE))
+      }))
     } else {
       files <- list.files(path = x,
                           pattern = ".txt$",
@@ -569,13 +569,13 @@ lnt_rename <- function(x,
     files <- grep(".txt$", x, ignore.case = TRUE, value = TRUE)
   } else if (any(grepl("\\\\|/", x))) {
     if (length(x) > 1) {
-      files <- unlist(sapply(x, function(f) {
+      files <- unlist(sapply(x, USE.NAMES = FALSE, function(f) {
         list.files(path = f,
                    pattern = ".txt$",
                    ignore.case = TRUE,
                    full.names = TRUE,
                    recursive = recursive)
-      }, USE.NAMES = FALSE))
+      }))
     } else {
       files <- list.files(path = x,
                           pattern = ".txt$",
@@ -687,7 +687,7 @@ lnt_rename <- function(x,
 #' @param texts Provide texts to check for similarity.
 #' @param dates Provide corresponding dates, same length as \code{text}.
 #' @param LNToutput Alternatively to providing texts an dates individually, you
-#'   can provide a LNToutput object.
+#'   can provide an LNToutput object.
 #' @param IDs IDs of articles.
 #' @param threshold At which threshold of similarity is an article considered a
 #'   duplicate. Note that lower threshold values will increase the time to
@@ -854,14 +854,15 @@ lnt_similarity <- function(texts,
 }
 
 
-#' Convert Strings to dates
+#' @title Convert Strings to dates
 #'
-#' Converts dates from string formats common in LexisNexis to date
+#' @description  Converts dates from string formats common in LexisNexis to a
+#'   date object.
 #'
 #' @param x A character object to be converted.
-#' @param format Either "auto" to guess the format based on common order of day,
-#'   month and year or provide (see \link[stringi]{stri_datetime_format} for
-#'   format options).
+#' @param format Either "auto" to guess the format based on a common order of
+#'   day, month and year or provide (see \link[stringi]{stri_datetime_format}
+#'   for format options).
 #' @param locale A ISO 639-1 locale code (see
 #'   \url{https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes}).
 #'
@@ -959,6 +960,86 @@ lnt_asDate <- function(x,
   return(x)
 }
 
+
+#' @title Lookup keywords in articles
+#'
+#' @description This function looks in for the provided keywords in the
+#'   provided string or LNToutput object. This can be useful, for example, to
+#'   see which of the keywords you used when retrieving the data was used in
+#'   each article.
+#' @details If an LNToutput object is provided, the function will look for the
+#'   pattern in the headlines and articles. The returned object is a list of
+#'   hits. If a regular expression is provided, the retunred word will be the
+#'   actual value from the text.
+#' @param x A string or vector of strings or an LNToutput object.
+#' @param pattern A character vector of keywords. Word boundaries before and
+#'   after the keywords are honoured. Regular expression can be used.
+#' @param cluster The number of CPU cores to use. Use \code{NULL} or \code{1} to
+#'   turn off.
+#' @param case_insensitive If FALSE, the pattern matching is case sensitive and if
+#'   TRUE, case is ignored during matching.
+#' @param verbose A logical flag indicating whether a status bar is printed to
+#'   the screen.
+#' @return A list keyword hits.
+#'
+#' @examples
+#' # Make LNToutput object from sample
+#' LNToutput <- lnt_read(lnt_sample())
+#'
+#' # Lookup keywords
+#' LNToutput@meta$Keyword <- lnt_lookup(LNToutput,
+#'                                      "statistical computing")
+#'
+#' @author Johannes Gruber
+#' @export
+#' @importFrom pbapply pboptions pblapply
+#' @importFrom parallel makeCluster stopCluster clusterExport
+#' @importFrom stringi stri_join stri_extract_all_regex stri_opts_regex
+lnt_lookup <- function(x,
+                       pattern,
+                       cluster = NULL,
+                       case_insensitive = FALSE,
+                       verbose = TRUE) {
+  if ("character" %in% class(x)) {
+  } else if ("LNToutput" %in% class(x)) {
+    x <- stringi::stri_join(x@meta$Headline,
+                            x@articles$Article,
+                            sep = " \n ")
+  } else (
+    stop("'x' must be either a character vector or LNToutput object.")
+  )
+
+
+  if (!verbose) {
+    pbapply::pboptions(type = "none")
+  } else {
+    pbapply::pboptions(type = "timer")
+  }
+  if (isTRUE(cluster > 1)) {
+    cl <- parallel::makeCluster(cluster)
+    parallel::clusterExport(cl = cl, varlist = "pattern")
+  } else {
+    cl <- NULL
+  }
+  return <- pbapply::pblapply(x, cl = cl, function(s) {
+    out <- stringi::stri_extract_all_regex(str = s,
+                                           pattern = paste0("\\b",
+                                                            pattern,
+                                                            "\\b"), #Use word boundaries
+                                           vectorize_all = TRUE,
+                                           omit_no_match = FALSE,
+                                           simplify = FALSE,
+                                           opts_regex = stringi::stri_opts_regex(
+                                             case_insensitive = case_insensitive)
+    )
+    out[is.na(out)] <- NULL
+    return(unlist(out))
+  })
+  if (!is.null(cl)) {
+    parallel::stopCluster(cl)
+  }
+  return(return)
+}
 
 # Conversion ------------------------------------------------------------
 
@@ -1123,21 +1204,31 @@ lnt2SQLite <- function(x, file = "LNT.sqlite", ...) {
 
 # Miscellaneous ------------------------------------------------------------
 
-#' Adds or replaces articles
+#' @title Adds or replaces articles
 #'
-#' This functions adds a dataframe to a slot in an LNToutput object or overwrite
-#' existing entries. The main use of the function is to add an extract of one of
-#' the data.frames back to an LNToutput object after operations were performed
-#' on it.
-#'
-#' @param to A LNToutput object to which something should be added.
+#' @description This functions adds a dataframe to a slot in an LNToutput object
+#'   or overwrite existing entries. The main use of the function is to add an
+#'   extract of one of the data.frames back to an LNToutput object after
+#'   operations were performed on it.
+#' @details Note, that when adding paragraphs, the Par_ID column is used to
+#'   determine if entries are already present in the set. For the other data
+#'   frames the article ID is used.
+#' @param to an LNToutput object to which something should be added.
 #' @param what A data.frame which is added.
-#' @param where Either "meta", "articles" or "paragraphs" to indicate the slot to which data is added.
+#' @param where Either "meta", "articles" or "paragraphs" to indicate the slot
+#'   to which data is added.
 #' @param replace If TRUE, will overwrite entries which have the same ID as
 #'
 #' @examples
-#' lnt_sample()
-#' # LNToutput <- lnt_add(to = LNToutput, what = ups, where = "meta", replace = TRUE)
+#' # Make LNToutput object from sample
+#' LNToutput <- lnt_read(lnt_sample())
+#' 
+#' # extract meta and make corrections
+#' correction <- LNToutput@meta[grepl("Wikipedia", LNToutput@meta$Headline), ]
+#' correction$Newspaper <- "Wikipedia"
+#' 
+#' # replace corrected meta information
+#' LNToutput <- lnt_add(to = LNToutput, what = correction, where = "meta", replace = TRUE)
 #' @author Johannes Gruber
 #' @export
 #' @importFrom methods slot
@@ -1162,8 +1253,7 @@ lnt_add <- function(to,
         message(sum(update), " entries added to ", where, ", ", sum(!update), " already present.")
       }
     } else {
-      temp <- rbind(temp,
-                               what[update, ])
+      temp <- rbind(temp, what[update, ])
       temp <- temp[order(temp$ID), ]
       message(nrow(what), " entries added to ", where, ".")
     }

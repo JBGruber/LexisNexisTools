@@ -9,9 +9,9 @@ lnt_asDate(x, format = "auto", locale = "auto")
 \arguments{
 \item{x}{A character object to be converted.}
 
-\item{format}{Either "auto" to guess the format based on common order of day,
-month and year or provide (see \link[stringi]{stri_datetime_format} for
-format options).}
+\item{format}{Either "auto" to guess the format based on a common order of
+day, month and year or provide (see \link[stringi]{stri_datetime_format}
+for format options).}
 
 \item{locale}{A ISO 639-1 locale code (see
 \url{https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes}).}
@@ -20,7 +20,8 @@ format options).}
 This function returns an object of class \link{date}.
 }
 \description{
-Converts dates from string formats common in LexisNexis to date
+Converts dates from string formats common in LexisNexis to a
+  date object.
 }
 \examples{
 LNToutput <- lnt_read(lnt_sample(), convert_date = FALSE)
