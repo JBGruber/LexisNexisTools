@@ -9,7 +9,7 @@
 
 # Class and Methods ------------------------------------------------------------
 
-#' An S4 class to store the three data.frames created with \link{lnt_read}.
+#' An S4 class to store the three data.frames created with \link{lnt_read}
 #'
 #' This S4 class stores the output from \link{lnt_read}. Just like a spreadsheet
 #' with multiple worksheets, an LNToutput object consist of three data.frames
@@ -861,8 +861,8 @@ lnt_similarity <- function(texts,
 #'
 #' @param x A character object to be converted.
 #' @param format Either "auto" to guess the format based on a common order of
-#'   day, month and year or provide (see \link[stringi]{stri_datetime_format}
-#'   for format options).
+#'   day, month and year or provide a custom format (see
+#'   \link[stringi]{stri_datetime_format} for format options).
 #' @param locale A ISO 639-1 locale code (see
 #'   \url{https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes}).
 #'
@@ -963,21 +963,22 @@ lnt_asDate <- function(x,
 
 #' @title Lookup keywords in articles
 #'
-#' @description This function looks in for the provided keywords in the
-#'   provided string or LNToutput object. This can be useful, for example, to
-#'   see which of the keywords you used when retrieving the data was used in
-#'   each article.
+#' @description This function looks for the provided pattern in the string or
+#'   LNToutput object. This can be useful, for example, to see which of the
+#'   keywords you used when retrieving the data was used in each article.
 #' @details If an LNToutput object is provided, the function will look for the
 #'   pattern in the headlines and articles. The returned object is a list of
 #'   hits. If a regular expression is provided, the retunred word will be the
 #'   actual value from the text.
-#' @param x A string or vector of strings or an LNToutput object.
+#' @param x An LNToutput object or a string or vector of strings.
 #' @param pattern A character vector of keywords. Word boundaries before and
 #'   after the keywords are honoured. Regular expression can be used.
 #' @param cluster The number of CPU cores to use. Use \code{NULL} or \code{1} to
 #'   turn off.
-#' @param case_insensitive If FALSE, the pattern matching is case sensitive and if
-#'   TRUE, case is ignored during matching.
+#' @param case_insensitive If FALSE, the pattern matching is case sensitive and
+#'   if TRUE, case is ignored during matching.
+#' @param unique_pattern If TRUE, duplicated mentions of the same pattern are
+#'   removed.
 #' @param verbose A logical flag indicating whether a status bar is printed to
 #'   the screen.
 #' @return A list keyword hits.
@@ -990,6 +991,11 @@ lnt_asDate <- function(x,
 #' LNToutput@meta$Keyword <- lnt_lookup(LNToutput,
 #'                                      "statistical computing")
 #'
+#' # keep only articles which mention the keyword
+#' LNToutput_stat <- LNToutput[!sapply(LNToutput@meta$Keyword, is.null)]
+#'
+#' # Covert list of keywords to string
+#' LNToutput@meta$Keyword <- sapply(LNToutput@meta$Keyword, toString)
 #' @author Johannes Gruber
 #' @export
 #' @importFrom pbapply pboptions pblapply
@@ -999,17 +1005,18 @@ lnt_lookup <- function(x,
                        pattern,
                        cluster = NULL,
                        case_insensitive = FALSE,
+                       unique_pattern = FALSE,
                        verbose = TRUE) {
   if ("character" %in% class(x)) {
   } else if ("LNToutput" %in% class(x)) {
+    IDs <- x@meta$ID
     x <- stringi::stri_join(x@meta$Headline,
                             x@articles$Article,
                             sep = " \n ")
+    names(x) <- IDs
   } else (
     stop("'x' must be either a character vector or LNToutput object.")
   )
-
-
   if (!verbose) {
     pbapply::pboptions(type = "none")
   } else {
@@ -1033,7 +1040,11 @@ lnt_lookup <- function(x,
                                              case_insensitive = case_insensitive)
     )
     out[is.na(out)] <- NULL
-    return(unlist(out))
+    if (unique_pattern) {
+      return(unique(unlist(out)))
+    } else {
+      return(unlist(out))
+    }
   })
   if (!is.null(cl)) {
     parallel::stopCluster(cl)

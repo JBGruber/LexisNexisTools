@@ -5,10 +5,10 @@
 \title{Lookup keywords in articles}
 \usage{
 lnt_lookup(x, pattern, cluster = NULL, case_insensitive = FALSE,
-  verbose = TRUE)
+  unique_pattern = FALSE, verbose = TRUE)
 }
 \arguments{
-\item{x}{A string or vector of strings or an LNToutput object.}
+\item{x}{An LNToutput object or a string or vector of strings.}
 
 \item{pattern}{A character vector of keywords. Word boundaries before and
 after the keywords are honoured. Regular expression can be used.}
@@ -16,8 +16,11 @@ after the keywords are honoured. Regular expression can be used.}
 \item{cluster}{The number of CPU cores to use. Use \code{NULL} or \code{1} to
 turn off.}
 
-\item{case_insensitive}{If FALSE, the pattern matching is case sensitive and if
-TRUE, case is ignored during matching.}
+\item{case_insensitive}{If FALSE, the pattern matching is case sensitive and
+if TRUE, case is ignored during matching.}
+
+\item{unique_pattern}{If TRUE, duplicated mentions of the same pattern are
+removed.}
 
 \item{verbose}{A logical flag indicating whether a status bar is printed to
 the screen.}
@@ -26,10 +29,9 @@ the screen.}
 A list keyword hits.
 }
 \description{
-This function looks in for the provided keywords in the
-  provided string or LNToutput object. This can be useful, for example, to
-  see which of the keywords you used when retrieving the data was used in
-  each article.
+This function looks for the provided pattern in the string or
+  LNToutput object. This can be useful, for example, to see which of the
+  keywords you used when retrieving the data was used in each article.
 }
 \details{
 If an LNToutput object is provided, the function will look for the
@@ -45,6 +47,11 @@ LNToutput <- lnt_read(lnt_sample())
 LNToutput@meta$Keyword <- lnt_lookup(LNToutput,
                                      "statistical computing")
 
+# keep only articles which mention the keyword
+LNToutput_stat <- LNToutput[!sapply(LNToutput@meta$Keyword, is.null)]
+
+# Covert list of keywords to string
+LNToutput@meta$Keyword <- sapply(LNToutput@meta$Keyword, toString)
 }
 \author{
 Johannes Gruber
