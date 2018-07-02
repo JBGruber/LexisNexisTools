@@ -1157,8 +1157,7 @@ lnt_add <- function(to,
         message(sum(update), " entries in ", where, " replaced, ", sum(!update), " newly added.")
       } else {
         update <- !what$ID %in% temp$ID
-        temp <- rbind(temp,
-                                 what[update, ])
+        temp <- rbind(temp, what[update, ])
         temp <- temp[order(temp$ID), ]
         message(sum(update), " entries added to ", where, ", ", sum(!update), " already present.")
       }
@@ -1169,7 +1168,25 @@ lnt_add <- function(to,
       message(nrow(what), " entries added to ", where, ".")
     }
   } else if (where %in% "paragraphs") {
-    stop("feature added soon")
+    temp <- slot(to, where)
+    if (any(what$Par_ID %in% temp$Par_ID)) {
+      if (replace) {
+        update <- what$Par_ID %in% temp$Par_ID
+        temp <- temp[!temp$Par_ID %in% what$Par_ID, ]
+        temp <- rbind(temp, what[update, ])
+        temp <- temp[order(temp$Par_ID), ]
+        message(sum(update), " entries in ", where, " replaced, ", sum(!update), " newly added.")
+      } else {
+        update <- !what$Par_ID %in% temp$Par_ID
+        temp <- rbind(temp, what[update, ])
+        temp <- temp[order(temp$Par_ID), ]
+        message(sum(update), " entries added to ", where, ", ", sum(!update), " already present.")
+      }
+    } else {
+      temp <- rbind(temp, what[update, ])
+      temp <- temp[order(temp$Par_ID), ]
+      message(nrow(what), " entries added to ", where, ".")
+    }
   } else {
     stop("Choose either 'meta', 'articles' or 'paragraphs' as 'to' argument.")
   }
