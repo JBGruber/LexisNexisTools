@@ -3,6 +3,7 @@ LexisNexisTools
 ===============
 
 [![Travis-CI Build Status](https://travis-ci.org/JBGruber/LexisNexisTools.svg?branch=master)](https://travis-ci.org/JBGruber/LexisNexisTools) [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version-ago/LexisNexisTools)](http://cran.r-project.org/package=LexisNexisTools) [![CRAN\_Download\_Badge](http://cranlogs.r-pkg.org/badges/grand-total/LexisNexisTools)](http://cran.r-project.org/package=LexisNexisTools)
+[![Coverage Status](https://img.shields.io/codecov/c/github/JBGruber/LexisNexisTools/master.svg)](https://codecov.io/github/JBGruber/LexisNexisTools?branch=master)
 
 My PhD supervisor once told me that everyone doing newspaper analysis starts by writing code to read in files from the 'LexisNexis' newspaper archive. However, while I do recommend this exercise, not everyone has the time. This package takes TXT files downloaded from 'LexisNexis' in most languages. If you run into any problems or have an idea about a great new feature? The please file an issue report: <https://github.com/JBGruber/LexisNexisTools/issues>.
 

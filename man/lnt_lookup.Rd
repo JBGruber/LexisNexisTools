@@ -36,7 +36,7 @@ This function looks for the provided pattern in the string or
 \details{
 If an LNToutput object is provided, the function will look for the
   pattern in the headlines and articles. The returned object is a list of
-  hits. If a regular expression is provided, the retunred word will be the
+  hits. If a regular expression is provided, the returned word will be the
   actual value from the text.
 }
 \examples{

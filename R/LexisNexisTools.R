@@ -886,6 +886,7 @@ lnt_asDate <- function(x,
                Dutch = "d MMMM yyyy",
                French = "d MMMM yyyy",
                Portuguese = "d MMMM yyyy",
+               Italian = "d MMMM yyyy",
                Russian = "d MMMM yyyy")
   locales <- c(English = "en",
                German = "de",
@@ -893,12 +894,13 @@ lnt_asDate <- function(x,
                Dutch = "nl",
                French = "fr",
                Portuguese = "pt",
+               Italian = "it",
                Russian = "ru")
 
   for (loc in locales) {
     x <- stri_replace_all_fixed(str = x,
                                 pattern = c(stri_datetime_symbols(locale = loc)$Weekday,
-                                            "PM", "AM"),
+                                            "PM", "AM", "GMT"),
                                 replacement = "",
                                 vectorize_all = FALSE,
                                 opts_fixed = stri_opts_fixed(case_insensitive = TRUE))
@@ -907,6 +909,10 @@ lnt_asDate <- function(x,
                               pattern = c("[A-Z]{3}$",
                                           "((?:(?:[0-1][0-9])|(?:[2][0-3])|(?:[0-9])):(?:[0-5][0-9])(?::[0-5][0-9])?(?:\\s?(?:am|AM|pm|PM))?)"),
                               replacement = "",
+                              vectorize_all = FALSE)
+  x <- stri_replace_all_fixed(str = x,
+                              pattern = "Maerz",
+                              replacement = "M\u00c4rz",
                               vectorize_all = FALSE)
 
   if (any(format == "auto",
@@ -919,6 +925,7 @@ lnt_asDate <- function(x,
       out * 100
     }, formats, locales)
     most <- head(sort(correct[correct > 0.01], decreasing = TRUE), n = 3)
+    if (is.na(most[1])) stop("No valid dates found.")
     if (most[1] < 100) {
       if (length(most) > 1) {
         if (length(most) == 2) {
@@ -968,7 +975,7 @@ lnt_asDate <- function(x,
 #'   keywords you used when retrieving the data was used in each article.
 #' @details If an LNToutput object is provided, the function will look for the
 #'   pattern in the headlines and articles. The returned object is a list of
-#'   hits. If a regular expression is provided, the retunred word will be the
+#'   hits. If a regular expression is provided, the returned word will be the
 #'   actual value from the text.
 #' @param x An LNToutput object or a string or vector of strings.
 #' @param pattern A character vector of keywords. Word boundaries before and

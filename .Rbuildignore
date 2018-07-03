@@ -13,3 +13,4 @@ Update LN package.R
 cran-comments.md
 test.R
 README.Rmd
+^codecov\.yml$
