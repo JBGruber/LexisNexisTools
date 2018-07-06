@@ -2,10 +2,9 @@
 LexisNexisTools
 ===============
 
-[![Travis-CI Build Status](https://travis-ci.org/JBGruber/LexisNexisTools.svg?branch=master)](https://travis-ci.org/JBGruber/LexisNexisTools) [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version-ago/LexisNexisTools)](http://cran.r-project.org/package=LexisNexisTools) [![CRAN\_Download\_Badge](http://cranlogs.r-pkg.org/badges/grand-total/LexisNexisTools)](http://cran.r-project.org/package=LexisNexisTools)
-[![Coverage Status](https://img.shields.io/codecov/c/github/JBGruber/LexisNexisTools/master.svg)](https://codecov.io/github/JBGruber/LexisNexisTools?branch=master)
+[![Travis-CI Build Status](https://travis-ci.org/JBGruber/LexisNexisTools.svg?branch=master)](https://travis-ci.org/JBGruber/LexisNexisTools) [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version-ago/LexisNexisTools)](http://cran.r-project.org/package=LexisNexisTools) [![CRAN\_Download\_Badge](http://cranlogs.r-pkg.org/badges/grand-total/LexisNexisTools)](http://cran.r-project.org/package=LexisNexisTools) [![Coverage Status](https://img.shields.io/codecov/c/github/JBGruber/LexisNexisTools/master.svg)](https://codecov.io/github/JBGruber/LexisNexisTools?branch=master)
 
-My PhD supervisor once told me that everyone doing newspaper analysis starts by writing code to read in files from the 'LexisNexis' newspaper archive. However, while I do recommend this exercise, not everyone has the time. This package takes TXT files downloaded from 'LexisNexis' in most languages. If you run into any problems or have an idea about a great new feature? The please file an issue report: <https://github.com/JBGruber/LexisNexisTools/issues>.
+My PhD supervisor once told me that everyone doing newspaper analysis starts by writing code to read in files from the 'LexisNexis' newspaper archive. However, while I do recommend this exercise, not everyone has the time. This package takes TXT files downloaded from 'LexisNexis' in most languages. If you run into any problems or have an idea about a great new feature? Then please file an issue report: <https://github.com/JBGruber/LexisNexisTools/issues>.
 
 Installation
 ------------
@@ -70,7 +69,7 @@ report.df
 ```
 
     ## 
-    ##  1 files renamed, in 0.0013 secs
+    ##  1 files renamed, in 0.0014 secs
 
 | name\_orig | name\_new                               | status  |
 |:-----------|:----------------------------------------|:--------|
@@ -96,21 +95,23 @@ To use the function, you can again provide either file name(s), folder name(s) o
 LNToutput <- lnt_read(x = getwd())
 ```
 
-    ## Creating LNToutput from a connection input...
-    ##  ...files loaded [0.0012 secs]
-    ##  ...articles split [0.0093 secs]
-    ##  ...lengths extracted [0.0098 secs]
-    ##  ...newspapers extracted [0.01 secs]
-    ##  ...dates extracted [0.012 secs]
+    ## Creating LNToutput from input 1 files...
+    ##  ...files loaded [0.0014 secs]
+    ##  ...articles split [0.01 secs]
+    ##  ...lengths extracted [0.011 secs]
+    ##  ...newspapers extracted [0.011 secs]
+    ##  ...dates extracted [0.013 secs]
     ##  ...authors extracted [0.013 secs]
-    ##  ...sections extracted [0.013 secs]
+    ##  ...sections extracted [0.014 secs]
     ##  ...editions extracted [0.014 secs]
     ##  ...headlines extracted [0.014 secs]
-    ##  ...dates converted [0.018 secs]
-    ##  ...metadata extracted [0.019 secs]
-    ##  ...article texts extracted [0.021 secs]
-    ##  ...paragraphs extracted [0.029 secs]
-    ## Elapsed time: 0.033 secs
+    ##  ...dates converted [0.019 secs]
+    ##  ...metadata extracted [0.02 secs]
+    ##  ...article texts extracted [0.023 secs]
+    ##  ...paragraphs extracted [0.031 secs]
+    ##  ...superfluous whitespace removed from articles [0.033 secs]
+    ##  ...superfluous whitespace removed from paragraphs [0.036 secs]
+    ## Elapsed time: 0.036 secs
 
 The returned object of class `LNToutput` can easily be converted to regular data.frames using `@` to select the data.frame you want:
 
@@ -218,12 +219,13 @@ duplicates.df <- lnt_similarity(texts = LNToutput@articles$Article,
                                 rel_dist = FALSE)
 ```
 
-    ## 
-    Processing date 2010-01-08 ... 0 duplicates found       
-    Processing date 2010-01-09 ... 0 duplicates found       
-    Processing date 2010-01-10 ... 0 duplicates found       
-    Processing date 2010-01-11 ... 8 duplicates found       
-    Threshold = 0.99; 4 days processed; 4 duplicates found; in 0.35 secs
+    ## Checking similiarity for 10 articles over 4 dates...
+    ##  ...quanteda dfm construced for similarity comparison [0.061 secs].
+        ...processing date 2010-01-08: 0 duplicates found [0.061 secs].         
+        ...processing date 2010-01-09: 0 duplicates found [0.061 secs].         
+        ...processing date 2010-01-10: 0 duplicates found [0.099 secs].         
+        ...processing date 2010-01-11: 9 duplicates found [0.10 secs].      
+    ## Threshold = 0.99; 4 days processed; 4 duplicates found; in 0.10 secs
 
 Now you can either remove those duplicates from the LNTOutput object:
 
@@ -252,7 +254,7 @@ paragraphs.df <-
 head(meta.df, n = 3)
 ```
 
-<table style="width:100%;">
+<table>
 <colgroup>
 <col width="1%" />
 <col width="1%" />
@@ -285,7 +287,7 @@ head(meta.df, n = 3)
 <tr class="odd">
 <td align="left">1</td>
 <td align="right">1</td>
-<td align="left">/home/johannes/Documents/Github 2/LexisNexisTools/SampleFile_20091201-20100511_1-10.txt</td>
+<td align="left">/home/johannes/Documents/Github/LexisNexisTools/SampleFile_20091201-20100511_1-10.txt</td>
 <td align="left">Guardian.com</td>
 <td align="left">2010-01-11</td>
 <td align="left">355 words</td>
@@ -298,7 +300,7 @@ head(meta.df, n = 3)
 <tr class="even">
 <td align="left">2</td>
 <td align="right">2</td>
-<td align="left">/home/johannes/Documents/Github 2/LexisNexisTools/SampleFile_20091201-20100511_1-10.txt</td>
+<td align="left">/home/johannes/Documents/Github/LexisNexisTools/SampleFile_20091201-20100511_1-10.txt</td>
 <td align="left">Guardian</td>
 <td align="left">2010-01-11</td>
 <td align="left">927 words</td>
@@ -311,7 +313,7 @@ head(meta.df, n = 3)
 <tr class="odd">
 <td align="left">7</td>
 <td align="right">7</td>
-<td align="left">/home/johannes/Documents/Github 2/LexisNexisTools/SampleFile_20091201-20100511_1-10.txt</td>
+<td align="left">/home/johannes/Documents/Github/LexisNexisTools/SampleFile_20091201-20100511_1-10.txt</td>
 <td align="left">Guardian</td>
 <td align="left">2010-01-08</td>
 <td align="left">607 words</td>

@@ -8,9 +8,6 @@ test_that("Show method", {
   expect_known_output(object = LNToutput, file = "../files/show")
 })
 
-
-
-
 test_that("Plus operator", {
   expect_length({
     test <- LNToutput + LNToutput
@@ -34,9 +31,9 @@ test_that("Subset method", {
   expect_equal({
     test <- LNToutput["Guardian", "Newspaper", invert = TRUE]
     test@meta$Newspaper
-  }, c("Guardian.com", "The Sun (England)", "The Times (London)", 
-       "The Times (London)", "The Times (London)", 
+  }, c("Guardian.com", "The Sun (England)", "The Times (London)",
+       "The Times (London)", "The Times (London)",
        "MAIL ON SUNDAY (London)", "Sunday Mirror", "DAILY MAIL (London)"))
 })
 
-teardown(unlink(lnt_sample(verbose = FALSE))) 
+teardown(unlink(lnt_sample(verbose = FALSE)))

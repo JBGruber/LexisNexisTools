@@ -747,7 +747,7 @@ lnt_similarity <- function(texts,
                            IDs = NULL,
                            threshold = 0.99,
                            rel_dist = TRUE,
-                           length_diff = 0.2,
+                           length_diff = Inf,
                            nthread = getOption("sd_num_thread"),
                            max_length = Inf,
                            verbose = TRUE) {
@@ -844,6 +844,7 @@ lnt_similarity <- function(texts,
   })
   #end loop
   duplicates.df <- data.table::rbindlist(duplicates.df)
+  class(duplicates.df) <- c(class(duplicates.df), "lnt_sim")
   time.elapsed <- Sys.time() - start_time
   cat("\r\nThreshold = ", threshold, "; ",
       length(dates.d), " days processed; ",
@@ -1059,6 +1060,73 @@ lnt_lookup <- function(x,
   return(return)
 }
 
+
+#' @title Display diff of similar articles
+#'
+#' @description This function is a wrapper for \link[diffobj]{diffPrint}. I is
+#'   intended to help performing a manual assessment of the difference between
+#'   highly similar articles identified via \link{lnt_similarity}.
+#'
+#' @param x lnt_sim object as returned by \link{lnt_similarity}.
+#' @param min Minimum value of rel_dist to include in diff.
+#' @param max Maximum value of rel_dist to include in diff.
+#' @param n Size of displayed sample.
+#' @param output_html Set to TRUE to output html code, e.g. to use for knitting
+#'   an rmarkdown document to html. Chunk option must be set to
+#'   \code{results='asis'} in that case.
+#' @param ... Currently not used.
+#' @return A list keyword hits.
+#'
+#' @examples
+#' # Test similarity of articles
+#' duplicates.df <- lnt_similarity(LNToutput = lnt_read(lnt_sample()),
+#'                                 threshold = 0.95)
+#'
+#' lnt_diff(duplicates.df, min = 0.18, max = 0.30)
+#' @author Johannes Gruber
+#' @export
+#' @importFrom quanteda tokens
+lnt_diff <- function(x,
+                     min,
+                     max,
+                     n = 25,
+                     output_html = FALSE,
+                     ...) {
+  if (!requireNamespace("diffobj", quietly = TRUE)) {
+    stop("Package \"diffobj\" is needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
+  if (!"lnt_sim" %in% class(x)) {
+    warning("'x' should be an object returned by lnt_similarity().")
+  }
+  dots <- list(...)
+  x <- x[x$rel_dist > min & x$rel_dist < max, ]
+  if (nrow(x) < n) {
+    n <- nrow(x)
+  }
+  sample <- sample(x = seq_len(nrow(x)), size = n)
+  x <- x[sample, ]
+  x <- x[order(x$rel_dist), ]
+  
+  for (i in seq_len(nrow(x))) {
+    original <- unname(unlist(quanteda::tokens(x$text_original[i], what = "sentence")))
+    duplicate <- unname(unlist(quanteda::tokens(x$text_duplicate[i], what = "sentence")))
+    diff <- diffobj::diffPrint(current = original,
+                       target = duplicate,
+                       mode = "sidebyside",
+                       cur.banner = paste("ID:", x$ID_original[i]),
+                       tar.banner = paste0("ID: ", x$ID_duplicate[i], ", rel_dist: ", 
+                                          round(x$rel_dist[i], digits = 2)),
+                       format = ifelse(output_html, "html", "auto"),
+                       interactive = !output_html)
+    print(diff)
+  }
+  if (output_html) {
+    cat("<style>", readLines(system.file("css", "diffobj.css", package = "diffobj")),
+        "</style>")
+  }
+}
+
 # Conversion ------------------------------------------------------------
 
 #' Convert LNToutput to other formats
@@ -1240,11 +1308,11 @@ lnt2SQLite <- function(x, file = "LNT.sqlite", ...) {
 #' @examples
 #' # Make LNToutput object from sample
 #' LNToutput <- lnt_read(lnt_sample())
-#' 
+#'
 #' # extract meta and make corrections
 #' correction <- LNToutput@meta[grepl("Wikipedia", LNToutput@meta$Headline), ]
 #' correction$Newspaper <- "Wikipedia"
-#' 
+#'
 #' # replace corrected meta information
 #' LNToutput <- lnt_add(to = LNToutput, what = correction, where = "meta", replace = TRUE)
 #' @author Johannes Gruber

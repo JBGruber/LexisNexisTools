@@ -16,6 +16,12 @@ matrix:
 before_install:
     - Rscript -e 'install.packages(c("devtools", "quanteda"))' # needs to be installed for every version separatly
 
+r_github_packages:
+    - r-lib/covr
+
 script:
     - R CMD build .
     - R CMD check *tar.gz
+    
+after_success:
+  - Rscript -e 'covr::codecov()'

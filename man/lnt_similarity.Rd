@@ -5,7 +5,7 @@
 \title{Check for highly similar articles.}
 \usage{
 lnt_similarity(texts, dates, LNToutput, IDs = NULL, threshold = 0.99,
-  rel_dist = TRUE, length_diff = 0.2,
+  rel_dist = TRUE, length_diff = Inf,
   nthread = getOption("sd_num_thread"), max_length = Inf, verbose = TRUE)
 }
 \arguments{

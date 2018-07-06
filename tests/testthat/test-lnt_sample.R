@@ -6,4 +6,4 @@ test_that("sample exists", {
   expect_equal(file.exists(lnt_sample(verbose = FALSE)), TRUE)
 })
 
-teardown(unlink(lnt_sample(verbose = FALSE)))       
+teardown(unlink(lnt_sample(verbose = FALSE)))

@@ -12,4 +12,4 @@ test_that("Read in sample file", {
     }, readRDS("../files/LNToutput.RDS"))
 })
 
-teardown(unlink(lnt_sample(verbose = FALSE)))       
+teardown(unlink(lnt_sample(verbose = FALSE)))

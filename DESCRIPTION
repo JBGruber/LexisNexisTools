@@ -1,7 +1,7 @@
 Package: LexisNexisTools
 Title: Working with Files from 'LexisNexis'
-Version: 0.1.50.9000
-Date: 2018-07-03
+Version: 0.1.51.9000
+Date: 2018-07-06
 Authors@R: person("Johannes", "Gruber", email = "j.gruber.1@research.gla.ac.uk", 
   role = c("aut", "cre"))
 Description: My PhD supervisor once told me that everyone doing newspaper
@@ -26,10 +26,11 @@ Imports:
     stringi (>= 1.1.7),
     utils (>= 3.3.0)
 Suggests:
-    RSQLite,
     corpustools,
-    testthat,
-    covr
+    covr,
+    diffobj,
+    RSQLite,
+    testthat
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
