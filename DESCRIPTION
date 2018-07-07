@@ -1,6 +1,6 @@
 Package: LexisNexisTools
 Title: Working with Files from 'LexisNexis'
-Version: 0.1.51.9000
+Version: 0.1.52.9000
 Date: 2018-07-07
 Authors@R: person("Johannes", "Gruber", email = "j.gruber.1@research.gla.ac.uk", 
   role = c("aut", "cre"))

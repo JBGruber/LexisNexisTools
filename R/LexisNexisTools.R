@@ -1102,7 +1102,7 @@ lnt_diff <- function(x,
   if (!"lnt_sim" %in% class(x)) {
     warning("'x' should be an object returned by lnt_similarity().")
   }
-  
+
   dots <- list(...)
   x <- x[x$rel_dist > min & x$rel_dist < max, ]
   if (nrow(x) < n) {
@@ -1118,7 +1118,7 @@ lnt_diff <- function(x,
                        target = duplicate,
                        mode = "sidebyside",
                        cur.banner = paste("ID:", x$ID_original[i]),
-                       tar.banner = paste0("ID: ", x$ID_duplicate[i], ", rel_dist: ", 
+                       tar.banner = paste0("ID: ", x$ID_duplicate[i], ", rel_dist: ",
                                           round(x$rel_dist[i], digits = 2)),
                        format = ifelse(output_html, "html", "auto"),
                        interactive = !output_html)
@@ -1171,7 +1171,12 @@ lnt_convert <- function(x,
 #' @export
 lnt2rDNA <- function(x, what) {
   if (what == "Articles") {
-    text <- x@articles$Article
+    text <- sapply(x@meta$ID, function(id) {
+      stringi::stri_join(x@paragraphs$Paragraph[x@paragraphs$Art_ID == id],
+                         sep = "",
+                         collapse = "\n\n",
+                         ignore_null = FALSE)
+    })
   } else if (what == "Paragraph") {
     text <- x@paragraphs$Paragraph
   }
