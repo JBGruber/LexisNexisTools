@@ -25,7 +25,7 @@ an rmarkdown document to html. Chunk option must be set to
 A list keyword hits.
 }
 \description{
-This function is a wrapper for \link[diffobj]{diffPrint}. I is
+This function is a wrapper for \link[diffobj]{diffPrint}. It is
   intended to help performing a manual assessment of the difference between
   highly similar articles identified via \link{lnt_similarity}.
 }

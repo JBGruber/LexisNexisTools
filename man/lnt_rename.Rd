@@ -4,7 +4,7 @@
 \alias{lnt_rename}
 \title{Assign proper names to LexisNexis TXT files}
 \usage{
-lnt_rename(x, encoding = "UTF-8", recursive = FALSE, report = FALSE,
+lnt_rename(x, encoding = "UTF-8", recursive = FALSE, report = TRUE,
   simulate = TRUE, verbose = FALSE)
 }
 \arguments{

@@ -1,34 +1,21 @@
 ---
-output: github_document
+title: "Basic Usage"
+author: "Johannes B. Gruber"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+ %\VignetteIndexEntry{Vignette Title}
+ %\VignetteEngine{knitr::rmarkdown}
+ %\VignetteEncoding{UTF-8}
 ---
-# LexisNexisTools
-[![Travis-CI Build Status](https://travis-ci.org/JBGruber/LexisNexisTools.svg?branch=master)](https://travis-ci.org/JBGruber/LexisNexisTools)
-[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version-ago/LexisNexisTools)](http://cran.r-project.org/package=LexisNexisTools)
-[![CRAN_Download_Badge](http://cranlogs.r-pkg.org/badges/grand-total/LexisNexisTools)](http://cran.r-project.org/package=LexisNexisTools)
-[![Coverage Status](https://img.shields.io/codecov/c/github/JBGruber/LexisNexisTools/master.svg)](https://codecov.io/github/JBGruber/LexisNexisTools?branch=master)
-
-## Motivation
-
-My PhD supervisor once told me that everyone doing newspaper analysis starts by writing code to read in files from the 'LexisNexis' newspaper archive. 
-However, while I do recommend this exercise, not everyone has the time.
-This package provides functions to read in TXT files downloaded from 'LexisNexis' and comes with a few other features I think come in handy while working with data from the popular newspaper archive.
-
-**Did you experience any problems, have questions or an idea about a great new feature?** Then please don't hesitate to file an [**issue report**](https://github.com/JBGruber/LexisNexisTools/issues).
-
-## Installation
-Install via:
-
-```{r, eval=FALSE}
-install.packages("LexisNexisTools")
-```
-
-Or get development version by installing `devtools` first (via `install.packages("devtools")`) then
-use (**note: the Github version is recommended at the moment as it has several new useful features while old code has massively improved**):
-
-```{r, eval=FALSE}
-devtools::install_github("JBGruber/LexisNexisTools")
-```
-
+  
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library("kableExtra")
+ ```
 ## Demo
 ### Load Package
 
@@ -271,37 +258,3 @@ table(unlist(lnt_lookup(LNToutput, pattern = "stat.+?\\b")))
 ```
 
 
-## Issues and questions?
-
-These are the common functions in *LexisNexisTools*. Do you feel like anything is missing from the package or is one of the functions not doing its job? File an issue here to let me know: [issue tracker](https://github.com/JBGruber/LexisNexisTools/issues).
-
-
-```{r make vignette from readme, echo=FALSE, results='hide', message=FALSE}
-library("magrittr")
-readLines("README.Rmd") %>% 
-  .[grep("^## Demo", .):(grep("^## Issues", .) - 1)] %>% 
-  c(
-    '---',
-    'title: "Basic Usage"',
-    'author: "Johannes B. Gruber"',
-    'date: "`r Sys.Date()`"',
-    'output: rmarkdown::html_vignette',
-    'vignette: >',
-    ' %\\VignetteIndexEntry{Vignette Title}',
-    ' %\\VignetteEngine{knitr::rmarkdown}',
-    ' %\\VignetteEncoding{UTF-8}',
-    '---',
-    '  ',
-    '```{r setup, include = FALSE}',
-    'knitr::opts_chunk$set(',
-    '  collapse = TRUE,',
-    '  comment = "#>"',
-    ')',
-    'library("kableExtra")',
-    ' ```',
-    .
-  ) %>% 
-  writeLines("./vignettes/demo.Rmd")
-rmarkdown::render("./vignettes/demo.Rmd")
-unlink("./vignettes/SampleFile_20091201-20100511_1-10.txt")
-```

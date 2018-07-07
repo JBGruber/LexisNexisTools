@@ -4,7 +4,12 @@ LexisNexisTools
 
 [![Travis-CI Build Status](https://travis-ci.org/JBGruber/LexisNexisTools.svg?branch=master)](https://travis-ci.org/JBGruber/LexisNexisTools) [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version-ago/LexisNexisTools)](http://cran.r-project.org/package=LexisNexisTools) [![CRAN\_Download\_Badge](http://cranlogs.r-pkg.org/badges/grand-total/LexisNexisTools)](http://cran.r-project.org/package=LexisNexisTools) [![Coverage Status](https://img.shields.io/codecov/c/github/JBGruber/LexisNexisTools/master.svg)](https://codecov.io/github/JBGruber/LexisNexisTools?branch=master)
 
-My PhD supervisor once told me that everyone doing newspaper analysis starts by writing code to read in files from the 'LexisNexis' newspaper archive. However, while I do recommend this exercise, not everyone has the time. This package takes TXT files downloaded from 'LexisNexis' in most languages. If you run into any problems or have an idea about a great new feature? Then please file an issue report: <https://github.com/JBGruber/LexisNexisTools/issues>.
+Motivation
+----------
+
+My PhD supervisor once told me that everyone doing newspaper analysis starts by writing code to read in files from the 'LexisNexis' newspaper archive. However, while I do recommend this exercise, not everyone has the time. This package provides functions to read in TXT files downloaded from 'LexisNexis' and comes with a few other features I think come in handy while working with data from the popular newspaper archive.
+
+**Did you experience any problems, have questions or an idea about a great new feature?** Then please don't hesitate to file an [**issue report**](https://github.com/JBGruber/LexisNexisTools/issues).
 
 Installation
 ------------
@@ -15,7 +20,7 @@ Install via:
 install.packages("LexisNexisTools")
 ```
 
-Or get development version by installing `devtools` first (via `install.packages("devtools")`) then use:
+Or get development version by installing `devtools` first (via `install.packages("devtools")`) then use (**note: the Github version is recommended at the moment as it has several new useful features while old code has massively improved**):
 
 ``` r
 devtools::install_github("JBGruber/LexisNexisTools")
@@ -48,19 +53,25 @@ lnt_sample()
 
 ### Rename Files
 
-'LexisNexis' does not give the .txt files proper names. The function `lnt_rename()` renames files to a standard format: "searchTerm\_startDate-endDate\_documenRange.txt" (e.g., "Obama\_20091201-20100511\_1-500.txt"). Note, that this will not work if your .txt files lack a cover page with this information. Currently, it seems, like 'LexisNexis' only delivers those cover pages when you first create a link to your search ("link to this search" on the results page), follow this link, and then download the txt files from there.
+'LexisNexis' does not give the TXT files proper names. The function `lnt_rename()` renames files to a standard format: "searchTerm\_startDate-endDate\_documentRange.txt" (e.g., "Obama\_20091201-20100511\_1-500.txt"). Note, that this will not work if your TXT files lack a cover page with this information. Currently, it seems, like 'LexisNexis' only delivers those cover pages when you first create a link to your search ("link to this search" on the results page), follow this link, and then download the TXT files from there. If you do not want to rename files, you can skip to the next section. The rest of the package's functionality stays untouched by whether you rename your files or not. However, in a larger database, you will profit from a consistent naming scheme.
 
 There are three ways in which you can rename the files:
 
+-   Run lnt\_rename() directly in your working directory without the x argument, which will prompt an option to scan for TXT files in your current working directory:
+
 ``` r
-# Either run lnt_rename() directly in your working directory without the x argument
-report.df <- lnt_rename(report = TRUE)
+report.df <- lnt_rename()
+```
 
-# Or provide a folder path or paths
+-   Provide a folder path (and set `recursive = TRUE` if you want to scan for files recursively):
+
+``` r
 report.df <- lnt_rename(x = getwd(), report = TRUE)
+```
 
-# Or provide a character object with file names. Use list.files() to search for
-# files in a certain path
+-   Provide a character object with file names. Use `list.files()` to search for files in a certain path.
+
+``` r
 my_files <- list.files(pattern = ".txt", path = getwd(),
                        full.names = TRUE, recursive = TRUE, ignore.case = TRUE)
 report.df <- lnt_rename(x = my_files, report = TRUE)
@@ -68,14 +79,13 @@ report.df <- lnt_rename(x = my_files, report = TRUE)
 report.df
 ```
 
-    ## 
-    ##  1 files renamed, in 0.0014 secs
+    ## in 0.0013 secs
 
 | name\_orig | name\_new                               | status  |
 |:-----------|:----------------------------------------|:--------|
 | sample.TXT | SampleFile\_20091201-20100511\_1-10.txt | renamed |
 
-Using `list.files()` instead of the built-in mechanism allows you to specify a file pattern. This might be a preferred option if you have a folder in which only some of the .txt files contain newspaper articles from 'LexisNexis' but other files have the ending .txt as well. If you are unsure what the txt files your chosen folder might contain, use the option `simulate = TRUE` (which is the default). The argument `report = TRUE` indicates that the output of the function in `R` will be a data.frame containing a report on which files have been changed on your drive and how.
+Using `list.files()` instead of the built-in mechanism allows you to specify a file pattern. This might be a preferred option if you have a folder in which only some of the TXT files contain newspaper articles from 'LexisNexis' but other files have the ending TXT as well. If you are unsure what the TXT files in your chosen folder might contain, use the option `simulate = TRUE` (which is the default). The argument `report = TRUE` indicates that the output of the function in `R` will be a data.frame containing a report on which files have been changed on your drive and how.
 
 ### Read in 'LexisNexis' Files to Get Meta, Articles and Paragraphs
 
@@ -83,35 +93,36 @@ The main function of this package is `lnt_read()`. It converts the raw text file
 
 There are several important keywords that are used to split up the raw articles into article text and metadata. Those need to be provided in some form but can be left to 'auto' to use 'LexisNexis' defaults in several languages. All keywords can be regular expressions and need to be in most cases:
 
--   `start_keyword`: The English default is "\\d+ of \\d+ DOCUMENTS$" which stands for, for example, "1 of 112 DOCUMENTS". It is used to split up the text in the txt files into individual articles.
+-   `start_keyword`: The English default is "\\d+ of \\d+ DOCUMENTS$" which stands for, for example, "1 of 112 DOCUMENTS". It is used to split up the text in the TXT files into individual articles. You will not have to change anything here, except you work with documents in languages other than the currently supported.
 -   `end_keyword`: This keyword is used to remove unnecessary information at the end of an article. Usually, this is "^LANGUAGE:". Where the keyword isn't found, the additional information ends up in the article text.
--   `length_keyword`: This keyword, which is usually just "^LENGTH:" (or its equivalent in other languages) finds the information about the length of an article. However, since this is always the last line of the metadata, it is used to separate metadata and article text. There seems to be only one type of cases where this information is missing: if the article consists only of a graphic (which 'LexisNexis' does not retrieve). The final output from `lnt_read()` has a column named `Graphic`, which indicates if this keyword was missing. The article text then contains all metadata as well. In those cases, you should remove the whole article after inspecting it.
+-   `length_keyword`: This keyword, which is usually just "^LENGTH:" (or its equivalent in other languages) finds the information about the length of an article. However, since this is always the last line of the metadata, it is used to separate metadata and article text. There seems to be only one type of cases where this information is missing: if the article consists only of a graphic (which 'LexisNexis' does not retrieve). The final output from `lnt_read()` has a column named `Graphic`, which indicates if this keyword was missing. The article text then contains all metadata as well. In these cases, you should remove the whole article after inspecting it. (Use `View(LNToutput@articles$Article[LNToutput@meta$Graphic])` to view these articles in a spreadsheet like viewer.)
 
-<a href="https://ibb.co/fj5YjG"><img src="https://preview.ibb.co/fOfNdb/LN.png" alt="LN" border="0"></a>
-
-To use the function, you can again provide either file name(s), folder name(s) or nothing---to search the current working directory for txt files---as `x` argument:
+<p align="center">
+<a href="https://ibb.co/fj5YjG"><img src="https://preview.ibb.co/fOfNdb/LN.png" alt="LN" border="1"></a>
+</p>
+To use the function, you can again provide either file name(s), folder name(s) or nothing---to search the current working directory for TXT files---as `x` argument:
 
 ``` r
 LNToutput <- lnt_read(x = getwd())
 ```
 
     ## Creating LNToutput from input 1 files...
-    ##  ...files loaded [0.0014 secs]
+    ##  ...files loaded [0.0013 secs]
     ##  ...articles split [0.01 secs]
     ##  ...lengths extracted [0.011 secs]
     ##  ...newspapers extracted [0.011 secs]
-    ##  ...dates extracted [0.013 secs]
+    ##  ...dates extracted [0.012 secs]
     ##  ...authors extracted [0.013 secs]
-    ##  ...sections extracted [0.014 secs]
-    ##  ...editions extracted [0.014 secs]
+    ##  ...sections extracted [0.013 secs]
+    ##  ...editions extracted [0.013 secs]
     ##  ...headlines extracted [0.014 secs]
     ##  ...dates converted [0.019 secs]
     ##  ...metadata extracted [0.02 secs]
-    ##  ...article texts extracted [0.023 secs]
-    ##  ...paragraphs extracted [0.031 secs]
-    ##  ...superfluous whitespace removed from articles [0.033 secs]
-    ##  ...superfluous whitespace removed from paragraphs [0.036 secs]
-    ## Elapsed time: 0.036 secs
+    ##  ...article texts extracted [0.022 secs]
+    ##  ...paragraphs extracted [0.03 secs]
+    ##  ...superfluous whitespace removed from articles [0.032 secs]
+    ##  ...superfluous whitespace removed from paragraphs [0.035 secs]
+    ## Elapsed time: 0.035 secs
 
 The returned object of class `LNToutput` can easily be converted to regular data.frames using `@` to select the data.frame you want:
 
@@ -191,24 +202,24 @@ head(meta.df, n = 3)
 </tbody>
 </table>
 
-Alternatively, you can convert LNTOutput objects to formats common in other packages using the function `lnt_convert`:
+Alternatively, you can convert LNToutput objects to formats common in other packages using the function `lnt_convert`:
 
 ``` r
-quanteda_corpus <- lnt_convert(LNToutput, to = "quanteda")
+quanteda_corpus <- lnt_convert(LNToutput, to = "rDNA")
 ```
 
 See `?lnt_convert` to find out which formats are available or comment in [this issue](https://github.com/JBGruber/LexisNexisTools/issues/2) if you want a format added to the convert function.
 
 ### Identify Highly Similar Articles
 
-In 'LexisNexis' itself, there is an option to group highly similar articles. However, experience shows that this feature does not always work perfectly. One common problem when working with 'LexisNexis' data is thus that many articles appear to be delivered twice or more times. While direct duplicates can be filtered out using, for example, `articles.df <- articles.df[!duplicated(articles.df$Article), ]` this does not work for articles with small differences. Hence when one comma or white space is different between two articles, they are normally treated as different.
+In 'LexisNexis' itself, there is an option to group highly similar articles. However, experience shows that this feature does not always work perfectly. One common problem when working with 'LexisNexis' data is thus that many articles appear to be delivered twice or more times. While direct duplicates can be filtered out using, for example, `LNToutput <- LNToutput[!duplicated(LNToutput@articles$Article), ]` this does not work for articles with small differences. Hence when one comma or white space is different between two articles, they are treated as different.
 
-The function `lnt_similarity()` combines the fast similarity measure from [quanteda](https://github.com/quanteda/quanteda) with the much slower but more accurate relative [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance) to compare all articles published on a day. Calculating the Levenshtein distance might be very slow though if you have many articles published each day in your data set. If you think the less accurate similarity measure might be sufficient in your case, simply turn this feature off `rel_dist = FALSE`. The easiest way to use `lnt_similarity()` is to input a `LNToutput` object directly. However, it is also possible to provide texts, dates and IDs separately:
+The function `lnt_similarity()` combines the fast similarity measure from [quanteda](https://github.com/quanteda/quanteda) with the much slower but more accurate relative [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance) to compare all articles published on the same day. Calculating the Levenshtein distance might be very slow though if you have many articles published each day in your data set. If you think the less accurate similarity measure might be sufficient in your case, simply turn this feature off with `rel_dist = FALSE`. The easiest way to use `lnt_similarity()` is to input an `LNToutput` object directly. However, it is also possible to provide texts, dates and IDs separately:
 
 ``` r
 # Either provide a LNToutput
 duplicates.df <- lnt_similarity(LNToutput = LNToutput,
-                                rel_dist = FALSE)
+                                threshold = 0.97)
 ```
 
 ``` r
@@ -216,61 +227,87 @@ duplicates.df <- lnt_similarity(LNToutput = LNToutput,
 duplicates.df <- lnt_similarity(texts = LNToutput@articles$Article,
                                 dates = LNToutput@meta$Date,
                                 IDs = LNToutput@articles$ID,
-                                rel_dist = FALSE)
+                                threshold = 0.97)
 ```
 
-    ## Checking similiarity for 10 articles over 4 dates...
-    ##  ...quanteda dfm construced for similarity comparison [0.061 secs].
-        ...processing date 2010-01-08: 0 duplicates found [0.061 secs].         
-        ...processing date 2010-01-09: 0 duplicates found [0.061 secs].         
-        ...processing date 2010-01-10: 0 duplicates found [0.099 secs].         
-        ...processing date 2010-01-11: 9 duplicates found [0.10 secs].      
-    ## Threshold = 0.99; 4 days processed; 4 duplicates found; in 0.10 secs
+Now you can inspect the results using the function `lnt_diff()`:
 
-Now you can either remove those duplicates from the LNTOutput object:
+``` r
+lnt_diff(duplicates.df, min = 0, max = Inf)
+```
+
+<p align="center">
+<a href="https://imgbb.com/"><img src="https://image.ibb.co/gjXa7J/diff.png" alt="diff" border="1"></a>
+</p>
+By default, 25 randomly selected articles are displayed one after another, ordered by least to most different within the min and max limits.
+
+After you have chosen a good cutoff value, you can subset the `duplicates.df` data.frame and remove the respective articles:
+
+``` r
+duplicates.df <- duplicates.df[duplicates.df$rel_dist < 0.2]
+LNToutput <- LNToutput[!LNToutput@meta$ID %in% duplicates.df$ID_duplicate, ]
+```
+
+Note, that you can subset LNToutput objects almost like you would in a regular data.frame using the square brackets.
+
+``` r
+LNToutput[1, ]
+```
+
+    ## Object of class 'LNToutput':
+    ## 1 Articles
+    ## 5 Paragraphs
+    ## 
+    ## 
+    ## Meta (6 of 1):
+    ##   ID Source_File   Newspaper  Date      Length Section      Author Edition
+    ## 1  1 /home/jo... Guardian... 14620 355 word...      NA Andrew S...        
+    ##      Headline Graphic
+    ## 1 Lorem ip...   FALSE
+    ## 
+    ## 
+    ## Articles (6 of 1):
+    ##   ID     Article
+    ## 1  1 Lorem ip...
+    ## 
+    ## 
+    ## Paragraphs (6 of 5):
+    ##   Art_ID Par_ID   Paragraph
+    ## 1      1      1 Lorem ip...
+    ## 2      1      2 Duis ele...
+    ## 3      1      3 Sed ut e...
+    ## 4      1      4  Aliquam...
+    ## 5      1      5 Fusce si...
+
+In this case, writing `[1, ]` delivers an LNToutput object which includes only the first article and the metadata and paragraphs belonging to it.
+
+Now you can extract the remaining articles or convert them to a format you prefer.
 
 ``` r
 #' generate new dataframes without highly similar duplicates
-LNToutput@meta <-
-  LNToutput@meta[!LNToutput@meta$ID %in% duplicates.df$ID_duplicate, ]
-LNToutput@articles <-
-  LNToutput@articles[!LNToutput@articles$ID %in% duplicates.df$ID_duplicate, ]
-LNToutput@paragraphs <-
-  LNToutput@paragraphs[!LNToutput@paragraphs$Art_ID %in% duplicates.df$ID_duplicate, ]
-```
-
-Or you directly output the data.frames without the duplicates:
-
-``` r
-#' generate new dataframes without highly similar duplicates
-meta.df <-
-  LNToutput@meta[!LNToutput@meta$ID %in% duplicates.df$ID.duplicate, ]
-articles.df <-
-  LNToutput@articles[!LNToutput@articles$ID %in% duplicates.df$ID_duplicate, ]
-paragraphs.df <-
-  LNToutput@paragraphs[!LNToutput@paragraphs$Art_ID %in% duplicates.df$ID_duplicate, ]
+meta.df <- LNToutput@meta
+articles.df <- LNToutput@articles
+paragraphs.df <- LNToutput@paragraphs
 
 # Print e.g., meta to see how the data changed
 head(meta.df, n = 3)
 ```
 
-<table>
+<table style="width:100%;">
 <colgroup>
 <col width="1%" />
-<col width="1%" />
-<col width="41%" />
-<col width="6%" />
+<col width="27%" />
+<col width="5%" />
+<col width="3%" />
+<col width="3%" />
 <col width="5%" />
 <col width="5%" />
-<col width="4%" />
-<col width="8%" />
-<col width="4%" />
-<col width="16%" />
-<col width="4%" />
+<col width="17%" />
+<col width="26%" />
+<col width="2%" />
 </colgroup>
 <thead>
 <tr class="header">
-<th align="left"></th>
 <th align="right">ID</th>
 <th align="left">Source_File</th>
 <th align="left">Newspaper</th>
@@ -285,7 +322,6 @@ head(meta.df, n = 3)
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">1</td>
 <td align="right">1</td>
 <td align="left">/home/johannes/Documents/Github/LexisNexisTools/SampleFile_20091201-20100511_1-10.txt</td>
 <td align="left">Guardian.com</td>
@@ -298,7 +334,6 @@ head(meta.df, n = 3)
 <td align="left">FALSE</td>
 </tr>
 <tr class="even">
-<td align="left">2</td>
 <td align="right">2</td>
 <td align="left">/home/johannes/Documents/Github/LexisNexisTools/SampleFile_20091201-20100511_1-10.txt</td>
 <td align="left">Guardian</td>
@@ -311,21 +346,104 @@ head(meta.df, n = 3)
 <td align="left">FALSE</td>
 </tr>
 <tr class="odd">
-<td align="left">7</td>
-<td align="right">7</td>
+<td align="right">3</td>
 <td align="left">/home/johannes/Documents/Github/LexisNexisTools/SampleFile_20091201-20100511_1-10.txt</td>
-<td align="left">Guardian</td>
-<td align="left">2010-01-08</td>
-<td align="left">607 words</td>
-<td align="left">NA</td>
-<td align="left">Allegra Stratton</td>
-<td align="left"></td>
-<td align="left">ranch noble ash voice declaration</td>
+<td align="left">The Sun (England)</td>
+<td align="left">2010-01-11</td>
+<td align="left">677 words</td>
+<td align="left">FEATURES; Pg. 6</td>
+<td align="left">TREVOR Kavanagh</td>
+<td align="left">Edition 1; Scotland</td>
+<td align="left">Edition 1; Scotland Lorem ipsum dolor sit amet</td>
 <td align="left">FALSE</td>
 </tr>
 </tbody>
 </table>
 
-### Issues and questions?
+### Lookup Keywords
 
-These are the common functions in *LexisNexisTools*. Do you feel like anything is missing from the package or is one of the functions not doing its job? File and issue here to let me know: [issue tracker](https://github.com/JBGruber/LexisNexisTools/issues).
+While downloading from 'LexisNexis', you have already used keywords to filter relevant articles from a larger set. However, while working with the data, your focus might change or you might want to find the different versions of your keyword in the set. Both can be done using `lnt_lookup`:
+
+``` r
+lnt_lookup(LNToutput, pattern = "statistical computing")
+```
+
+    ## $`1`
+    ## NULL
+    ## 
+    ## $`2`
+    ## NULL
+    ## 
+    ## $`3`
+    ## NULL
+    ## 
+    ## $`7`
+    ## NULL
+    ## 
+    ## $`8`
+    ## NULL
+    ## 
+    ## $`9`
+    ## [1] "statistical computing" "statistical computing"
+    ## 
+    ## $`10`
+    ## NULL
+
+The output shows that the keyword pattern was only found in the article with ID 9, all other values are `NULL`, which means the keyword wasn't found. If your focus shifts and you want to subset your data to only include articles which mention this keyword, you could append this information to the meta information in the LNToutput object and then subset it to articles where the list entry is different from `NULL`.
+
+``` r
+LNToutput@meta$stats <- lnt_lookup(LNToutput, pattern = "statistical computing")
+LNToutput <- LNToutput[!sapply(LNToutput@meta$stats, is.null), ]
+LNToutput
+```
+
+    ## Object of class 'LNToutput':
+    ## 1 Articles
+    ## 7 Paragraphs
+    ## 
+    ## 
+    ## Meta (6 of 1):
+    ##   ID Source_File   Newspaper  Date      Length     Section      Author
+    ## 9  9 /home/jo... Sunday M... 14619 446 word... NEWS; Pg... Ross Iha...
+    ##       Edition    Headline Graphic       stats
+    ## 9 3 Star E... 3 Star E...   FALSE c("stati...
+    ## 
+    ## 
+    ## Articles (6 of 1):
+    ##   ID     Article
+    ## 9  9 R is a p...
+    ## 
+    ## 
+    ## Paragraphs (6 of 7):
+    ##    Art_ID Par_ID   Paragraph
+    ## 67      9     67 R is a p...
+    ## 68      9     68 R is a G...
+    ## 69      9     69  R is an...
+    ## 70      9     70 R was cr...
+    ## 71      9     71 R and it...
+    ## 72      9     72  Another...
+
+Another use of the function is to find out which versions of your keyword are in the set. You can do so by using regular expressions. The following looks for words starting with the 'stat', followed by more characters, up until the end of the word (the pattern internally always starts and ends at a word boundary).
+
+``` r
+lnt_lookup(LNToutput, pattern = "stat.*?")
+```
+
+    ## $`9`
+    ## [1] "statistical"   "statisticians" "statistical"   "statistical"  
+    ## [5] "statistical"   "statistical"   "static"
+
+You can use `table()` to count the different versions of patterns:
+
+``` r
+table(unlist(lnt_lookup(LNToutput, pattern = "stat.+?\\b")))
+```
+
+    ## 
+    ##        static   statistical statisticians 
+    ##             1             5             1
+
+Issues and questions?
+---------------------
+
+These are the common functions in *LexisNexisTools*. Do you feel like anything is missing from the package or is one of the functions not doing its job? File an issue here to let me know: [issue tracker](https://github.com/JBGruber/LexisNexisTools/issues).

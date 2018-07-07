@@ -547,7 +547,7 @@ lnt_checkFiles <- function(...){
 lnt_rename <- function(x,
                        encoding = "UTF-8",
                        recursive = FALSE,
-                       report = FALSE,
+                       report = TRUE,
                        simulate = TRUE,
                        verbose = FALSE) {
   # Check how files are provided
@@ -653,7 +653,7 @@ lnt_rename <- function(x,
     if (verbose) cat("\r\t...renaming files", scales::percent(i / length(files)), "\t\t")
 
   }
-  cat("\n", sum(grepl("^renamed$", renamed$status)), "files renamed, ")
+  if (verbose) cat("\n", sum(grepl("^renamed$", renamed$status)), "files renamed, ")
   if (sum(grepl("exists", renamed$status, fixed = TRUE)) > 0) {
     cat(sum(grepl("exists", renamed$status, fixed = TRUE)), "not renamed (file already exists), ")
   }
@@ -1063,7 +1063,7 @@ lnt_lookup <- function(x,
 
 #' @title Display diff of similar articles
 #'
-#' @description This function is a wrapper for \link[diffobj]{diffPrint}. I is
+#' @description This function is a wrapper for \link[diffobj]{diffPrint}. It is
 #'   intended to help performing a manual assessment of the difference between
 #'   highly similar articles identified via \link{lnt_similarity}.
 #'
@@ -1096,9 +1096,13 @@ lnt_diff <- function(x,
     stop("Package \"diffobj\" is needed for this function to work. Please install it.",
          call. = FALSE)
   }
+  if (!"rel_dist" %in% colnames(x)) {
+    stop("'x' must contain a column with rel_dist information (see ?lnt_similarity)")
+  }
   if (!"lnt_sim" %in% class(x)) {
     warning("'x' should be an object returned by lnt_similarity().")
   }
+  
   dots <- list(...)
   x <- x[x$rel_dist > min & x$rel_dist < max, ]
   if (nrow(x) < n) {
@@ -1107,7 +1111,6 @@ lnt_diff <- function(x,
   sample <- sample(x = seq_len(nrow(x)), size = n)
   x <- x[sample, ]
   x <- x[order(x$rel_dist), ]
-  
   for (i in seq_len(nrow(x))) {
     original <- unname(unlist(quanteda::tokens(x$text_original[i], what = "sentence")))
     duplicate <- unname(unlist(quanteda::tokens(x$text_duplicate[i], what = "sentence")))

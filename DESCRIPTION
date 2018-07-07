@@ -1,7 +1,7 @@
 Package: LexisNexisTools
 Title: Working with Files from 'LexisNexis'
 Version: 0.1.51.9000
-Date: 2018-07-06
+Date: 2018-07-07
 Authors@R: person("Johannes", "Gruber", email = "j.gruber.1@research.gla.ac.uk", 
   role = c("aut", "cre"))
 Description: My PhD supervisor once told me that everyone doing newspaper
@@ -30,7 +30,11 @@ Suggests:
     covr,
     diffobj,
     RSQLite,
-    testthat
+    testthat,
+    kableExtra,
+    knitr,
+    rmarkdown
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
+VignetteBuilder: knitr
