@@ -89,7 +89,7 @@ setMethod("[",
               if (j %in% colnames(x@meta)) {
                 select <- x@meta$ID[x@meta[, j] %in% i]
               } else if (j %in% colnames(x@articles)) {
-                select <- x@articles$ID[x@articles[, j] %in% i, ]
+                select <- x@articles$ID[x@articles[, j] %in% i]
               } else if (j %in% colnames(x@paragraphs)) {
                 select <- x@paragraphs$Art_ID[x@paragraphs[, j] %in% i]
               } else {
@@ -207,7 +207,7 @@ lnt_read <- function(x,
                      verbose = TRUE,
                      ...){
   if (missing(x)) {
-    if (readline(prompt = "No path was given. Should files in working direcotry be read? [y/n]")
+    if (readline(prompt = "No path was given. Should files in working directory be read? [y/n]")
         %in% c("y", "yes", "Y", "Yes")) {
       x <- paste0(getwd(), "/")
     } else {
@@ -270,7 +270,7 @@ lnt_read <- function(x,
   }
 
   beginnings <- grep(start_keyword, articles.v)
-  articles.l <- lapply(seq_len(length(beginnings)), function(n) {
+  articles.l <- lapply(seq_along(beginnings), function(n) {
     if (n < length(beginnings)) {
       articles.v[beginnings[n]:beginnings[n + 1]]
     } else {
@@ -361,7 +361,7 @@ lnt_read <- function(x,
 
 
   ### edition (where available)
-  edition.v <- sapply(seq_len(length(df.l)), function(i) {
+  edition.v <- sapply(seq_along(df.l), function(i) {
     date <- grep(date.v[i], x = df.l[[i]]$meta, fixed = TRUE)
     if (length(date) == 1) {
       d1 <- df.l[[i]]$meta[(date + 1):(date + 2)]
@@ -386,7 +386,7 @@ lnt_read <- function(x,
   if (verbose) cat("\t...editions extracted [", format( (Sys.time() - start_time), digits = 2, nsmall = 2), "]\n", sep = "")
 
   ### Headline
-  headline.v <- sapply(seq_len(length(df.l)), function(i) {
+  headline.v <- sapply(seq_along(df.l), function(i) {
     headline <- df.l[[i]]$meta
     headline[c(grep(length.v[i], headline, fixed = TRUE),
                grep(date.v[i], headline, fixed = TRUE),
@@ -411,7 +411,7 @@ lnt_read <- function(x,
                     replacement = "")
 
   ### make data.frame
-  meta.df <- data.frame(ID = seq_len(length(df.l)),
+  meta.df <- data.frame(ID = seq_along(df.l),
                         Source_File = unlist(sapply(df.l, function(i) i[["source"]])),
                         Newspaper = trimws(newspaper.v, which = "both"),
                         Date = date.v,
@@ -433,7 +433,7 @@ lnt_read <- function(x,
     }
     i$article
   })
-  articles.df <- data.frame(ID = seq_len(length(df.l)),
+  articles.df <- data.frame(ID = seq_along(df.l),
                             Article = sapply(df.l, function(i) {
                               stringi::stri_join(i, collapse = "\n")
                             }),
@@ -448,7 +448,7 @@ lnt_read <- function(x,
                                    n = -1L,
                                    omit_empty = TRUE,
                                    simplify = FALSE)
-    paragraphs.df <- data.table::rbindlist(lapply(seq_len(length(.)), function(i) {
+    paragraphs.df <- data.table::rbindlist(lapply(seq_along(.), function(i) {
       if (length(.[[i]][!.[[i]] == "\n"]) > 0) {
         data.frame(Art_ID = i,
                    Paragraph = .[[i]][!.[[i]] == "\n"],
@@ -555,7 +555,7 @@ lnt_rename <- function(x,
   # 2. txt file or files
   # 3. folder name(s)
   if (missing(x)) {
-    if (readline(prompt = "No path was given. Should files in working direcotry be renamed? [y/n]")
+    if (readline(prompt = "No path was given. Should files in working directory be renamed? [y/n]")
         %in% c("y", "yes", "Y", "Yes")) {
       x <- paste0(getwd(), "/")
     } else {
@@ -596,7 +596,7 @@ lnt_rename <- function(x,
                         status = character(length = length(files)),
                         stringsAsFactors = FALSE)
   # start renaming files
-  for (i in seq_len(length(files))){
+  for (i in seq_along(files)){
     #read in the articles
     content.v <- readLines(files[i], encoding = encoding, n = 50)
     #look for the range of articles
@@ -757,7 +757,7 @@ lnt_similarity <- function(texts,
     if (any(missing(texts), missing(dates))) {
       stop("Supply either 'LNToutput' or 'texts' and 'dates'.")
     }
-    if (is.null(IDs)) IDs <- seq_len(length(texts))
+    if (is.null(IDs)) IDs <- seq_along(texts)
   } else if (!missing(LNToutput)) {
     if (missing(texts)) texts <- LNToutput@articles$Article
     if (missing(dates)) dates <- LNToutput@meta$Date

@@ -303,5 +303,6 @@ readLines("README.Rmd") %>%
   ) %>% 
   writeLines("./vignettes/demo.Rmd")
 rmarkdown::render("./vignettes/demo.Rmd")
-unlink("./vignettes/SampleFile_20091201-20100511_1-10.txt")
+unlink(c("./vignettes/SampleFile_20091201-20100511_1-10.txt",
+         "SampleFile_20091201-20100511_1-10.txt"))
 ```

@@ -3,9 +3,11 @@ library(LexisNexisTools)
 
 
 LNToutput <- lnt_read(lnt_sample(verbose = FALSE), verbose = FALSE)
+LNToutput@meta$Source_File <- basename(LNToutput@meta$Source_File)
 
 test_that("Show method", {
-  expect_known_output(object = LNToutput, file = "../files/show")
+  expect_known_output(object = show(LNToutput), 
+                      file = "../files/show")
 })
 
 test_that("Plus operator", {
@@ -25,9 +27,17 @@ test_that("Subset method", {
     test@meta$ID
   }, c(2:3, 7))
   expect_equal({
+    test <- LNToutput[LNToutput@articles$Article[1], "Article"]
+    test@articles$Article
+  }, LNToutput@articles$Article[1])
+  expect_equal({
     test <- LNToutput["Guardian", "Newspaper"]
     test@meta$Newspaper
   }, c("Guardian", "Guardian"))
+  expect_equal({
+    test <- LNToutput[100, "Par_ID"]
+    unique(test@paragraphs$Art_ID)
+  }, 10)
   expect_equal({
     test <- LNToutput["Guardian", "Newspaper", invert = TRUE]
     test@meta$Newspaper

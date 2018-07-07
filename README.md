@@ -79,7 +79,7 @@ report.df <- lnt_rename(x = my_files, report = TRUE)
 report.df
 ```
 
-    ## in 0.0013 secs
+    ## in 0.0014 secs
 
 | name\_orig | name\_new                               | status  |
 |:-----------|:----------------------------------------|:--------|
@@ -107,22 +107,22 @@ LNToutput <- lnt_read(x = getwd())
 ```
 
     ## Creating LNToutput from input 1 files...
-    ##  ...files loaded [0.0013 secs]
-    ##  ...articles split [0.01 secs]
-    ##  ...lengths extracted [0.011 secs]
-    ##  ...newspapers extracted [0.011 secs]
-    ##  ...dates extracted [0.012 secs]
-    ##  ...authors extracted [0.013 secs]
-    ##  ...sections extracted [0.013 secs]
-    ##  ...editions extracted [0.013 secs]
-    ##  ...headlines extracted [0.014 secs]
-    ##  ...dates converted [0.019 secs]
-    ##  ...metadata extracted [0.02 secs]
-    ##  ...article texts extracted [0.022 secs]
-    ##  ...paragraphs extracted [0.03 secs]
-    ##  ...superfluous whitespace removed from articles [0.032 secs]
-    ##  ...superfluous whitespace removed from paragraphs [0.035 secs]
-    ## Elapsed time: 0.035 secs
+    ##  ...files loaded [0.0014 secs]
+    ##  ...articles split [0.011 secs]
+    ##  ...lengths extracted [0.012 secs]
+    ##  ...newspapers extracted [0.012 secs]
+    ##  ...dates extracted [0.014 secs]
+    ##  ...authors extracted [0.015 secs]
+    ##  ...sections extracted [0.015 secs]
+    ##  ...editions extracted [0.015 secs]
+    ##  ...headlines extracted [0.016 secs]
+    ##  ...dates converted [0.021 secs]
+    ##  ...metadata extracted [0.023 secs]
+    ##  ...article texts extracted [0.025 secs]
+    ##  ...paragraphs extracted [0.034 secs]
+    ##  ...superfluous whitespace removed from articles [0.036 secs]
+    ##  ...superfluous whitespace removed from paragraphs [0.039 secs]
+    ## Elapsed time: 0.039 secs
 
 The returned object of class `LNToutput` can easily be converted to regular data.frames using `@` to select the data.frame you want:
 
