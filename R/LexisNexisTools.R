@@ -330,8 +330,10 @@ lnt_read <- function(x,
 
   ### Date
   date.v <- sapply(df.l, function(i) {
-    . <- stringi::stri_extract_last_regex(str = i$meta[seq_len(10)],
-                                          pattern = "\\w+ \\d+, \\d+|\\d+ \\w+ \\d+")
+    . <- stringi::stri_extract_last_regex(
+      str = i$meta[seq_len(10)],
+      pattern = "\\w+ \\d+, \\d+|\\d+ \\w+ \\d+|\\d+. \\w+ \\d+"
+    )
     na.omit(.)[1]
   })
   if (verbose) cat("\t...dates extracted [", format( (Sys.time() - start_time), digits = 2, nsmall = 2), "]\n", sep = "")
@@ -1032,20 +1034,23 @@ lnt_lookup <- function(x,
   }
   if (isTRUE(cluster > 1)) {
     cl <- parallel::makeCluster(cluster)
-    parallel::clusterExport(cl = cl, varlist = "pattern")
+    force(pattern)
+    parallel::clusterExport(cl = cl, varlist = "pattern", envir = environment())
   } else {
     cl <- NULL
   }
   return <- pbapply::pblapply(x, cl = cl, function(s) {
-    out <- stringi::stri_extract_all_regex(str = s,
-                                           pattern = paste0("\\b",
-                                                            pattern,
-                                                            "\\b"), #Use word boundaries
-                                           vectorize_all = TRUE,
-                                           omit_no_match = FALSE,
-                                           simplify = FALSE,
-                                           opts_regex = stringi::stri_opts_regex(
-                                             case_insensitive = case_insensitive)
+    out <- stringi::stri_extract_all_regex(
+      str = s,
+      pattern = paste0("\\b",
+                       pattern,
+                       "\\b"), #Use word boundaries
+      vectorize_all = TRUE,
+      omit_no_match = FALSE,
+      simplify = FALSE,
+      opts_regex = stringi::stri_opts_regex(
+        case_insensitive = case_insensitive
+      )
     )
     out[is.na(out)] <- NULL
     if (unique_pattern) {
