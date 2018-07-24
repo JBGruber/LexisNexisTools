@@ -900,13 +900,18 @@ lnt_asDate <- function(x,
                Italian = "it",
                Russian = "ru")
 
+  if (!locale == "auto") locales <- locale
   for (loc in locales) {
-    x <- stri_replace_all_fixed(str = x,
-                                pattern = c(stri_datetime_symbols(locale = loc)$Weekday,
-                                            "PM", "AM", "GMT"),
+    x <- stri_replace_all_regex(str = x,
+                                pattern = paste0(
+                                  "\\b",
+                                  c(stri_datetime_symbols(locale = loc)$Weekday,
+                                    "PM", "AM", "GMT"),
+                                  "\\b"
+                                ),
                                 replacement = "",
                                 vectorize_all = FALSE,
-                                opts_fixed = stri_opts_fixed(case_insensitive = TRUE))
+                                opts_regex = stri_opts_regex(case_insensitive = TRUE))
   }
   x <- stri_replace_all_regex(str = x,
                               pattern = c("[A-Z]{3}$",
