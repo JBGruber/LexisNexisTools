@@ -2,7 +2,7 @@
 LexisNexisTools
 ===============
 
-[![Travis-CI Build Status](https://travis-ci.org/JBGruber/LexisNexisTools.svg?branch=master)](https://travis-ci.org/JBGruber/LexisNexisTools) [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version-ago/LexisNexisTools)](http://cran.r-project.org/package=LexisNexisTools) [![CRAN\_Download\_Badge](http://cranlogs.r-pkg.org/badges/grand-total/LexisNexisTools)](http://cran.r-project.org/package=LexisNexisTools) [![Coverage Status](https://img.shields.io/codecov/c/github/JBGruber/LexisNexisTools/master.svg)](https://codecov.io/github/JBGruber/LexisNexisTools?branch=master)
+[![Travis-CI Build Status](https://travis-ci.org/JBGruber/LexisNexisTools.svg?branch=master)](https://travis-ci.org/JBGruber/LexisNexisTools) [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version-ago/LexisNexisTools)](http://cran.r-project.org/package=LexisNexisTools) [![CRAN\_Download\_Badge](http://cranlogs.r-pkg.org/badges/grand-total/LexisNexisTools)](http://cran.r-project.org/package=LexisNexisTools) [![Coverage Status](https://codecov.io/gh/JBGruber/LexisNexisTools/branch/master/graph/badge.svg)](https://codecov.io/github/JBGruber/LexisNexisTools?branch=master)
 
 Motivation
 ----------
@@ -41,7 +41,7 @@ library("LexisNexisTools")
 # For example
 setwd("C:/Test/LNTools_test")
 
-# Or 
+# Or
 setwd("~/Test/LNTools_test")
 ```
 
@@ -79,7 +79,7 @@ report.df <- lnt_rename(x = my_files, report = TRUE)
 report.df
 ```
 
-    ## in 0.0014 secs
+    ## in 0.0013 secs
 
 | name\_orig | name\_new                               | status  |
 |:-----------|:----------------------------------------|:--------|
@@ -107,24 +107,26 @@ LNToutput <- lnt_read(x = getwd())
 ```
 
     ## Creating LNToutput from input 1 files...
-    ##  ...files loaded [0.0014 secs]
-    ##  ...articles split [0.011 secs]
-    ##  ...lengths extracted [0.012 secs]
-    ##  ...newspapers extracted [0.012 secs]
-    ##  ...dates extracted [0.014 secs]
-    ##  ...authors extracted [0.015 secs]
-    ##  ...sections extracted [0.015 secs]
-    ##  ...editions extracted [0.015 secs]
-    ##  ...headlines extracted [0.016 secs]
+    ##  ...files loaded [0.0012 secs]
+    ##  ...articles split [0.0099 secs]
+    ##  ...lengths extracted [0.01 secs]
+    ##  ...newspapers extracted [0.011 secs]
+    ##  ...dates extracted [0.013 secs]
+    ##  ...authors extracted [0.014 secs]
+    ##  ...sections extracted [0.014 secs]
+    ##  ...editions extracted [0.014 secs]
+    ##  ...headlines extracted [0.014 secs]
     ##  ...dates converted [0.021 secs]
-    ##  ...metadata extracted [0.023 secs]
+    ##  ...metadata extracted [0.022 secs]
     ##  ...article texts extracted [0.025 secs]
-    ##  ...paragraphs extracted [0.034 secs]
-    ##  ...superfluous whitespace removed from articles [0.036 secs]
-    ##  ...superfluous whitespace removed from paragraphs [0.039 secs]
-    ## Elapsed time: 0.039 secs
+    ##  ...paragraphs extracted [0.033 secs]
+    ##  ...superfluous whitespace removed from articles [0.035 secs]
+    ##  ...superfluous whitespace removed from paragraphs [0.038 secs]
+    ## Elapsed time: 0.038 secs
 
-The returned object of class `LNToutput` can easily be converted to regular data.frames using `@` to select the data.frame you want:
+The returned object of class `LNToutput` is intended to be an intermediate container. As it stores articles and paragraphs in two separate data.frames, nested in an S4 object, the relevant text data is stored twice in almost the same format. This has the advantage, that there is no need to use special characters, such as "\\n". However, it makes the files rather big when you save them directly.
+
+The object can, however, be easily converted to regular data.frames using `@` to select the data.frame you want:
 
 ``` r
 meta.df <- LNToutput@meta
@@ -201,6 +203,32 @@ head(meta.df, n = 3)
 </tr>
 </tbody>
 </table>
+
+If you want to keep only one data.frame including metadata and text data you can easily do so:
+
+``` r
+library("dplyr")
+```
+
+    ## 
+    ## Attaching package: 'dplyr'
+
+    ## The following objects are masked from 'package:stats':
+    ## 
+    ##     filter, lag
+
+    ## The following objects are masked from 'package:base':
+    ## 
+    ##     intersect, setdiff, setequal, union
+
+``` r
+meta_articles.df <- meta.df %>%
+  right_join(articles.df, by = "ID")
+
+# Or keep the paragraphs
+meta_paragraphs.df <- meta.df %>%
+  right_join(paragraphs.df, by = c("ID" = "Art_ID"))
+```
 
 Alternatively, you can convert LNToutput objects to formats common in other packages using the function `lnt_convert`:
 

@@ -5,11 +5,11 @@ output: github_document
 [![Travis-CI Build Status](https://travis-ci.org/JBGruber/LexisNexisTools.svg?branch=master)](https://travis-ci.org/JBGruber/LexisNexisTools)
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version-ago/LexisNexisTools)](http://cran.r-project.org/package=LexisNexisTools)
 [![CRAN_Download_Badge](http://cranlogs.r-pkg.org/badges/grand-total/LexisNexisTools)](http://cran.r-project.org/package=LexisNexisTools)
-[![Coverage Status](https://img.shields.io/codecov/c/github/JBGruber/LexisNexisTools/master.svg)](https://codecov.io/github/JBGruber/LexisNexisTools?branch=master)
+[![Coverage Status](https://codecov.io/gh/JBGruber/LexisNexisTools/branch/master/graph/badge.svg)](https://codecov.io/github/JBGruber/LexisNexisTools?branch=master)
 
 ## Motivation
 
-My PhD supervisor once told me that everyone doing newspaper analysis starts by writing code to read in files from the 'LexisNexis' newspaper archive. 
+My PhD supervisor once told me that everyone doing newspaper analysis starts by writing code to read in files from the 'LexisNexis' newspaper archive.
 However, while I do recommend this exercise, not everyone has the time.
 This package provides functions to read in TXT files downloaded from 'LexisNexis' and comes with a few other features I think come in handy while working with data from the popular newspaper archive.
 
@@ -42,7 +42,7 @@ library("LexisNexisTools")
 # For example
 setwd("C:/Test/LNTools_test")
 
-# Or 
+# Or
 setwd("~/Test/LNTools_test")
 ```
 
@@ -54,9 +54,9 @@ lnt_sample()
 
 ### Rename Files
 
-'LexisNexis' does not give the TXT files proper names. 
-The function `lnt_rename()` renames files to a standard format: "searchTerm_startDate-endDate_documentRange.txt" (e.g., "Obama_20091201-20100511_1-500.txt"). 
-Note, that this will not work if your TXT files lack a cover page with this information. 
+'LexisNexis' does not give the TXT files proper names.
+The function `lnt_rename()` renames files to a standard format: "searchTerm_startDate-endDate_documentRange.txt" (e.g., "Obama_20091201-20100511_1-500.txt").
+Note, that this will not work if your TXT files lack a cover page with this information.
 Currently, it seems, like 'LexisNexis' only delivers those cover pages when you first create a link to your search ("link to this search" on the results page), follow this link, and then download the TXT files from there.
 If you do not want to rename files, you can skip to the next section.
 The rest of the package's functionality stays untouched by whether you rename your files or not.
@@ -76,7 +76,7 @@ report.df <- lnt_rename()
 report.df <- lnt_rename(x = getwd(), report = TRUE)
 ```
 
- - Provide a character object with file names. 
+ - Provide a character object with file names.
 Use `list.files()` to search for files in a certain path.
 
 ```{r, eval=FALSE}
@@ -103,7 +103,7 @@ The argument `report = TRUE` indicates that the output of the function in `R` wi
 
 ### Read in 'LexisNexis' Files to Get Meta, Articles and Paragraphs
 
-The main function of this package is `lnt_read()`. 
+The main function of this package is `lnt_read()`.
 It converts the raw text files into three different `data.frames` nested in a special S4 object of class `LNToutput`.
 The three data.frames contain (1.) the metadata of the articles, (2.) the articles themselves, and (3.) the paragraphs (when `extract_paragraphs = TRUE`).
 
@@ -113,12 +113,12 @@ All keywords can be regular expressions and need to be in most cases:
 
 - `start_keyword`: The English default is "\\d+ of \\d+ DOCUMENTS$" which stands for, for example, "1 of 112 DOCUMENTS". It is used to split up the text in the TXT files into individual articles. You will not have to change anything here, except you work with documents in languages other than the currently supported.
 - `end_keyword`: This keyword is used to remove unnecessary information at the end of an article. Usually, this is "^LANGUAGE:". Where the keyword isn't found, the additional information ends up in the article text.
-- `length_keyword`: This keyword, which is usually just "^LENGTH:" (or its equivalent in other languages) finds the information about the length of an article. 
-However, since this is always the last line of the metadata, it is used to separate metadata and article text. 
+- `length_keyword`: This keyword, which is usually just "^LENGTH:" (or its equivalent in other languages) finds the information about the length of an article.
+However, since this is always the last line of the metadata, it is used to separate metadata and article text.
 There seems to be only one type of cases where this information is missing:
-if the article consists only of a graphic (which 'LexisNexis' does not retrieve). 
-The final output from `lnt_read()` has a column named `Graphic`, which indicates if this keyword was missing. 
-The article text then contains all metadata as well. 
+if the article consists only of a graphic (which 'LexisNexis' does not retrieve).
+The final output from `lnt_read()` has a column named `Graphic`, which indicates if this keyword was missing.
+The article text then contains all metadata as well.
 In these cases, you should remove the whole article after inspecting it.
 (Use `View(LNToutput@articles$Article[LNToutput@meta$Graphic])` to view these articles in a spreadsheet like viewer.)
 
@@ -132,9 +132,14 @@ To use the function, you can again provide either file name(s), folder name(s) o
 LNToutput <- lnt_read(x = getwd())
 ```
 
-The returned object  of class `LNToutput` can easily be converted to regular data.frames using `@` to select the data.frame you want:
+The returned object  of class `LNToutput` is intended to be an intermediate container.
+As it stores articles and paragraphs in two separate data.frames, nested in an S4 object, the relevant text data is stored twice in almost the same format.
+This has the advantage, that there is no need to use special characters, such as "\\n".
+However, it makes the files rather big when you save them directly.
 
-```{r, eval=FALSE}                 
+The object can, however, be easily converted to regular data.frames using `@` to select the data.frame you want:
+
+```{r, eval=FALSE}
 meta.df <- LNToutput@meta
 articles.df <- LNToutput@articles
 paragraphs.df <- LNToutput@paragraphs
@@ -154,9 +159,21 @@ kable(head(meta.df, n = 3), format = "markdown")
 
 ```
 
+If you want to keep only one data.frame including metadata and text data you can easily do so:
+
+```{r}
+library("dplyr")
+meta_articles.df <- meta.df %>%
+  right_join(articles.df, by = "ID")
+
+# Or keep the paragraphs
+meta_paragraphs.df <- meta.df %>%
+  right_join(paragraphs.df, by = c("ID" = "Art_ID"))
+```
+
 Alternatively, you can convert LNToutput objects to formats common in other packages using the function `lnt_convert`:
 
-```{r}                 
+```{r}
 quanteda_corpus <- lnt_convert(LNToutput, to = "rDNA")
 ```
 
@@ -165,10 +182,10 @@ See `?lnt_convert` to find out which formats are available or comment in [this i
 ### Identify Highly Similar Articles
 
 In 'LexisNexis' itself, there is an option to group highly similar articles.
-However, experience shows that this feature does not always  work perfectly. 
-One common problem when working with 'LexisNexis' data is thus that many articles appear to be delivered twice or more times. 
+However, experience shows that this feature does not always  work perfectly.
+One common problem when working with 'LexisNexis' data is thus that many articles appear to be delivered twice or more times.
 While direct duplicates can be filtered out using, for example, `LNToutput <- LNToutput[!duplicated(LNToutput@articles$Article), ]` this does not work for articles with small differences.
-Hence when one comma or white space is different between two articles, they are  treated as different. 
+Hence when one comma or white space is different between two articles, they are  treated as different.
 
 The function `lnt_similarity()` combines the fast similarity measure from [quanteda](https://github.com/quanteda/quanteda) with the much slower but more accurate relative [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance) to compare all articles published on the same day.
 Calculating the Levenshtein distance might be very slow though if you have many articles published each day in your data set.
@@ -278,8 +295,8 @@ These are the common functions in *LexisNexisTools*. Do you feel like anything i
 
 ```{r make vignette from readme, echo=FALSE, results='hide', message=FALSE}
 library("magrittr")
-readLines("README.Rmd") %>% 
-  .[grep("^## Demo", .):(grep("^## Issues", .) - 1)] %>% 
+readLines("README.Rmd") %>%
+  .[grep("^## Demo", .):(grep("^## Issues", .) - 1)] %>%
   c(
     '---',
     'title: "Basic Usage"',
@@ -300,7 +317,7 @@ readLines("README.Rmd") %>%
     'library("kableExtra")',
     ' ```',
     .
-  ) %>% 
+  ) %>%
   writeLines("./vignettes/demo.Rmd")
 rmarkdown::render("./vignettes/demo.Rmd")
 unlink(c("./vignettes/SampleFile_20091201-20100511_1-10.txt",

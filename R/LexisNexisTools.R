@@ -777,6 +777,14 @@ lnt_similarity <- function(texts,
     warning("You supplied NA values to 'dates'. Those will be ignored.")
     dates.d <- dates.d[!is.na(dates.d)]
   }
+  lenghts <- sapply(texts, nchar, USE.NAMES = FALSE)
+  if (any(lenghts < 1)) {
+    warning("\nAt least one of the supplied texts had length 0. These articles with the following IDs will be ignored: ",
+            paste(IDs[lenghts == 0], collapse = ", "))
+    texts <- texts[lenghts > 0]
+    dates <- dates[lenghts > 0]
+    IDs <- IDs[lenghts > 0]
+  }
   if (exists("LNToutput")) rm(LNToutput)
   if (verbose) cat("Checking similiarity for", length(dates), "articles over", length(dates.d), "dates...\n")
   text.dfm <- quanteda::dfm(texts,
