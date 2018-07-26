@@ -4,6 +4,7 @@
 \alias{lnt_convert}
 \alias{lnt2rDNA}
 \alias{lnt2quanteda}
+\alias{lnt2tm}
 \alias{lnt2cptools}
 \alias{lnt2SQLite}
 \title{Convert LNToutput to other formats}
@@ -14,12 +15,14 @@ lnt2rDNA(x, what)
 
 lnt2quanteda(x, what, ...)
 
+lnt2tm(x, what, ...)
+
 lnt2cptools(x, what, ...)
 
 lnt2SQLite(x, file = "LNT.sqlite", ...)
 }
 \arguments{
-\item{x}{An object of class LNToutput}
+\item{x}{An object of class LNToutput.}
 
 \item{to}{Which format to convert into. Possible values are "rDNA",
 "corpustools", "SQLite" and "quanteda".}
@@ -29,15 +32,35 @@ text in the output object.}
 
 \item{file}{The name of the database to be written to (for lnt2SQLite only).}
 
-\item{...}{Passed on to different methods.}
+\item{...}{Passed on to different methods (see details).}
 }
 \description{
-Takes output from \link{lnt_read} and converts it to other formats.
+Takes output from \link{lnt_read} and converts it to other formats. You can
+either use \code{lnt_convert()} and choose the output format via \code{to} or
+use the individual functions directly.
+}
+\details{
+lnt_convert() provides conversion methods into several formats
+commonly used in prominent R packages for text analysis. Besides the
+options set here, the ... (ellipsis) is passed on to the individual methods
+for tuning the outcome:
+\itemize{
+\item rDNA ... not used.
+\item quanteda ... passed on to \code{\link[quanteda:corpus]{quanteda::corpus()}}.
+\item corpustools ... passed on to \code{\link[corpustools:create_tcorpus]{corpustools::create_tcorpus()}}.
+\item tm ... passed on to \code{\link[tm:Corpus]{tm::Corpus()}}.
+\item tidytext ... passed on to \code{\link[tidytext:unnest_tokens]{tidytext::unnest_tokens()}}.
+\item lnt2SQLite ... passed on to \code{\link[RSQLite:dbWriteTable]{RSQLite::dbWriteTable()}}.
+}
 }
 \examples{
 LNToutput <- lnt_read(lnt_sample())
+
 docs <- lnt_convert(LNToutput, to = "rDNA")
+
 corpus <- lnt_convert(LNToutput, to = "quanteda")
+
 dbloc <- lnt_convert(LNToutput, to = "lnt2SQLite")
+
 tCorpus <- lnt_convert(LNToutput, to = "corpustools")
 }

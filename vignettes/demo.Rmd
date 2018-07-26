@@ -148,7 +148,7 @@ kable(head(meta.df, n = 3), format = "markdown")
 
 If you want to keep only one data.frame including metadata and text data you can easily do so:
 
-```{r}
+```{r, message=FALSE}
 library("dplyr")
 meta_articles.df <- meta.df %>%
   right_join(articles.df, by = "ID")

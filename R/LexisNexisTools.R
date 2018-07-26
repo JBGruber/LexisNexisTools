@@ -297,8 +297,8 @@ lnt_read <- function(x,
   })
   if (verbose) cat("\t...articles split [",
                    format( (Sys.time() - start_time),
-                          digits = 2,
-                          nsmall = 2),
+                           digits = 2,
+                           nsmall = 2),
                    "]\n",
                    sep = "")
 
@@ -637,18 +637,18 @@ lnt_rename <- function(x,
     file.name <- paste0(file.name, term.v, "_", date.v, "_", range.v, ".txt")
     #rename file
 
-    if (file.exists(file.name)) { #file already exists
+    if (file.exists(file.name)) {
       renamed$name_new[i] <- renamed$name_orig[i]
       renamed$status[i] <- "not renamed (file exists)"
     }else{
-      if (file.name == "__.txt") { #file name is empty
+      if (file.name == "__.txt") {
         renamed$name_new[i] <- file.name
         renamed$status[i] <- "not renamed (file is empty)"
       } else {
         renamed$name_new[i] <- file.name
         renamed$status[i] <- "renamed"
         if (!simulate) {
-          file.rename(files[i], file.name) #rename
+          file.rename(files[i], file.name)
         }
       }
     }
@@ -793,7 +793,7 @@ lnt_similarity <- function(texts,
                             valuetype = "regex",
                             verbose = FALSE)
   if (verbose) cat("\t...quanteda dfm construced for similarity comparison [",
-      format( (Sys.time() - start_time), digits = 2, nsmall = 2), "].", sep = "")
+                   format( (Sys.time() - start_time), digits = 2, nsmall = 2), "].", sep = "")
   text.dfm@Dimnames$docs <- IDs
   duplicates.df <- lapply(dates.d, function(x){
     if (length(grep(x, dates)) > 1) {
@@ -1133,13 +1133,13 @@ lnt_diff <- function(x,
     original <- unname(unlist(quanteda::tokens(x$text_original[i], what = "sentence")))
     duplicate <- unname(unlist(quanteda::tokens(x$text_duplicate[i], what = "sentence")))
     diff <- diffobj::diffPrint(current = original,
-                       target = duplicate,
-                       mode = "sidebyside",
-                       cur.banner = paste("ID:", x$ID_original[i]),
-                       tar.banner = paste0("ID: ", x$ID_duplicate[i], ", rel_dist: ",
-                                          round(x$rel_dist[i], digits = 2)),
-                       format = ifelse(output_html, "html", "auto"),
-                       interactive = !output_html)
+                               target = duplicate,
+                               mode = "sidebyside",
+                               cur.banner = paste("ID:", x$ID_original[i]),
+                               tar.banner = paste0("ID: ", x$ID_duplicate[i], ", rel_dist: ",
+                                                   round(x$rel_dist[i], digits = 2)),
+                               format = ifelse(output_html, "html", "auto"),
+                               interactive = !output_html)
     print(diff)
   }
   if (output_html) {
@@ -1152,23 +1152,47 @@ lnt_diff <- function(x,
 
 #' Convert LNToutput to other formats
 #'
-#' Takes output from \link{lnt_read} and converts it to other formats.
+#' Takes output from \link{lnt_read} and converts it to other formats. You can
+#' either use \code{lnt_convert()} and choose the output format via \code{to} or
+#' use the individual functions directly.
 #'
-#' @param x An object of class LNToutput
+#' @param x An object of class LNToutput.
 #' @param to Which format to convert into. Possible values are "rDNA",
 #'   "corpustools", "SQLite" and "quanteda".
 #' @param what Either "Articles" or "Paragraph" to use articles or paragraphs as
 #'   text in the output object.
 #' @param file The name of the database to be written to (for lnt2SQLite only).
-#' @param ... Passed on to different methods.
-#' @export
+#' @param ... Passed on to different methods (see details).
+#'
+#' @details lnt_convert() provides conversion methods into several formats
+#'   commonly used in prominent R packages for text analysis. Besides the
+#'   options set here, the ... (ellipsis) is passed on to the individual methods
+#'   for tuning the outcome:
+#'   * rDNA ... not used.
+#'
+#'   * quanteda ... passed on to [quanteda::corpus()].
+#'
+#'   * corpustools ... passed on to [corpustools::create_tcorpus()].
+#'
+#'   * tm ... passed on to [tm::Corpus()].
+#'
+#'   * tidytext ... passed on to [tidytext::unnest_tokens()].
+#'
+#'   * lnt2SQLite ... passed on to [RSQLite::dbWriteTable()].
 #'
 #' @examples
 #' LNToutput <- lnt_read(lnt_sample())
+#'
 #' docs <- lnt_convert(LNToutput, to = "rDNA")
+#'
 #' corpus <- lnt_convert(LNToutput, to = "quanteda")
+#'
 #' dbloc <- lnt_convert(LNToutput, to = "lnt2SQLite")
+#'
 #' tCorpus <- lnt_convert(LNToutput, to = "corpustools")
+#' @export
+#' @md
+
 lnt_convert <- function(x,
                         to = "rDNA",
                         what = "Articles",
@@ -1182,6 +1206,10 @@ lnt_convert <- function(x,
     return(lnt2SQLite(x, file = file, ...))
   } else if (to == "corpustools") {
     return(lnt2cptools(x, what = what, ...))
+  } else if (to == "tm") {
+    return(lnt2tm(x, what = what, ...))
+  } else if (to == "tidytext") {
+    return(lnt2tidy(x, what = what, ...))
   }
 }
 
@@ -1264,6 +1292,35 @@ lnt2quanteda <- function(x, what, ...) {
 
 #' @rdname lnt_convert
 #' @export
+lnt2tm <- function(x, what, ...) {
+  if (!requireNamespace("tm", quietly = TRUE)) {
+    stop("Package \"tm\" is needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
+  if (what == "Articles") {
+    df <- data.frame(doc_id = x@articles$ID,
+                     text = x@articles$Article)
+    df <- merge.data.frame(df,
+                           x@meta,
+                           by.x = "doc_id",
+                           by.y = "ID")
+  } else if (what == "Paragraph") {
+    df <- data.frame(doc_id = x@paragraphs$Par_ID,
+                     text = x@paragraphs$Paragraph,
+                     par_id = x@paragraphs$Par_ID)
+    df <- merge.data.frame(df,
+                           x@meta,
+                           by.x = "doc_id",
+                           by.y = "ID",
+                           all.x = TRUE)
+  }
+  corpus <- tm::Corpus(tm::DataframeSource(df), ...)
+  return(corpus)
+}
+
+
+#' @rdname lnt_convert
+#' @export
 #' @importFrom methods slot slotNames
 lnt2cptools <- function(x, what, ...) {
   if (!requireNamespace("corpustools", quietly = TRUE)) {
@@ -1286,12 +1343,44 @@ lnt2cptools <- function(x, what, ...) {
       all.y = TRUE
     )
   }
-  tCorpus <- corpustools::create_tcorpus(
+  tcorpus <- corpustools::create_tcorpus(
     x = text,
     doc_id = ID,
     meta = meta,
     ...)
-  return(tCorpus)
+  return(tcorpus)
+}
+
+
+lnt2tidy <- function(x, what, ...) {
+  if (!requireNamespace("tidytext", quietly = TRUE)) {
+    stop("Package \"tidytext\" is needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
+  if (what == "Articles") {
+    df <- merge.data.frame(x@meta,
+                           x@articles,
+                           by = "ID")
+    tidy <- tidytext::unnest_tokens(
+      tbl = df,
+      input = "Article",
+      output = "Article",
+      ...
+    )
+  } else if (what == "Paragraph") {
+    df <- merge.data.frame(
+      x@paragraphs,
+      x@meta,
+      by.x = "Art_ID",
+      by.y = "ID")
+    tidy <- tidytext::unnest_tokens(
+      tbl = df,
+      input = "Paragraph",
+      output = "Paragraph",
+      ...
+    )
+  }
+  return(tidy)
 }
 
 
@@ -1355,7 +1444,7 @@ lnt_add <- function(to,
         update <- what$ID %in% temp$ID
         temp <- temp[!temp$ID %in% what$ID, ]
         temp <- rbind(temp,
-                                 what[update, ])
+                      what[update, ])
         temp <- temp[order(temp$ID), ]
         message(sum(update), " entries in ", where, " replaced, ", sum(!update), " newly added.")
       } else {
