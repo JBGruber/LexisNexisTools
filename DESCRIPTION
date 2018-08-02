@@ -1,7 +1,7 @@
 Package: LexisNexisTools
 Title: Working with Files from 'LexisNexis'
-Version: 0.1.56.9000
-Date: 2018-07-26
+Version: 0.1.57.9000
+Date: 2018-08-02
 Authors@R: person("Johannes", "Gruber", email = "j.gruber.1@research.gla.ac.uk", 
   role = c("aut", "cre"))
 Description: My PhD supervisor once told me that everyone doing newspaper
@@ -9,7 +9,7 @@ Description: My PhD supervisor once told me that everyone doing newspaper
     archive (retrieved e.g., from <http://www.nexis.com/> or any of the partner
     sites). However, while this is a nice exercise I do recommend, not everyone has
     the time. This package takes TXT files downloaded from the newspaper archive of
-    'LexisNexis' and read them into R for further processing.
+    'LexisNexis' and reads them into R for further processing.
 Depends:
     R (>= 3.3.0)
 License: GPL-3

@@ -8,3 +8,4 @@ Update LN package.R
 test.R
 
 inst/doc
+vignettes/demo.html

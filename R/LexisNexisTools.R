@@ -66,11 +66,23 @@ setMethod("show",
             for (cols in colnames(paragraphs)) {
               paragraphs[, cols] <- trim(paragraphs[, cols], 8)
             }
-            cat("\n\nMeta (6 of ", nrow(object@meta), "):\n", sep = "")
+            n <- ifelse(nrow(object@meta) >= 6,
+                        6,
+                        nrow(object@meta))
+            n2 <- ifelse(nrow(object@paragraphs) >= 6,
+                         6,
+                         nrow(object@paragraphs))
+            cat("\n\nMeta (", n, " of ", nrow(object@meta), 
+                "):\n", sep = "")
             print(meta)
-            cat("\n\nArticles (6 of ", nrow(object@articles), "):\n", sep = "")
+            cat("\n\nArticles (", n, " of ", nrow(object@articles), 
+                "):\n", sep = "")
             print(articles)
-            cat("\n\nParagraphs (6 of ", nrow(object@paragraphs), "):\n",
+            cat("\n\nParagraphs (",
+                n2,
+                " of ",
+                nrow(object@paragraphs),
+                "):\n",
                 sep = "")
             print(paragraphs)
           }
@@ -765,9 +777,7 @@ lnt_similarity <- function(texts,
     if (missing(dates)) dates <- LNToutput@meta$Date
     if (is.null(IDs)) IDs <- LNToutput@articles$ID
   }
-  if (!all.equal(length(texts),
-                 length(dates),
-                 length(IDs))) {
+  if (!length(texts) == length(dates) | !length(dates) == length(IDs)) {
     stop("'texts', 'dates' and 'IDs' need to have the same length.")
   }
   # get unique dates
@@ -996,12 +1006,15 @@ lnt_asDate <- function(x,
 #' @param x An LNToutput object or a string or vector of strings.
 #' @param pattern A character vector of keywords. Word boundaries before and
 #'   after the keywords are honoured. Regular expression can be used.
-#' @param cluster The number of CPU cores to use. Use \code{NULL} or \code{1} to
+#' @param cores The number of CPU cores to use. Use \code{NULL} or \code{1} to
 #'   turn off.
 #' @param case_insensitive If FALSE, the pattern matching is case sensitive and
 #'   if TRUE, case is ignored during matching.
 #' @param unique_pattern If TRUE, duplicated mentions of the same pattern are
 #'   removed.
+#' @param word_boundaries If TRUE, lookup is performed with word boundaries at
+#'   beginning and end of the pattern (i.e., pattern "protest" will not identify
+#'   "protesters" etc.).
 #' @param verbose A logical flag indicating whether a status bar is printed to
 #'   the screen.
 #' @return A list keyword hits.
@@ -1026,9 +1039,10 @@ lnt_asDate <- function(x,
 #' @importFrom stringi stri_join stri_extract_all_regex stri_opts_regex
 lnt_lookup <- function(x,
                        pattern,
-                       cluster = NULL,
                        case_insensitive = FALSE,
                        unique_pattern = FALSE,
+                       word_boundaries = TRUE,
+                       cores = NULL,
                        verbose = TRUE) {
   if ("character" %in% class(x)) {
   } else if ("LNToutput" %in% class(x)) {
@@ -1040,13 +1054,18 @@ lnt_lookup <- function(x,
   } else (
     stop("'x' must be either a character vector or LNToutput object.")
   )
+  if (word_boundaries) {
+    pattern <- paste0("\\b",
+           pattern,
+           "\\b")
+  }
   if (!verbose) {
     pbapply::pboptions(type = "none")
   } else {
     pbapply::pboptions(type = "timer")
   }
-  if (isTRUE(cluster > 1)) {
-    cl <- parallel::makeCluster(cluster)
+  if (isTRUE(cores > 1)) {
+    cl <- parallel::makeCluster(cores)
     force(pattern)
     parallel::clusterExport(cl = cl, varlist = "pattern", envir = environment())
   } else {
@@ -1055,9 +1074,7 @@ lnt_lookup <- function(x,
   return <- pbapply::pblapply(x, cl = cl, function(s) {
     out <- stringi::stri_extract_all_regex(
       str = s,
-      pattern = paste0("\\b",
-                       pattern,
-                       "\\b"), #Use word boundaries
+      pattern = pattern,
       vectorize_all = TRUE,
       omit_no_match = FALSE,
       simplify = FALSE,
@@ -1110,6 +1127,9 @@ lnt_diff <- function(x,
                      n = 25,
                      output_html = FALSE,
                      ...) {
+  if (!"lnt_sim" %in% class(x)) {
+    warning("'x' should be an object returned by lnt_similarity().")
+  }
   if (!requireNamespace("diffobj", quietly = TRUE)) {
     stop("Package \"diffobj\" is needed for this function to work. Please install it.",
          call. = FALSE)
@@ -1117,10 +1137,6 @@ lnt_diff <- function(x,
   if (!"rel_dist" %in% colnames(x)) {
     stop("'x' must contain a column with rel_dist information (see ?lnt_similarity)")
   }
-  if (!"lnt_sim" %in% class(x)) {
-    warning("'x' should be an object returned by lnt_similarity().")
-  }
-
   dots <- list(...)
   x <- x[x$rel_dist > min & x$rel_dist < max, ]
   if (nrow(x) < n) {
@@ -1190,6 +1206,10 @@ lnt_diff <- function(x,
 #' dbloc <- lnt_convert(LNToutput, to = "lnt2SQLite")
 #'
 #' tCorpus <- lnt_convert(LNToutput, to = "corpustools")
+#' 
+#' tidy <- lnt_convert(LNToutput, to = "tidytext")
+#' 
+#' Corpus <- lnt_convert(LNToutput, to = "tm")
 #' @export
 #' @md
 

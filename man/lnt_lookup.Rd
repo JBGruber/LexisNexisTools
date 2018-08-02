@@ -4,8 +4,8 @@
 \alias{lnt_lookup}
 \title{Lookup keywords in articles}
 \usage{
-lnt_lookup(x, pattern, cluster = NULL, case_insensitive = FALSE,
-  unique_pattern = FALSE, verbose = TRUE)
+lnt_lookup(x, pattern, case_insensitive = FALSE, unique_pattern = FALSE,
+  word_boundaries = TRUE, cores = NULL, verbose = TRUE)
 }
 \arguments{
 \item{x}{An LNToutput object or a string or vector of strings.}
@@ -13,14 +13,18 @@ lnt_lookup(x, pattern, cluster = NULL, case_insensitive = FALSE,
 \item{pattern}{A character vector of keywords. Word boundaries before and
 after the keywords are honoured. Regular expression can be used.}
 
-\item{cluster}{The number of CPU cores to use. Use \code{NULL} or \code{1} to
-turn off.}
-
 \item{case_insensitive}{If FALSE, the pattern matching is case sensitive and
 if TRUE, case is ignored during matching.}
 
 \item{unique_pattern}{If TRUE, duplicated mentions of the same pattern are
 removed.}
+
+\item{word_boundaries}{If TRUE, lookup is performed with word boundaries at
+beginning and end of the pattern (i.e., pattern "protest" will not identify
+"protesters" etc.).}
+
+\item{cores}{The number of CPU cores to use. Use \code{NULL} or \code{1} to
+turn off.}
 
 \item{verbose}{A logical flag indicating whether a status bar is printed to
 the screen.}

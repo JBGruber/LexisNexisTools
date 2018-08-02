@@ -162,9 +162,19 @@ Alternatively, you can convert LNToutput objects to formats common in other pack
 
 ```{r}
 quanteda_corpus <- lnt_convert(LNToutput, to = "rDNA")
+
+corpus <- lnt_convert(LNToutput, to = "quanteda")
+
+tCorpus <- lnt_convert(LNToutput, to = "corpustools")
+
+tidy <- lnt_convert(LNToutput, to = "tidytext")
+
+Corpus <- lnt_convert(LNToutput, to = "tm")
+
+dbloc <- lnt_convert(LNToutput, to = "lnt2SQLite")
 ```
 
-See `?lnt_convert` to find out which formats are available or comment in [this issue](https://github.com/JBGruber/LexisNexisTools/issues/2) if you want a format added to the convert function.
+See `?lnt_convert` for details and pleas comment in [this issue](https://github.com/JBGruber/LexisNexisTools/issues/2) if you want a format added to the convert function.
 
 ### Identify Highly Similar Articles
 
