@@ -108,21 +108,21 @@ LNToutput <- lnt_read(x = getwd())
 
     ## Creating LNToutput from input 1 files...
     ##  ...files loaded [0.0013 secs]
-    ##  ...articles split [0.0099 secs]
-    ##  ...lengths extracted [0.01 secs]
+    ##  ...articles split [0.01 secs]
+    ##  ...lengths extracted [0.011 secs]
     ##  ...newspapers extracted [0.011 secs]
     ##  ...dates extracted [0.013 secs]
-    ##  ...authors extracted [0.013 secs]
+    ##  ...authors extracted [0.014 secs]
     ##  ...sections extracted [0.014 secs]
-    ##  ...editions extracted [0.014 secs]
-    ##  ...headlines extracted [0.014 secs]
-    ##  ...dates converted [0.02 secs]
+    ##  ...editions extracted [0.015 secs]
+    ##  ...headlines extracted [0.015 secs]
+    ##  ...dates converted [0.021 secs]
     ##  ...metadata extracted [0.022 secs]
-    ##  ...article texts extracted [0.024 secs]
-    ##  ...paragraphs extracted [0.032 secs]
-    ##  ...superfluous whitespace removed from articles [0.035 secs]
-    ##  ...superfluous whitespace removed from paragraphs [0.037 secs]
-    ## Elapsed time: 0.037 secs
+    ##  ...article texts extracted [0.025 secs]
+    ##  ...paragraphs extracted [0.033 secs]
+    ##  ...superfluous whitespace removed from articles [0.036 secs]
+    ##  ...superfluous whitespace removed from paragraphs [0.038 secs]
+    ## Elapsed time: 0.038 secs
 
 The returned object of class `LNToutput` is intended to be an intermediate container. As it stores articles and paragraphs in two separate data.frames, nested in an S4 object, the relevant text data is stored twice in almost the same format. This has the advantage, that there is no need to use special characters, such as "\\n". However, it makes the files rather big when you save them directly.
 
@@ -283,19 +283,19 @@ LNToutput[1, ]
     ## 5 Paragraphs
     ## 
     ## 
-    ## Meta (6 of 1):
+    ## Meta (1 of 1):
     ##   ID Source_File   Newspaper  Date      Length Section      Author Edition
     ## 1  1 /home/jo... Guardian... 14620 355 word...      NA Andrew S...        
     ##      Headline Graphic
     ## 1 Lorem ip...   FALSE
     ## 
     ## 
-    ## Articles (6 of 1):
+    ## Articles (1 of 1):
     ##   ID     Article
     ## 1  1 Lorem ip...
     ## 
     ## 
-    ## Paragraphs (6 of 5):
+    ## Paragraphs (5 of 5):
     ##   Art_ID Par_ID   Paragraph
     ## 1      1      1 Lorem ip...
     ## 2      1      2 Duis ele...
@@ -426,14 +426,14 @@ LNToutput
     ## 7 Paragraphs
     ## 
     ## 
-    ## Meta (6 of 1):
+    ## Meta (1 of 1):
     ##   ID Source_File   Newspaper  Date      Length     Section      Author
     ## 9  9 /home/jo... Sunday M... 14619 446 word... NEWS; Pg... Ross Iha...
     ##       Edition    Headline Graphic       stats
     ## 9 3 Star E... 3 Star E...   FALSE c("stati...
     ## 
     ## 
-    ## Articles (6 of 1):
+    ## Articles (1 of 1):
     ##   ID     Article
     ## 9  9 R is a p...
     ## 

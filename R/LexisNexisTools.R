@@ -1243,19 +1243,22 @@ lnt2rDNA <- function(x, what) {
                          collapse = "\n\n",
                          ignore_null = FALSE)
     })
+    ids <- x@meta$ID
   } else if (what == "Paragraph") {
     text <- x@paragraphs$Paragraph
+    ids <- x@paragraphs$Art_ID
   }
-  dta <- data.frame(id = x@meta$ID,
-                    title = x@meta$Headline,
+  order <- match(ids, x@meta$ID)
+  dta <- data.frame(id = x@meta$ID[order],
+                    title = x@meta$Headline[order],
                     text = text,
                     coder = 1,
-                    author = x@meta$Author,
-                    source = x@meta$Newspaper,
-                    section = x@meta$Section,
+                    author = x@meta$Author[order],
+                    source = x@meta$Newspaper[order],
+                    section = x@meta$Section[order],
                     notes = "",
                     type = "newspaper",
-                    date = x@meta$Date,
+                    date = x@meta$Date[order],
                     stringsAsFactors = FALSE)
   if (any(grepl("Date", class(dta$date)))) {
     dta$date <- as.POSIXct.Date(dta$date)
