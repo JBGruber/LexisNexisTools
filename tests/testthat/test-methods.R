@@ -6,7 +6,7 @@ LNToutput <- lnt_read(lnt_sample(verbose = FALSE), verbose = FALSE)
 LNToutput@meta$Source_File <- basename(LNToutput@meta$Source_File)
 
 test_that("Show method", {
-  expect_known_output(object = show(LNToutput), 
+  expect_known_output(object = show(LNToutput),
                       file = "../files/show")
 })
 

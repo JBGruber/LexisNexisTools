@@ -18,7 +18,7 @@ test_that("Convert LNToutput to rDNA", {
 test_that("Convert LNToutput to quanteda", {
   expect_equal({
     corpus <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
-                          to = "quanteda", what = "Articles")
+                          to = "quanteda", what = "Articles", collapse = FALSE)
     corpus$metadata$created <- "Wed Jul 25 19:33:20 2018"
     corpus$metadata$source <-
       "/home/johannes/Documents/Github/LexisNexisTools/tests/testthat/* on x86_64 by johannes"

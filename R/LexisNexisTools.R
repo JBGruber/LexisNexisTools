@@ -946,7 +946,8 @@ lnt_asDate <- function(x,
     correct <- mapply(function(format, locale) {
       out <- stringi::stri_datetime_parse(str = x,
                                           format = format,
-                                          locale = locale)
+                                          locale = locale,
+                                          tz = NULL)
       out <- 1 - sum(is.na(out)) / length(x)
       out * 100
     }, formats, locales)
@@ -988,6 +989,7 @@ lnt_asDate <- function(x,
   }
   x <- stringi::stri_datetime_parse(str = x,
                                     format = format,
+                                    tz = "UTC",
                                     locale = locale)
   x <- as.Date(x)
   return(x)
@@ -1241,7 +1243,7 @@ lnt_convert <- function(x,
 lnt2rDNA <- function(x, what = "Articles", collapse = TRUE) {
   if (isTRUE(collapse)) {
     collapse <- "\n\n"
-  } else if (isFALSE(collapse)) {
+  } else if (is.logical(collapse) && length(collapse) == 1L && !is.na(collapse) && !collapse) {
     collapse <- NULL
   }
   if (what == "Articles") {
@@ -1299,7 +1301,7 @@ lnt2rDNA <- function(x, what = "Articles", collapse = TRUE) {
 lnt2quanteda <- function(x, what = "Articles", collapse = NULL, ...) {
   if (isTRUE(collapse)) {
     collapse <- "\n\n"
-  } else if (isFALSE(collapse)) {
+  } else if (is.logical(collapse) && length(collapse) == 1L && !is.na(collapse) && !collapse) {
     collapse <- NULL
   }
   if (what == "Articles") {
@@ -1352,7 +1354,7 @@ lnt2tm <- function(x, what = "Articles", collapse = NULL, ...) {
   }
   if (isTRUE(collapse)) {
     collapse <- "\n\n"
-  } else if (isFALSE(collapse)) {
+  } else if (is.logical(collapse) && length(collapse) == 1L && !is.na(collapse) && !collapse) {
     collapse <- NULL
   }
   if (what == "Articles") {
@@ -1397,7 +1399,7 @@ lnt2cptools <- function(x, what = "Articles", collapse = NULL, ...) {
   }
   if (isTRUE(collapse)) {
     collapse <- "\n\n"
-  } else if (isFALSE(collapse)) {
+  } else if (is.logical(collapse) && length(collapse) == 1L && !is.na(collapse) && !collapse) {
     collapse <- NULL
   }
   if (what == "Articles") {
@@ -1441,7 +1443,7 @@ lnt2tidy <- function(x, what = "Articles", collapse = NULL, ...) {
   }
   if (isTRUE(collapse)) {
     collapse <- "\n\n"
-  } else if (isFALSE(collapse)) {
+  } else if (is.logical(collapse) && length(collapse) == 1L && !is.na(collapse) && !collapse) {
     collapse <- NULL
   }
   if (what == "Articles") {
