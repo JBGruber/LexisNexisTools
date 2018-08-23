@@ -22,7 +22,7 @@ report which files were renamed.}
 
 \item{simulate}{Should the renaming be simulated instead of actually done?
 This can help prevent accidental renaming of unrelated txt files which
-happen to be in the same directory as the files from 'LexisNexsis'.}
+happen to be in the same directory as the files from 'LexisNexis'.}
 
 \item{verbose}{A logical flag indicating whether information should be
 printed to the screen.}

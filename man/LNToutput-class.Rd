@@ -7,7 +7,14 @@
 \description{
 This S4 class stores the output from \link{lnt_read}. Just like a spreadsheet
 with multiple worksheets, an LNToutput object consist of three data.frames
-which you can select using \code{@}.
+which you can select using \code{@}. This object class is intended to be an
+intermediate container. As it stores articles and paragraphs in two separate
+data.frames, nested in an S4 object, the relevant text data is stored twice
+in almost the same format. This has the advantage, that there is no need to
+use special characters, such as "\\n" to indicate a new paragraph. However,
+it makes the files rather big when you save them directly. They should thus
+usually be subsetted using \code{@} or converted to a different format using
+\link{lnt_convert}.
 }
 \section{Slots}{
 

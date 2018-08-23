@@ -4,8 +4,9 @@
 \alias{lnt_lookup}
 \title{Lookup keywords in articles}
 \usage{
-lnt_lookup(x, pattern, case_insensitive = FALSE, unique_pattern = FALSE,
-  word_boundaries = TRUE, cores = NULL, verbose = TRUE)
+lnt_lookup(x, pattern, case_insensitive = FALSE,
+  unique_pattern = FALSE, word_boundaries = TRUE, cores = NULL,
+  verbose = TRUE)
 }
 \arguments{
 \item{x}{An LNToutput object or a string or vector of strings.}

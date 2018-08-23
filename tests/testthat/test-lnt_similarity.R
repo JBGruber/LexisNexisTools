@@ -11,7 +11,7 @@ test_that("Test similarity", {
     duplicates.df <- lnt_similarity(texts = LNToutput@articles$Article,
                                     dates = LNToutput@meta$Date,
                                     IDs = LNToutput@articles$ID)
-    attributes(duplicates.df)$call <- 
+    attributes(duplicates.df)$call <-
       attributes(readRDS("../files/duplicates.df.RDS"))$call
     duplicates.df
   },
@@ -19,7 +19,6 @@ test_that("Test similarity", {
   expect_equal(lnt_similarity(texts = LNToutput@articles$Article,
                               dates = LNToutput@meta$Date)$ID_original,
                c(1, 2, 2, 2, 2, 3, 4, 4, 5))
-  
 })
 
 

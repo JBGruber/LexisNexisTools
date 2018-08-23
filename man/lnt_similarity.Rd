@@ -6,7 +6,8 @@
 \usage{
 lnt_similarity(texts, dates, LNToutput, IDs = NULL, threshold = 0.99,
   rel_dist = TRUE, length_diff = Inf,
-  nthread = getOption("sd_num_thread"), max_length = Inf, verbose = TRUE)
+  nthread = getOption("sd_num_thread"), max_length = Inf,
+  verbose = TRUE)
 }
 \arguments{
 \item{texts}{Provide texts to check for similarity.}

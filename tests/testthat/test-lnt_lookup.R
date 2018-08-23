@@ -16,8 +16,8 @@ test_that("Lookup stat. computing in sample", {
                     `8` = NULL,
                     `9` = c("statistical computing", "statistical computing"),
                     `10` = NULL))
-  expect_equal(lnt_lookup(LNToutput, "statis", 
-                          verbose = TRUE, 
+  expect_equal(lnt_lookup(LNToutput, "statis",
+                          verbose = TRUE,
                           word_boundaries = FALSE),
                list(`1` = NULL,
                     `2` = NULL,

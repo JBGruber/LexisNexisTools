@@ -8,7 +8,7 @@ library(LexisNexisTools)
 test_that("Convert LNToutput to rDNA", {
   expect_equal({
     lnt_convert(x = readRDS("../files/LNToutput.RDS"),
-                to = "rDNA", what = "Articles")
+                to = "rDNA", what = "Articles", collapse = TRUE)
   }, readRDS("../files/rDNA.RDS"))
 })
 
@@ -20,7 +20,7 @@ test_that("Convert LNToutput to quanteda", {
     corpus <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
                           to = "quanteda", what = "Articles")
     corpus$metadata$created <- "Wed Jul 25 19:33:20 2018"
-    corpus$metadata$source <- 
+    corpus$metadata$source <-
       "/home/johannes/Documents/Github/LexisNexisTools/tests/testthat/* on x86_64 by johannes"
     corpus
   }, readRDS("../files/quanteda.RDS"))

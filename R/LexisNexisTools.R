@@ -13,7 +13,14 @@
 #'
 #' This S4 class stores the output from \link{lnt_read}. Just like a spreadsheet
 #' with multiple worksheets, an LNToutput object consist of three data.frames
-#' which you can select using \code{@}.
+#' which you can select using \code{@}. This object class is intended to be an
+#' intermediate container. As it stores articles and paragraphs in two separate
+#' data.frames, nested in an S4 object, the relevant text data is stored twice
+#' in almost the same format. This has the advantage, that there is no need to
+#' use special characters, such as "\\n" to indicate a new paragraph. However,
+#' it makes the files rather big when you save them directly. They should thus
+#' usually be subsetted using \code{@} or converted to a different format using
+#' \link{lnt_convert}.
 #'
 #' @slot meta The metadata of the articles read in.
 #' @slot articles The article texts and respective IDs.
@@ -50,13 +57,6 @@ setMethod("show",
             meta <- head(object@meta, n = 6)
             articles <- head(object@articles, n = 6)
             paragraphs <- head(object@paragraphs, n = 6)
-            trim <- function(object, n, e = "...") {
-              ifelse(nchar(object) > n,
-                     paste0(gsub("\\s+$", "",
-                                 strtrim(object, width = n)),
-                            e),
-                     object)
-            }
             for (cols in colnames(meta)) {
               meta[, cols] <- trim(meta[, cols], 8)
             }
@@ -72,10 +72,10 @@ setMethod("show",
             n2 <- ifelse(nrow(object@paragraphs) >= 6,
                          6,
                          nrow(object@paragraphs))
-            cat("\n\nMeta (", n, " of ", nrow(object@meta), 
+            cat("\n\nMeta (", n, " of ", nrow(object@meta),
                 "):\n", sep = "")
             print(meta)
-            cat("\n\nArticles (", n, " of ", nrow(object@articles), 
+            cat("\n\nArticles (", n, " of ", nrow(object@articles),
                 "):\n", sep = "")
             print(articles)
             cat("\n\nParagraphs (",
@@ -384,7 +384,7 @@ lnt_read <- function(x,
         if (!d1[2] == "") edition.v <- paste(edition.v, d1[2], collapse = "; ")
         edition.v
       } else {
-        # alternativly, the edition is sometimes the first non-empty line in the article
+        # Alternatively, the edition is sometimes the first non-empty line in the article
         edition.v <- grep("edition",
                           df.l[[i]]$article[!stringi::stri_isempty(str = df.l[[i]]$article)][1],
                           value = TRUE,
@@ -530,7 +530,7 @@ lnt_checkFiles <- function(...){
 #'   report which files were renamed.
 #' @param simulate Should the renaming be simulated instead of actually done?
 #'   This can help prevent accidental renaming of unrelated txt files which
-#'   happen to be in the same directory as the files from 'LexisNexsis'.
+#'   happen to be in the same directory as the files from 'LexisNexis'.
 #' @param verbose A logical flag indicating whether information should be
 #'   printed to the screen.
 #' @keywords LexisNexis
@@ -1137,7 +1137,6 @@ lnt_diff <- function(x,
   if (!"rel_dist" %in% colnames(x)) {
     stop("'x' must contain a column with rel_dist information (see ?lnt_similarity)")
   }
-  dots <- list(...)
   x <- x[x$rel_dist > min & x$rel_dist < max, ]
   if (nrow(x) < n) {
     n <- nrow(x)
@@ -1177,14 +1176,17 @@ lnt_diff <- function(x,
 #'   "corpustools", "SQLite" and "quanteda".
 #' @param what Either "Articles" or "Paragraph" to use articles or paragraphs as
 #'   text in the output object.
+#' @param collapse Only has an effect when \code{what = "Articles"}. If set to
+#'   TRUE, an empty line will be added after each paragraphs. Alternatively you
+#'   can enter a custom string (such as \code{"\\n"} for newline). \code{NULL}
+#'   or \code{FALSE} turns off this feature.
 #' @param file The name of the database to be written to (for lnt2SQLite only).
 #' @param ... Passed on to different methods (see details).
 #'
 #' @details lnt_convert() provides conversion methods into several formats
 #'   commonly used in prominent R packages for text analysis. Besides the
 #'   options set here, the ... (ellipsis) is passed on to the individual methods
-#'   for tuning the outcome:
-#'   * rDNA ... not used.
+#'   for tuning the outcome: * rDNA ... not used.
 #'
 #'   * quanteda ... passed on to [quanteda::corpus()].
 #'
@@ -1206,9 +1208,9 @@ lnt_diff <- function(x,
 #' dbloc <- lnt_convert(LNToutput, to = "lnt2SQLite")
 #'
 #' tCorpus <- lnt_convert(LNToutput, to = "corpustools")
-#' 
+#'
 #' tidy <- lnt_convert(LNToutput, to = "tidytext")
-#' 
+#'
 #' Corpus <- lnt_convert(LNToutput, to = "tm")
 #' @export
 #' @md
@@ -1216,47 +1218,61 @@ lnt_diff <- function(x,
 lnt_convert <- function(x,
                         to = "rDNA",
                         what = "Articles",
+                        collapse = FALSE,
                         file = "LNT.sqlite",
                         ...) {
   if (to == "rDNA") {
-    return(lnt2rDNA(x, what = what))
+    return(lnt2rDNA(x, what = what, collapse = collapse))
   } else if (to == "quanteda") {
-    return(lnt2quanteda(x, what = what, ...))
+    return(lnt2quanteda(x, what = what, collapse = collapse, ...))
   } else if (to == "SQLite") {
-    return(lnt2SQLite(x, file = file, ...))
+    return(lnt2SQLite(x, file = file, collapse = collapse, ...))
   } else if (to == "corpustools") {
-    return(lnt2cptools(x, what = what, ...))
+    return(lnt2cptools(x, what = what, collapse = collapse, ...))
   } else if (to == "tm") {
-    return(lnt2tm(x, what = what, ...))
+    return(lnt2tm(x, what = what, collapse = collapse, ...))
   } else if (to == "tidytext") {
-    return(lnt2tidy(x, what = what, ...))
+    return(lnt2tidy(x, what = what, collapse = collapse, ...))
   }
 }
 
 #' @rdname lnt_convert
 #' @export
-lnt2rDNA <- function(x, what) {
+lnt2rDNA <- function(x, what = "Articles", collapse = TRUE) {
+  if (isTRUE(collapse)) {
+    collapse <- "\n\n"
+  } else if (isFALSE(collapse)) {
+    collapse <- NULL
+  }
   if (what == "Articles") {
-    text <- sapply(x@meta$ID, function(id) {
-      stringi::stri_join(x@paragraphs$Paragraph[x@paragraphs$Art_ID == id],
-                         sep = "",
-                         collapse = "\n\n",
-                         ignore_null = FALSE)
-    })
-    ids <- x@meta$ID
+    if (is.null(collapse)) {
+      text <- x@articles$Article
+    } else if (!is.null(collapse)) {
+      text <- sapply(x@meta$ID, function(id) {
+        stringi::stri_join(x@paragraphs$Paragraph[x@paragraphs$Art_ID == id],
+                           sep = "",
+                           collapse = collapse,
+                           ignore_null = FALSE)
+      })
+    }
+    notes <- paste("ID:", x@meta$ID)
+    order <- seq_along(x@meta$ID)
   } else if (what == "Paragraph") {
     text <- x@paragraphs$Paragraph
-    ids <- x@paragraphs$Art_ID
+    notes <-  paste0("Art_ID: ", x@paragraphs$Art_ID, "; Par_ID", x@paragraphs$Par_ID )
+    order <- match(x@paragraphs$Art_ID, x@meta$ID)
   }
-  order <- match(ids, x@meta$ID)
-  dta <- data.frame(id = x@meta$ID[order],
-                    title = x@meta$Headline[order],
+  dta <- data.frame(id = seq_along(order),
+                    title = sapply(x@meta$Headline[order],
+                                   trim,
+                                   n = 197,
+                                   USE.NAMES = FALSE),
                     text = text,
                     coder = 1,
                     author = x@meta$Author[order],
                     source = x@meta$Newspaper[order],
                     section = x@meta$Section[order],
-                    notes = "",
+                    notes = notes,
                     type = "newspaper",
                     date = x@meta$Date[order],
                     stringsAsFactors = FALSE)
@@ -1280,9 +1296,23 @@ lnt2rDNA <- function(x, what) {
 #' @rdname lnt_convert
 #' @export
 #' @importFrom quanteda corpus
-lnt2quanteda <- function(x, what, ...) {
+lnt2quanteda <- function(x, what = "Articles", collapse = NULL, ...) {
+  if (isTRUE(collapse)) {
+    collapse <- "\n\n"
+  } else if (isFALSE(collapse)) {
+    collapse <- NULL
+  }
   if (what == "Articles") {
-    text <- x@articles$Article
+    if (is.null(collapse)) {
+      text <- x@articles$Article
+    } else if (!is.null(collapse)) {
+      text <- sapply(x@meta$ID, function(id) {
+        stringi::stri_join(x@paragraphs$Paragraph[x@paragraphs$Art_ID == id],
+                           sep = "",
+                           collapse = collapse,
+                           ignore_null = FALSE)
+      })
+    }
     ID <- x@meta$ID
     meta <- x@meta
   } else if (what == "Paragraph") {
@@ -1315,14 +1345,29 @@ lnt2quanteda <- function(x, what, ...) {
 
 #' @rdname lnt_convert
 #' @export
-lnt2tm <- function(x, what, ...) {
+lnt2tm <- function(x, what = "Articles", collapse = NULL, ...) {
   if (!requireNamespace("tm", quietly = TRUE)) {
     stop("Package \"tm\" is needed for this function to work. Please install it.",
          call. = FALSE)
   }
+  if (isTRUE(collapse)) {
+    collapse <- "\n\n"
+  } else if (isFALSE(collapse)) {
+    collapse <- NULL
+  }
   if (what == "Articles") {
+    if (is.null(collapse)) {
+      text <- x@articles$Article
+    } else if (!is.null(collapse)) {
+      text <- sapply(x@meta$ID, function(id) {
+        stringi::stri_join(x@paragraphs$Paragraph[x@paragraphs$Art_ID == id],
+                           sep = "",
+                           collapse = collapse,
+                           ignore_null = FALSE)
+      })
+    }
     df <- data.frame(doc_id = x@articles$ID,
-                     text = x@articles$Article)
+                     text = text)
     df <- merge.data.frame(df,
                            x@meta,
                            by.x = "doc_id",
@@ -1345,13 +1390,27 @@ lnt2tm <- function(x, what, ...) {
 #' @rdname lnt_convert
 #' @export
 #' @importFrom methods slot slotNames
-lnt2cptools <- function(x, what, ...) {
+lnt2cptools <- function(x, what = "Articles", collapse = NULL, ...) {
   if (!requireNamespace("corpustools", quietly = TRUE)) {
     stop("Package \"corpustools\" is needed for this function to work. Please install it.",
          call. = FALSE)
   }
+  if (isTRUE(collapse)) {
+    collapse <- "\n\n"
+  } else if (isFALSE(collapse)) {
+    collapse <- NULL
+  }
   if (what == "Articles") {
-    text <- x@articles$Article
+    if (is.null(collapse)) {
+      text <- x@articles$Article
+    } else if (!is.null(collapse)) {
+      text <- sapply(x@meta$ID, function(id) {
+        stringi::stri_join(x@paragraphs$Paragraph[x@paragraphs$Art_ID == id],
+                           sep = "",
+                           collapse = collapse,
+                           ignore_null = FALSE)
+      })
+    }
     ID <- x@meta$ID
     meta <- x@meta
   } else if (what == "Paragraph") {
@@ -1375,12 +1434,25 @@ lnt2cptools <- function(x, what, ...) {
 }
 
 
-lnt2tidy <- function(x, what, ...) {
+lnt2tidy <- function(x, what = "Articles", collapse = NULL, ...) {
   if (!requireNamespace("tidytext", quietly = TRUE)) {
     stop("Package \"tidytext\" is needed for this function to work. Please install it.",
          call. = FALSE)
   }
+  if (isTRUE(collapse)) {
+    collapse <- "\n\n"
+  } else if (isFALSE(collapse)) {
+    collapse <- NULL
+  }
   if (what == "Articles") {
+    if (!is.null(collapse)) {
+      x@articles$Article <- sapply(x@meta$ID, function(id) {
+        stringi::stri_join(x@paragraphs$Paragraph[x@paragraphs$Art_ID == id],
+                           sep = "",
+                           collapse = collapse,
+                           ignore_null = FALSE)
+      })
+    }
     df <- merge.data.frame(x@meta,
                            x@articles,
                            by = "ID")
@@ -1551,4 +1623,24 @@ lnt_sample <- function(overwrite = FALSE,
               overwrite = TRUE)
   }
   return(paste0(getwd(), "/sample.TXT"))
+}
+
+
+#' Truncate
+#'
+#' Internal function, used to truncate text
+#'
+#' @param x A character string
+#' @param n Max number of characters to truncate to. Value \code{Inf} turns off
+#'   truncation.
+#' @param e String added at the end of x to signal it was truncated.
+#'
+#' @noRd
+#' @author Johannes B. Gruber
+trim <- function(object, n, e = "...") {
+  ifelse(nchar(object) > n,
+         paste0(gsub("\\s+$", "",
+                     strtrim(object, width = n)),
+                e),
+         object)
 }

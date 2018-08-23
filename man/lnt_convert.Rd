@@ -9,15 +9,16 @@
 \alias{lnt2SQLite}
 \title{Convert LNToutput to other formats}
 \usage{
-lnt_convert(x, to = "rDNA", what = "Articles", file = "LNT.sqlite", ...)
+lnt_convert(x, to = "rDNA", what = "Articles", collapse = FALSE,
+  file = "LNT.sqlite", ...)
 
-lnt2rDNA(x, what)
+lnt2rDNA(x, what = "Articles", collapse = TRUE)
 
-lnt2quanteda(x, what, ...)
+lnt2quanteda(x, what = "Articles", collapse = NULL, ...)
 
-lnt2tm(x, what, ...)
+lnt2tm(x, what = "Articles", collapse = NULL, ...)
 
-lnt2cptools(x, what, ...)
+lnt2cptools(x, what = "Articles", collapse = NULL, ...)
 
 lnt2SQLite(x, file = "LNT.sqlite", ...)
 }
@@ -29,6 +30,11 @@ lnt2SQLite(x, file = "LNT.sqlite", ...)
 
 \item{what}{Either "Articles" or "Paragraph" to use articles or paragraphs as
 text in the output object.}
+
+\item{collapse}{Only has an effect when \code{what = "Articles"}. If set to
+TRUE, an empty line will be added after each paragraphs. Alternatively you
+can enter a custom string (such as \code{"\\n"} for newline). \code{NULL}
+or \code{FALSE} turns off this feature.}
 
 \item{file}{The name of the database to be written to (for lnt2SQLite only).}
 
@@ -43,9 +49,8 @@ use the individual functions directly.
 lnt_convert() provides conversion methods into several formats
 commonly used in prominent R packages for text analysis. Besides the
 options set here, the ... (ellipsis) is passed on to the individual methods
-for tuning the outcome:
+for tuning the outcome: * rDNA ... not used.
 \itemize{
-\item rDNA ... not used.
 \item quanteda ... passed on to \code{\link[quanteda:corpus]{quanteda::corpus()}}.
 \item corpustools ... passed on to \code{\link[corpustools:create_tcorpus]{corpustools::create_tcorpus()}}.
 \item tm ... passed on to \code{\link[tm:Corpus]{tm::Corpus()}}.
