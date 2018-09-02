@@ -14,7 +14,7 @@ lnt_similarity(texts, dates, LNToutput, IDs = NULL, threshold = 0.99,
 
 \item{dates}{Provide corresponding dates, same length as \code{text}.}
 
-\item{LNToutput}{Alternatively to providing texts an dates individually, you
+\item{LNToutput}{Alternatively to providing texts and dates individually, you
 can provide an LNToutput object.}
 
 \item{IDs}{IDs of articles.}
@@ -37,7 +37,7 @@ NA.}
 \link[stringdist]{stringdist-parallelization}).}
 
 \item{max_length}{If the article is too long, calculation of the relative
-distance can crash the process (see
+distance can cause R to crash (see
 \url{https://github.com/markvanderloo/stringdist/issues/59}). To prevent
 this you can set a maximum length (longer articles will not be evaluated).}
 
@@ -46,7 +46,7 @@ printed to the screen.}
 }
 \value{
 A data.table consisting of information about duplicated
-  articles.Articles with a lower similarity than the threshold will be
+  articles. Articles with a lower similarity than the threshold will be
   removed, while all relative distances are still in the returned object.
   Before you use the duplicated information to subset your dataset, you
   should, therefore, filter out results with a high relative distance (e.g.
@@ -55,19 +55,19 @@ A data.table consisting of information about duplicated
 \description{
 Check for highly similar articles by comparing all articles published on the
 same date. This function implements two measures to test if articles are
-almost identical. The \link[quanteda]{textstat_simil}, which compares the
-word similarity of two given texts; and a relative modification of the
-generalized Levenshtein (edit) distance implementation in
+almost identical. The function \link[quanteda]{textstat_simil}, which
+compares the word similarity of two given texts; and a relative modification
+of the generalized Levenshtein (edit) distance implementation in
 \link[stringdist]{stringdist}. The relative distance is calculated by
 dividing the string distance by the number of characters in the longer
 article (resulting in a minimum of 0 if articles are exactly alike and 1 if
 strings are completely different). Using both methods cancels out the
 disadvantages of each method: the similarity measure is fast but does not
 take the word order into account. Two widely different texts could,
-therefore, be identified as the same, if they employ the exact same words for
-some reason. The generalized Levenshtein is more accurate but is very
-computationally demanding, especially if more than two texts are compared at
-once.
+therefore, be identified as the same, if they employ the exact same
+vocabulary for some reason. The generalized Levenshtein distance is more
+accurate but is very computationally demanding, especially if more than two
+texts are compared at once.
 }
 \examples{
 # Copy sample file to current wd

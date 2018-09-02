@@ -15,26 +15,26 @@ folder name(s) or can be left blank (see example).}
 (the LexisNexis standard value).}
 
 \item{recursive}{A logical flag indicating whether subdirectories are
-searched for more txt files.}
+searched for more TXT files.}
 
 \item{report}{A logical flag indicating whether the function will return a
 report which files were renamed.}
 
 \item{simulate}{Should the renaming be simulated instead of actually done?
-This can help prevent accidental renaming of unrelated txt files which
+This can help prevent accidental renaming of unrelated TXT files which
 happen to be in the same directory as the files from 'LexisNexis'.}
 
 \item{verbose}{A logical flag indicating whether information should be
 printed to the screen.}
 }
 \description{
-Give proper names to LN TXT files based on search term and period retrieved
-from each file cover page. This information is not always delivered by
-LexisNexis though. If the information is not present in the file, new file
-names will be empty.
+Give proper names to TXT files downloaded from 'LexisNexis' based on search
+term and period retrieved from each file cover page. This information is not
+always delivered by LexisNexis though. If the information is not present in
+the file, new file names will be empty.
 }
 \details{
-Warning: This will rename all txt files in a give folder.
+Warning: This will rename all TXT files in a give folder.
 }
 \examples{
 

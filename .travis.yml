@@ -10,6 +10,9 @@ matrix:
         - os: linux
           sudo: required
           r: oldrel
+        - os: linux
+          sudo: required
+          r: devel
         - os: osx
           r: release
 

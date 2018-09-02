@@ -52,7 +52,7 @@ LNToutput <- lnt_read(lnt_sample())
 LNToutput@meta$Keyword <- lnt_lookup(LNToutput,
                                      "statistical computing")
 
-# keep only articles which mention the keyword
+# Keep only articles which mention the keyword
 LNToutput_stat <- LNToutput[!sapply(LNToutput@meta$Keyword, is.null)]
 
 # Covert list of keywords to string

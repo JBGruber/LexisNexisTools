@@ -26,7 +26,7 @@ lnt2SQLite(x, file = "LNT.sqlite", ...)
 \item{x}{An object of class LNToutput.}
 
 \item{to}{Which format to convert into. Possible values are "rDNA",
-"corpustools", "SQLite" and "quanteda".}
+"corpustools", "tidytext", "tm", "SQLite" and "quanteda".}
 
 \item{what}{Either "Articles" or "Paragraph" to use articles or paragraphs as
 text in the output object.}
@@ -49,8 +49,9 @@ use the individual functions directly.
 lnt_convert() provides conversion methods into several formats
 commonly used in prominent R packages for text analysis. Besides the
 options set here, the ... (ellipsis) is passed on to the individual methods
-for tuning the outcome: * rDNA ... not used.
+for tuning the outcome:
 \itemize{
+\item rDNA ... not used.
 \item quanteda ... passed on to \code{\link[quanteda:corpus]{quanteda::corpus()}}.
 \item corpustools ... passed on to \code{\link[corpustools:create_tcorpus]{corpustools::create_tcorpus()}}.
 \item tm ... passed on to \code{\link[tm:Corpus]{tm::Corpus()}}.

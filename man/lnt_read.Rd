@@ -20,16 +20,15 @@ lnt_read(x, encoding = "UTF-8", extract_paragraphs = TRUE,
 will include a third data frame with paragraphs.}
 
 \item{convert_date}{A logical flag indicating if it should be tried to
-convert the date of each article into Date format. For non-standard
-dates provided by LexisNexis it might be safer to convert dates
-afterwards (see \link{lnt_asDate}).}
+convert the date of each article into Date format. For non-standard dates
+provided by LexisNexis it might be safer to convert dates afterwards (see
+\link{lnt_asDate}).}
 
 \item{start_keyword}{Is used to indicate the beginning of an article. All
 articles should have the same number of Beginnings, ends and lengths (which
-indicate the last line of metadata). Use regex expression such as
-"\\d+ of \\d+ DOCUMENTS$" (which would catch e.g., the format "2 of 100
-DOCUMENTS") or "auto" to try all common keywords. Keyword search is case
-sensitive.}
+indicate the last line of metadata). Use regex expression such as "\\d+ of
+\\d+ DOCUMENTS$" (which would catch e.g., the format "2 of 100 DOCUMENTS")
+or "auto" to try all common keywords. Keyword search is case sensitive.}
 
 \item{end_keyword}{Is used to indicate the end of an article. Works the same
 way as start_keyword. A common regex would be "^LANGUAGE: " which catches
@@ -45,7 +44,7 @@ same way as start_keyword and end_keyword. A common regex would be
 Set to \code{character()} if you want to turn off this feature.}
 
 \item{recursive}{A logical flag indicating whether subdirectories are
-searched for more txt files.}
+searched for more TXT files.}
 
 \item{verbose}{A logical flag indicating whether information should be
 printed to the screen.}
@@ -53,24 +52,28 @@ printed to the screen.}
 \item{...}{Additional arguments passed on to \link{lnt_asDate}.}
 }
 \value{
-an LNToutput S4 object consisting of 3 data.frames for metadata,
+An LNToutput S4 object consisting of 3 data.frames for metadata,
   articles and paragraphs.
 }
 \description{
-Read a LexisNexis TXT file and convert it to a data frame.
+Read a LexisNexis TXT file and convert it to a object of class
+\link{LNToutput}.
 }
 \details{
-The function can produce an LNToutput S4 object with two data.frame:
-  meta, containing all meta information such as date, author and headline and
-  articles, containing just the article ID and the text of the articles. When
-  extract_paragraphs is set to TRUE, the output contains a third data.frame,
-  similar to articles but with articles split into paragraphs.
+The function can produce an \link{LNToutput} S4 object with two or
+  three data.frame: meta, containing all meta information such as date,
+  author and headline and articles, containing just the article ID and the
+  text of the articles. When extract_paragraphs is set to TRUE, the output
+  contains a third data.frame, similar to articles but with articles split
+  into paragraphs.
 
-  When left to 'auto', the keywords will use the following defaults:
-  \code{start_keyword = "\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$|
-  Document \\d+ de \\d+$"}, \code{end_keyword = "^LANGUAGE: |^SPRACHE:
-  |^LANGUE: "}, which should be the standard keywords in all languages used
-  by 'LexisNexis'.
+  When left to 'auto', the keywords will use the following defaults, which
+  should be the standard keywords in all languages used by 'LexisNexis':
+
+  * \code{start_keyword = "\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$|
+  Document \\d+ de \\d+$"}.
+
+  * \code{end_keyword = "^LANGUAGE: |^SPRACHE: |^LANGUE: "}.
 }
 \examples{
 LNToutput <- lnt_read(lnt_sample())

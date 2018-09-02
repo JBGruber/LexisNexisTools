@@ -21,9 +21,6 @@ an rmarkdown document to html. Chunk option must be set to
 
 \item{...}{Currently not used.}
 }
-\value{
-A list keyword hits.
-}
 \description{
 This function is a wrapper for \link[diffobj]{diffPrint}. It is
   intended to help performing a manual assessment of the difference between

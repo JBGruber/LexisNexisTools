@@ -20,7 +20,7 @@ Install via:
 install.packages("LexisNexisTools")
 ```
 
-Or get development version by installing `devtools` first (via `install.packages("devtools")`) then use (**note: the Github version is recommended at the moment as it has several new useful features while old code has massively improved**):
+Or get the development version by installing directly from github (if you do not have `devtools` yet install it via `install.packages("devtools")` first):
 
 ``` r
 devtools::install_github("JBGruber/LexisNexisTools")
@@ -79,7 +79,7 @@ report.df <- lnt_rename(x = my_files, report = TRUE)
 report.df
 ```
 
-    ## in 0.0012 secs
+    ## in 0.0013 secs
 
 | name\_orig | name\_new                               | status  |
 |:-----------|:----------------------------------------|:--------|
@@ -117,12 +117,12 @@ LNToutput <- lnt_read(x = getwd())
     ##  ...editions extracted [0.014 secs]
     ##  ...headlines extracted [0.014 secs]
     ##  ...dates converted [0.02 secs]
-    ##  ...metadata extracted [0.021 secs]
-    ##  ...article texts extracted [0.023 secs]
-    ##  ...paragraphs extracted [0.031 secs]
-    ##  ...superfluous whitespace removed from articles [0.033 secs]
-    ##  ...superfluous whitespace removed from paragraphs [0.036 secs]
-    ## Elapsed time: 0.036 secs
+    ##  ...metadata extracted [0.022 secs]
+    ##  ...article texts extracted [0.025 secs]
+    ##  ...paragraphs extracted [0.034 secs]
+    ##  ...superfluous whitespace removed from articles [0.036 secs]
+    ##  ...superfluous whitespace removed from paragraphs [0.039 secs]
+    ## Elapsed time: 0.039 secs
 
 The returned object of class `LNToutput` is intended to be an intermediate container. As it stores articles and paragraphs in two separate data.frames, nested in an S4 object, the relevant text data is stored twice in almost the same format. This has the advantage, that there is no need to use special characters, such as "\\n". However, it makes the files rather big when you save them directly.
 
@@ -281,27 +281,23 @@ LNToutput[1, ]
     ## Object of class 'LNToutput':
     ## 1 Articles
     ## 5 Paragraphs
-    ## 
-    ## 
-    ## Meta (1 of 1):
-    ##   ID Source_File   Newspaper  Date      Length Section      Author Edition
-    ## 1  1 /home/jo... Guardian... 14620 355 word...      NA Andrew S...        
-    ##      Headline Graphic
-    ## 1 Lorem ip...   FALSE
-    ## 
-    ## 
-    ## Articles (1 of 1):
-    ##   ID     Article
-    ## 1  1 Lorem ip...
-    ## 
-    ## 
-    ## Paragraphs (5 of 5):
-    ##   Art_ID Par_ID   Paragraph
-    ## 1      1      1 Lorem ip...
-    ## 2      1      2 Duis ele...
-    ## 3      1      3 Sed ut e...
-    ## 4      1      4  Aliquam...
-    ## 5      1      5 Fusce si...
+    ## # A tibble: 1 x 10
+    ##      ID Source_File Newspaper Date       Length Section Author Edition
+    ##   <int> <chr>       <chr>     <date>     <chr>  <chr>   <chr>  <chr>  
+    ## 1     1 /home/joha… Guardian… 2010-01-11 355 w… <NA>    Andre… ""     
+    ## # ... with 2 more variables: Headline <chr>, Graphic <lgl>
+    ## # A tibble: 1 x 2
+    ##      ID Article                                                           
+    ##   <int> <chr>                                                             
+    ## 1     1 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam la…
+    ## # A tibble: 5 x 3
+    ##   Art_ID Par_ID Paragraph                                                 
+    ##    <int>  <int> <chr>                                                     
+    ## 1      1      1 Lorem ipsum dolor sit amet, consectetur adipiscing elit. …
+    ## 2      1      2 Duis eleifend ipsum vehicula nunc luctus vestibulum. Done…
+    ## 3      1      3 Sed ut ex quis nisi interdum ornare quis quis velit. Ut e…
+    ## 4      1      4 Aliquam ut consectetur urna, et dignissim turpis. Ut matt…
+    ## 5      1      5 Fusce sit amet aliquet lorem, id faucibus nisl. Nulla sus…
 
 In this case, writing `[1, ]` delivers an LNToutput object which includes only the first article and the metadata and paragraphs belonging to it.
 
@@ -424,28 +420,25 @@ LNToutput
     ## Object of class 'LNToutput':
     ## 1 Articles
     ## 7 Paragraphs
-    ## 
-    ## 
-    ## Meta (1 of 1):
-    ##   ID Source_File   Newspaper  Date      Length     Section      Author
-    ## 9  9 /home/jo... Sunday M... 14619 446 word... NEWS; Pg... Ross Iha...
-    ##       Edition    Headline Graphic       stats
-    ## 9 3 Star E... 3 Star E...   FALSE c("stati...
-    ## 
-    ## 
-    ## Articles (1 of 1):
-    ##   ID     Article
-    ## 9  9 R is a p...
-    ## 
-    ## 
-    ## Paragraphs (6 of 7):
-    ##    Art_ID Par_ID   Paragraph
-    ## 67      9     67 R is a p...
-    ## 68      9     68 R is a G...
-    ## 69      9     69  R is an...
-    ## 70      9     70 R was cr...
-    ## 71      9     71 R and it...
-    ## 72      9     72  Another...
+    ## # A tibble: 1 x 11
+    ##      ID Source_File Newspaper Date       Length Section Author Edition
+    ##   <int> <chr>       <chr>     <date>     <chr>  <chr>   <chr>  <chr>  
+    ## 1     9 /home/joha… Sunday M… 2010-01-10 446 w… NEWS; … Ross … 3 Star…
+    ## # ... with 3 more variables: Headline <chr>, Graphic <lgl>, stats <list>
+    ## # A tibble: 1 x 2
+    ##      ID Article                                                           
+    ##   <int> <chr>                                                             
+    ## 1     9 R is a programming language and free software environment for sta…
+    ## # A tibble: 7 x 3
+    ##   Art_ID Par_ID Paragraph                                                 
+    ##    <int>  <int> <chr>                                                     
+    ## 1      9     67 R is a programming language and free software environment…
+    ## 2      9     68 R is a GNU package. The source code for the R software en…
+    ## 3      9     69 R is an implementation of the S programming language comb…
+    ## 4      9     70 R was created by Ross Ihaka and Robert Gentleman at the U…
+    ## 5      9     71 R and its libraries implement a wide variety of statistic…
+    ## 6      9     72 Another strength of R is static graphics, which can produ…
+    ## # ... with 1 more row
 
 Another use of the function is to find out which versions of your keyword are in the set. You can do so by using regular expressions. The following looks for words starting with the 'stat', followed by more characters, up until the end of the word (the pattern internally always starts and ends at a word boundary).
 

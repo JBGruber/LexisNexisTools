@@ -26,6 +26,7 @@
 #' @slot articles The article texts and respective IDs.
 #' @slot paragraphs The paragraphs (if the data.frame exists) and respective
 #'   article and paragraph IDs.
+#' @name LNToutput
 #' @importFrom methods new
 setClass("LNToutput",
          representation(meta = "data.frame",
@@ -42,6 +43,7 @@ setClass("LNToutput",
 #' @param invert Invert the selection of i.
 #' @param e1,e2 LNToutput objects which will be combined.
 #' @name LNToutput_methods
+#' @importFrom tibble tibble
 NULL
 
 
@@ -52,39 +54,9 @@ setMethod("show",
             cat("Object of class 'LNToutput':\n")
             cat(nrow(object@meta), "Articles\n")
             cat(nrow(object@paragraphs), "Paragraphs\n")
-
-
-            meta <- head(object@meta, n = 6)
-            articles <- head(object@articles, n = 6)
-            paragraphs <- head(object@paragraphs, n = 6)
-            for (cols in colnames(meta)) {
-              meta[, cols] <- trim(meta[, cols], 8)
-            }
-            for (cols in colnames(articles)) {
-              articles[, cols] <- trim(articles[, cols], 8)
-            }
-            for (cols in colnames(paragraphs)) {
-              paragraphs[, cols] <- trim(paragraphs[, cols], 8)
-            }
-            n <- ifelse(nrow(object@meta) >= 6,
-                        6,
-                        nrow(object@meta))
-            n2 <- ifelse(nrow(object@paragraphs) >= 6,
-                         6,
-                         nrow(object@paragraphs))
-            cat("\n\nMeta (", n, " of ", nrow(object@meta),
-                "):\n", sep = "")
-            print(meta)
-            cat("\n\nArticles (", n, " of ", nrow(object@articles),
-                "):\n", sep = "")
-            print(articles)
-            cat("\n\nParagraphs (",
-                n2,
-                " of ",
-                nrow(object@paragraphs),
-                "):\n",
-                sep = "")
-            print(paragraphs)
+            print(object@meta, n = 6)
+            print(object@articles, n = 6)
+            print(object@paragraphs, n = 6)
           }
 )
 
@@ -99,11 +71,11 @@ setMethod("[",
               x@paragraphs <- x@paragraphs[x@paragraphs$Art_ID %in% x@meta$ID, ]
             } else {
               if (j %in% colnames(x@meta)) {
-                select <- x@meta$ID[x@meta[, j] %in% i]
+                select <- x@meta$ID[x@meta[[j]] %in% i]
               } else if (j %in% colnames(x@articles)) {
-                select <- x@articles$ID[x@articles[, j] %in% i]
+                select <- x@articles$ID[x@articles[[j]] %in% i]
               } else if (j %in% colnames(x@paragraphs)) {
-                select <- x@paragraphs$Art_ID[x@paragraphs[, j] %in% i]
+                select <- x@paragraphs$Art_ID[x@paragraphs[[j]] %in% i]
               } else {
                 stop("'j' was not found to be a valid column name.")
               }
@@ -153,22 +125,22 @@ setMethod("+",
 
 #' Read in a LexisNexis TXT file
 #'
-#' Read a LexisNexis TXT file and convert it to a data frame.
+#' Read a LexisNexis TXT file and convert it to a object of class
+#' \link{LNToutput}.
 #' @param x Name or names of LexisNexis TXT file to be converted.
 #' @param encoding Encoding to be assumed for input files. Defaults to UTF-8
 #'   (the LexisNexis standard value).
 #' @param extract_paragraphs A logical flag indicating if the returned object
 #'   will include a third data frame with paragraphs.
 #' @param convert_date A logical flag indicating if it should be tried to
-#'   convert the date of each article into Date format. For non-standard
-#'   dates provided by LexisNexis it might be safer to convert dates
-#'   afterwards (see \link{lnt_asDate}).
+#'   convert the date of each article into Date format. For non-standard dates
+#'   provided by LexisNexis it might be safer to convert dates afterwards (see
+#'   \link{lnt_asDate}).
 #' @param start_keyword Is used to indicate the beginning of an article. All
 #'   articles should have the same number of Beginnings, ends and lengths (which
-#'   indicate the last line of metadata). Use regex expression such as
-#'   "\\d+ of \\d+ DOCUMENTS$" (which would catch e.g., the format "2 of 100
-#'   DOCUMENTS") or "auto" to try all common keywords. Keyword search is case
-#'   sensitive.
+#'   indicate the last line of metadata). Use regex expression such as "\\d+ of
+#'   \\d+ DOCUMENTS$" (which would catch e.g., the format "2 of 100 DOCUMENTS")
+#'   or "auto" to try all common keywords. Keyword search is case sensitive.
 #' @param end_keyword Is used to indicate the end of an article. Works the same
 #'   way as start_keyword. A common regex would be "^LANGUAGE: " which catches
 #'   language in all caps at the beginning of the line (usually the last line of
@@ -180,23 +152,27 @@ setMethod("+",
 #' @param exclude_lines Lines in which these keywords are found are excluded.
 #'   Set to \code{character()} if you want to turn off this feature.
 #' @param recursive A logical flag indicating whether subdirectories are
-#'   searched for more txt files.
+#'   searched for more TXT files.
 #' @param verbose A logical flag indicating whether information should be
 #'   printed to the screen.
 #' @param ... Additional arguments passed on to \link{lnt_asDate}.
-#' @return an LNToutput S4 object consisting of 3 data.frames for metadata,
+#' @return An LNToutput S4 object consisting of 3 data.frames for metadata,
 #'   articles and paragraphs.
-#' @details The function can produce an LNToutput S4 object with two data.frame:
-#'   meta, containing all meta information such as date, author and headline and
-#'   articles, containing just the article ID and the text of the articles. When
-#'   extract_paragraphs is set to TRUE, the output contains a third data.frame,
-#'   similar to articles but with articles split into paragraphs.
+#' @details The function can produce an \link{LNToutput} S4 object with two or
+#'   three data.frame: meta, containing all meta information such as date,
+#'   author and headline and articles, containing just the article ID and the
+#'   text of the articles. When extract_paragraphs is set to TRUE, the output
+#'   contains a third data.frame, similar to articles but with articles split
+#'   into paragraphs.
 #'
-#'   When left to 'auto', the keywords will use the following defaults:
-#'   \code{start_keyword = "\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$|
-#'   Document \\d+ de \\d+$"}, \code{end_keyword = "^LANGUAGE: |^SPRACHE:
-#'   |^LANGUE: "}, which should be the standard keywords in all languages used
-#'   by 'LexisNexis'.
+#'   When left to 'auto', the keywords will use the following defaults, which
+#'   should be the standard keywords in all languages used by 'LexisNexis':
+#'
+#'   * \code{start_keyword = "\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$|
+#'   Document \\d+ de \\d+$"}.
+#'
+#'   * \code{end_keyword = "^LANGUAGE: |^SPRACHE: |^LANGUE: "}.
+#'
 #' @author Johannes B. Gruber
 #' @export
 #' @examples
@@ -207,6 +183,7 @@ setMethod("+",
 #' @importFrom stringi stri_read_lines stri_extract_last_regex stri_join
 #'   stri_isempty stri_split_fixed stri_replace_all_regex
 #' @importFrom utils tail
+#' @importFrom tibble tibble as_tibble
 lnt_read <- function(x,
                      encoding = "UTF-8",
                      extract_paragraphs = TRUE,
@@ -425,17 +402,16 @@ lnt_read <- function(x,
                     replacement = "")
 
   ### make data.frame
-  meta.df <- data.frame(ID = seq_along(df.l),
-                        Source_File = unlist(sapply(df.l, function(i) i[["source"]])),
-                        Newspaper = trimws(newspaper.v, which = "both"),
-                        Date = date.v,
-                        Length = trimws(length.v, which = "both"),
-                        Section = trimws(section.v, which = "both"),
-                        Author = trimws(author.v, which = "both"),
-                        Edition = trimws(edition.v, which = "both"),
-                        Headline = trimws(headline.v, which = "both"),
-                        Graphic = unlist(sapply(df.l, function(i) i[["graphic"]])),
-                        stringsAsFactors = FALSE)
+  meta.df <- tibble(ID = seq_along(df.l),
+                    Source_File = unlist(sapply(df.l, function(i) i[["source"]])),
+                    Newspaper = trimws(newspaper.v, which = "both"),
+                    Date = date.v,
+                    Length = trimws(length.v, which = "both"),
+                    Section = trimws(section.v, which = "both"),
+                    Author = trimws(author.v, which = "both"),
+                    Edition = trimws(edition.v, which = "both"),
+                    Headline = trimws(headline.v, which = "both"),
+                    Graphic = unlist(sapply(df.l, function(i) i[["graphic"]])))
   if (verbose) cat("\t...metadata extracted [", format( (Sys.time() - start_time), digits = 2, nsmall = 2), "]\n", sep = "")
 
 
@@ -447,11 +423,10 @@ lnt_read <- function(x,
     }
     i$article
   })
-  articles.df <- data.frame(ID = seq_along(df.l),
-                            Article = sapply(df.l, function(i) {
-                              stringi::stri_join(i, collapse = "\n")
-                            }),
-                            stringsAsFactors = FALSE)
+  articles.df <- tibble(ID = seq_along(df.l),
+                        Article = sapply(df.l, function(i) {
+                          stringi::stri_join(i, collapse = "\n")
+                        }))
 
   if (verbose) cat("\t...article texts extracted [", format( (Sys.time() - start_time), digits = 2, nsmall = 2), "]\n", sep = "")
 
@@ -464,23 +439,20 @@ lnt_read <- function(x,
                                    simplify = FALSE)
     paragraphs.df <- data.table::rbindlist(lapply(seq_along(.), function(i) {
       if (length(.[[i]][!.[[i]] == "\n"]) > 0) {
-        data.frame(Art_ID = i,
-                   Paragraph = .[[i]][!.[[i]] == "\n"],
-                   stringsAsFactors = FALSE)
+        tibble(Art_ID = i,
+               Paragraph = .[[i]][!.[[i]] == "\n"])
       } else {
-        data.frame(Art_ID = i,
-                   Paragraph = NA,
-                   stringsAsFactors = FALSE)
+        tibble(Art_ID = i,
+               Paragraph = NA)
       }
     }))
     paragraphs.df$Par_ID <- seq_len(nrow(paragraphs.df))
     paragraphs.df <- paragraphs.df[, c("Art_ID", "Par_ID", "Paragraph")]
     if (verbose) cat("\t...paragraphs extracted [", format( (Sys.time() - start_time), digits = 2, nsmall = 2), "]\n", sep = "")
   }else{
-    paragraphs.df <- data.frame(Art_ID = NA,
-                                Par_ID = NA,
-                                Paragraph = NA,
-                                stringsAsFactors = FALSE)
+    paragraphs.df <- tibble(Art_ID = NA,
+                            Par_ID = NA,
+                            Paragraph = NA)
   }
 
   # remove unneccesary whitespace (removes \n as well)
@@ -494,8 +466,8 @@ lnt_read <- function(x,
                                                              replacement = c(" ", ""),
                                                              vectorize_all = FALSE)
   if (verbose) cat("\t...superfluous whitespace removed from paragraphs [", format( (Sys.time() - start_time), digits = 2, nsmall = 2), "]\n", sep = "")
-  if (verbose) cat("Elapsed time: ", format( (Sys.time() - start_time), digits = 2, nsmall = 2), "\n", sep = "")
-  out <- new("LNToutput", meta = meta.df, articles = articles.df, paragraphs = paragraphs.df)
+  if (verbose) cat("Elapsed time: ", format((Sys.time() - start_time), digits = 2, nsmall = 2), "\n", sep = "")
+  out <- new("LNToutput", meta = meta.df, articles = articles.df, paragraphs = tibble::as_tibble(paragraphs.df))
   attributes(out)$created <- list(time = Sys.time(),
                                   Version = packageVersion("LexisNexisTools"))
   return(out)
@@ -513,23 +485,23 @@ lnt_checkFiles <- function(...){
 
 #' Assign proper names to LexisNexis TXT files
 #'
-#' Give proper names to LN TXT files based on search term and period retrieved
-#' from each file cover page. This information is not always delivered by
-#' LexisNexis though. If the information is not present in the file, new file
-#' names will be empty.
+#' Give proper names to TXT files downloaded from 'LexisNexis' based on search
+#' term and period retrieved from each file cover page. This information is not
+#' always delivered by LexisNexis though. If the information is not present in
+#' the file, new file names will be empty.
 #'
-#' Warning: This will rename all txt files in a give folder.
+#' Warning: This will rename all TXT files in a give folder.
 #'
 #' @param x Can be either a character vector of LexisNexis TXT file name(s),
 #'   folder name(s) or can be left blank (see example).
 #' @param encoding Encoding to be assumed for input files. Defaults to UTF-8
 #'   (the LexisNexis standard value).
 #' @param recursive A logical flag indicating whether subdirectories are
-#'   searched for more txt files.
+#'   searched for more TXT files.
 #' @param report A logical flag indicating whether the function will return a
 #'   report which files were renamed.
 #' @param simulate Should the renaming be simulated instead of actually done?
-#'   This can help prevent accidental renaming of unrelated txt files which
+#'   This can help prevent accidental renaming of unrelated TXT files which
 #'   happen to be in the same directory as the files from 'LexisNexis'.
 #' @param verbose A logical flag indicating whether information should be
 #'   printed to the screen.
@@ -684,23 +656,23 @@ lnt_rename <- function(x,
 #'
 #' Check for highly similar articles by comparing all articles published on the
 #' same date. This function implements two measures to test if articles are
-#' almost identical. The \link[quanteda]{textstat_simil}, which compares the
-#' word similarity of two given texts; and a relative modification of the
-#' generalized Levenshtein (edit) distance implementation in
+#' almost identical. The function \link[quanteda]{textstat_simil}, which
+#' compares the word similarity of two given texts; and a relative modification
+#' of the generalized Levenshtein (edit) distance implementation in
 #' \link[stringdist]{stringdist}. The relative distance is calculated by
 #' dividing the string distance by the number of characters in the longer
 #' article (resulting in a minimum of 0 if articles are exactly alike and 1 if
 #' strings are completely different). Using both methods cancels out the
 #' disadvantages of each method: the similarity measure is fast but does not
 #' take the word order into account. Two widely different texts could,
-#' therefore, be identified as the same, if they employ the exact same words for
-#' some reason. The generalized Levenshtein is more accurate but is very
-#' computationally demanding, especially if more than two texts are compared at
-#' once.
+#' therefore, be identified as the same, if they employ the exact same
+#' vocabulary for some reason. The generalized Levenshtein distance is more
+#' accurate but is very computationally demanding, especially if more than two
+#' texts are compared at once.
 #'
 #' @param texts Provide texts to check for similarity.
 #' @param dates Provide corresponding dates, same length as \code{text}.
-#' @param LNToutput Alternatively to providing texts an dates individually, you
+#' @param LNToutput Alternatively to providing texts and dates individually, you
 #'   can provide an LNToutput object.
 #' @param IDs IDs of articles.
 #' @param threshold At which threshold of similarity is an article considered a
@@ -717,14 +689,14 @@ lnt_rename <- function(x,
 #' @param nthread Maximum number of threads to use (see
 #'   \link[stringdist]{stringdist-parallelization}).
 #' @param max_length If the article is too long, calculation of the relative
-#'   distance can crash the process (see
+#'   distance can cause R to crash (see
 #'   \url{https://github.com/markvanderloo/stringdist/issues/59}). To prevent
 #'   this you can set a maximum length (longer articles will not be evaluated).
 #' @param verbose A logical flag indicating whether information should be
 #'   printed to the screen.
 #' @keywords similarity
 #' @return A data.table consisting of information about duplicated
-#'   articles.Articles with a lower similarity than the threshold will be
+#'   articles. Articles with a lower similarity than the threshold will be
 #'   removed, while all relative distances are still in the returned object.
 #'   Before you use the duplicated information to subset your dataset, you
 #'   should, therefore, filter out results with a high relative distance (e.g.
@@ -1029,7 +1001,7 @@ lnt_asDate <- function(x,
 #' LNToutput@meta$Keyword <- lnt_lookup(LNToutput,
 #'                                      "statistical computing")
 #'
-#' # keep only articles which mention the keyword
+#' # Keep only articles which mention the keyword
 #' LNToutput_stat <- LNToutput[!sapply(LNToutput@meta$Keyword, is.null)]
 #'
 #' # Covert list of keywords to string
@@ -1112,7 +1084,6 @@ lnt_lookup <- function(x,
 #'   an rmarkdown document to html. Chunk option must be set to
 #'   \code{results='asis'} in that case.
 #' @param ... Currently not used.
-#' @return A list keyword hits.
 #'
 #' @examples
 #' # Test similarity of articles
@@ -1175,7 +1146,7 @@ lnt_diff <- function(x,
 #'
 #' @param x An object of class LNToutput.
 #' @param to Which format to convert into. Possible values are "rDNA",
-#'   "corpustools", "SQLite" and "quanteda".
+#'   "corpustools", "tidytext", "tm", "SQLite" and "quanteda".
 #' @param what Either "Articles" or "Paragraph" to use articles or paragraphs as
 #'   text in the output object.
 #' @param collapse Only has an effect when \code{what = "Articles"}. If set to
@@ -1188,7 +1159,9 @@ lnt_diff <- function(x,
 #' @details lnt_convert() provides conversion methods into several formats
 #'   commonly used in prominent R packages for text analysis. Besides the
 #'   options set here, the ... (ellipsis) is passed on to the individual methods
-#'   for tuning the outcome: * rDNA ... not used.
+#'   for tuning the outcome: 
+#'   
+#'   * rDNA ... not used.
 #'
 #'   * quanteda ... passed on to [quanteda::corpus()].
 #'
