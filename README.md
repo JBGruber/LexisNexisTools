@@ -79,7 +79,7 @@ report.df <- lnt_rename(x = my_files, report = TRUE)
 report.df
 ```
 
-    ## in 0.0013 secs
+    ## in 0.0014 secs
 
 | name\_orig | name\_new                               | status  |
 |:-----------|:----------------------------------------|:--------|
@@ -108,21 +108,21 @@ LNToutput <- lnt_read(x = getwd())
 
     ## Creating LNToutput from input 1 files...
     ##  ...files loaded [0.0012 secs]
-    ##  ...articles split [0.0096 secs]
-    ##  ...lengths extracted [0.01 secs]
-    ##  ...newspapers extracted [0.01 secs]
-    ##  ...dates extracted [0.012 secs]
-    ##  ...authors extracted [0.013 secs]
-    ##  ...sections extracted [0.013 secs]
-    ##  ...editions extracted [0.014 secs]
-    ##  ...headlines extracted [0.014 secs]
-    ##  ...dates converted [0.02 secs]
-    ##  ...metadata extracted [0.022 secs]
-    ##  ...article texts extracted [0.025 secs]
-    ##  ...paragraphs extracted [0.034 secs]
-    ##  ...superfluous whitespace removed from articles [0.036 secs]
-    ##  ...superfluous whitespace removed from paragraphs [0.039 secs]
-    ## Elapsed time: 0.039 secs
+    ##  ...articles split [0.01 secs]
+    ##  ...lengths extracted [0.011 secs]
+    ##  ...newspapers extracted [0.011 secs]
+    ##  ...dates extracted [0.013 secs]
+    ##  ...authors extracted [0.014 secs]
+    ##  ...sections extracted [0.014 secs]
+    ##  ...editions extracted [0.015 secs]
+    ##  ...headlines extracted [0.015 secs]
+    ##  ...dates converted [0.021 secs]
+    ##  ...metadata extracted [0.024 secs]
+    ##  ...article texts extracted [0.027 secs]
+    ##  ...paragraphs extracted [0.036 secs]
+    ##  ...superfluous whitespace removed from articles [0.039 secs]
+    ##  ...superfluous whitespace removed from paragraphs [0.041 secs]
+    ## Elapsed time: 0.041 secs
 
 The returned object of class `LNToutput` is intended to be an intermediate container. As it stores articles and paragraphs in two separate data.frames, nested in an S4 object, the relevant text data is stored twice in almost the same format. This has the advantage, that there is no need to use special characters, such as "\\n". However, it makes the files rather big when you save them directly.
 
