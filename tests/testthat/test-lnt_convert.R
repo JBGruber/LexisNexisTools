@@ -63,15 +63,14 @@ test_that("Convert LNToutput to tm", {
 # saveRDS(lnt_convert(x = readRDS("../files/LNToutput.RDS"),
 #                     to = "tm", what = "Articles"), "../files/tm.RDS")
 
-test_that("Convert LNToutput to SQLite", {
-  expect_equal({
-    conn <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
-                        to = "SQLite", what = "Articles",
-                        file = "../files/LNT.sqlite")
-    DBI::dbDisconnect(conn)
-    conn
-  }, readRDS("../files/SQLite.RDS"))
-})
+# test_that("Convert LNToutput to SQLite", {
+#   expect_equal({
+#     conn <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
+#                         to = "SQLite", what = "Articles",
+#                         file = "../files/LNT.sqlite")
+#     conn
+#   }, readRDS("../files/SQLite.RDS"))
+# })
 
 # saveRDS(lnt_convert(x = readRDS("../files/LNToutput.RDS"),
 #                     to = "SQLite", what = "Articles"), "../files/SQLite.RDS")

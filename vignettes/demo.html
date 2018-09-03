@@ -12,7 +12,7 @@
 
 <meta name="author" content="Johannes B. Gruber" />
 
-<meta name="date" content="2018-09-02" />
+<meta name="date" content="2018-09-03" />
 
 <title>Basic Usage</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Basic Usage</h1>
 <h4 class="author"><em>Johannes B. Gruber</em></h4>
-<h4 class="date"><em>2018-09-02</em></h4>
+<h4 class="date"><em>2018-09-03</em></h4>
 
 
 
@@ -110,7 +110,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 report.df &lt;-<span class="st"> </span><span class="kw">lnt_rename</span>(<span class="dt">x =</span> my_files, <span class="dt">report =</span> <span class="ot">TRUE</span>)
 
 report.df</code></pre></div>
-<pre><code>#&gt; in 0.001 secs</code></pre>
+<pre><code>#&gt; in 0.0015 secs</code></pre>
 <table>
 <thead>
 <tr class="header">
@@ -144,22 +144,22 @@ report.df</code></pre></div>
 <p>To use the function, you can again provide either file name(s), folder name(s) or nothing—to search the current working directory for TXT files—as <code>x</code> argument:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">LNToutput &lt;-<span class="st"> </span><span class="kw">lnt_read</span>(<span class="dt">x =</span> <span class="kw">getwd</span>())
 <span class="co">#&gt; Creating LNToutput from input 1 files...</span>
-<span class="co">#&gt;  ...files loaded [0.001 secs]</span>
-<span class="co">#&gt;  ...articles split [0.01 secs]</span>
-<span class="co">#&gt;  ...lengths extracted [0.011 secs]</span>
-<span class="co">#&gt;  ...newspapers extracted [0.011 secs]</span>
-<span class="co">#&gt;  ...dates extracted [0.013 secs]</span>
-<span class="co">#&gt;  ...authors extracted [0.014 secs]</span>
-<span class="co">#&gt;  ...sections extracted [0.014 secs]</span>
-<span class="co">#&gt;  ...editions extracted [0.014 secs]</span>
-<span class="co">#&gt;  ...headlines extracted [0.015 secs]</span>
-<span class="co">#&gt;  ...dates converted [0.018 secs]</span>
-<span class="co">#&gt;  ...metadata extracted [0.02 secs]</span>
-<span class="co">#&gt;  ...article texts extracted [0.023 secs]</span>
-<span class="co">#&gt;  ...paragraphs extracted [0.028 secs]</span>
-<span class="co">#&gt;  ...superfluous whitespace removed from articles [0.03 secs]</span>
-<span class="co">#&gt;  ...superfluous whitespace removed from paragraphs [0.033 secs]</span>
-<span class="co">#&gt; Elapsed time: 0.033 secs</span></code></pre></div>
+<span class="co">#&gt;  ...files loaded [0.0015 secs]</span>
+<span class="co">#&gt;  ...articles split [0.014 secs]</span>
+<span class="co">#&gt;  ...lengths extracted [0.015 secs]</span>
+<span class="co">#&gt;  ...newspapers extracted [0.015 secs]</span>
+<span class="co">#&gt;  ...dates extracted [0.018 secs]</span>
+<span class="co">#&gt;  ...authors extracted [0.019 secs]</span>
+<span class="co">#&gt;  ...sections extracted [0.019 secs]</span>
+<span class="co">#&gt;  ...editions extracted [0.02 secs]</span>
+<span class="co">#&gt;  ...headlines extracted [0.021 secs]</span>
+<span class="co">#&gt;  ...dates converted [0.026 secs]</span>
+<span class="co">#&gt;  ...metadata extracted [0.028 secs]</span>
+<span class="co">#&gt;  ...article texts extracted [0.032 secs]</span>
+<span class="co">#&gt;  ...paragraphs extracted [0.038 secs]</span>
+<span class="co">#&gt;  ...superfluous whitespace removed from articles [0.041 secs]</span>
+<span class="co">#&gt;  ...superfluous whitespace removed from paragraphs [0.045 secs]</span>
+<span class="co">#&gt; Elapsed time: 0.045 secs</span></code></pre></div>
 <p>The returned object of class <code>LNToutput</code> is intended to be an intermediate container. As it stores articles and paragraphs in two separate data.frames, nested in an S4 object, the relevant text data is stored twice in almost the same format. This has the advantage, that there is no need to use special characters, such as “\n”. However, it makes the files rather big when you save them directly.</p>
 <p>The object can, however, be easily converted to regular data.frames using <code>@</code> to select the data.frame you want:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">meta.df &lt;-<span class="st"> </span>LNToutput<span class="op">@</span>meta

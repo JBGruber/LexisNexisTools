@@ -1469,6 +1469,7 @@ lnt2SQLite <- function(x, file = "LNT.sqlite", ...) {
                           value = slot(x, i),
                           ...)
   }
+  on.exit(RSQLite::dbDisconnect(db))
   return(db)
 }
 

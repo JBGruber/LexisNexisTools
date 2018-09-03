@@ -2,7 +2,7 @@
 LexisNexisTools
 ===============
 
-[![Travis-CI Build Status](https://travis-ci.org/JBGruber/LexisNexisTools.svg?branch=master)](https://travis-ci.org/JBGruber/LexisNexisTools) [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version-ago/LexisNexisTools)](http://cran.r-project.org/package=LexisNexisTools) [![CRAN\_Download\_Badge](http://cranlogs.r-pkg.org/badges/grand-total/LexisNexisTools)](http://cran.r-project.org/package=LexisNexisTools) [![Coverage Status](https://codecov.io/gh/JBGruber/LexisNexisTools/branch/master/graph/badge.svg)](https://codecov.io/github/JBGruber/LexisNexisTools?branch=master)
+[![Travis-CI Build Status](https://travis-ci.org/JBGruber/LexisNexisTools.svg?branch=master)](https://travis-ci.org/JBGruber/LexisNexisTools) [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version-ago/LexisNexisTools)](https://cran.r-project.org/package=LexisNexisTools) [![CRAN\_Download\_Badge](http://cranlogs.r-pkg.org/badges/grand-total/LexisNexisTools)](https://cran.r-project.org/package=LexisNexisTools) [![Coverage Status](https://codecov.io/gh/JBGruber/LexisNexisTools/branch/master/graph/badge.svg)](https://codecov.io/github/JBGruber/LexisNexisTools?branch=master)
 
 Motivation
 ----------
@@ -79,7 +79,7 @@ report.df <- lnt_rename(x = my_files, report = TRUE)
 report.df
 ```
 
-    ## in 0.0014 secs
+    ## in 0.0019 secs
 
 | name\_orig | name\_new                               | status  |
 |:-----------|:----------------------------------------|:--------|
@@ -107,22 +107,22 @@ LNToutput <- lnt_read(x = getwd())
 ```
 
     ## Creating LNToutput from input 1 files...
-    ##  ...files loaded [0.0012 secs]
-    ##  ...articles split [0.01 secs]
-    ##  ...lengths extracted [0.011 secs]
-    ##  ...newspapers extracted [0.011 secs]
-    ##  ...dates extracted [0.013 secs]
-    ##  ...authors extracted [0.014 secs]
-    ##  ...sections extracted [0.014 secs]
-    ##  ...editions extracted [0.015 secs]
-    ##  ...headlines extracted [0.015 secs]
-    ##  ...dates converted [0.021 secs]
-    ##  ...metadata extracted [0.024 secs]
-    ##  ...article texts extracted [0.027 secs]
-    ##  ...paragraphs extracted [0.036 secs]
-    ##  ...superfluous whitespace removed from articles [0.039 secs]
-    ##  ...superfluous whitespace removed from paragraphs [0.041 secs]
-    ## Elapsed time: 0.041 secs
+    ##  ...files loaded [0.0015 secs]
+    ##  ...articles split [0.012 secs]
+    ##  ...lengths extracted [0.013 secs]
+    ##  ...newspapers extracted [0.014 secs]
+    ##  ...dates extracted [0.016 secs]
+    ##  ...authors extracted [0.017 secs]
+    ##  ...sections extracted [0.017 secs]
+    ##  ...editions extracted [0.018 secs]
+    ##  ...headlines extracted [0.018 secs]
+    ##  ...dates converted [0.025 secs]
+    ##  ...metadata extracted [0.029 secs]
+    ##  ...article texts extracted [0.032 secs]
+    ##  ...paragraphs extracted [0.044 secs]
+    ##  ...superfluous whitespace removed from articles [0.047 secs]
+    ##  ...superfluous whitespace removed from paragraphs [0.05 secs]
+    ## Elapsed time: 0.05 secs
 
 The returned object of class `LNToutput` is intended to be an intermediate container. As it stores articles and paragraphs in two separate data.frames, nested in an S4 object, the relevant text data is stored twice in almost the same format. This has the advantage, that there is no need to use special characters, such as "\\n". However, it makes the files rather big when you save them directly.
 
