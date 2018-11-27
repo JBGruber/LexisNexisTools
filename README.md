@@ -79,7 +79,7 @@ report.df <- lnt_rename(x = my_files, report = TRUE)
 report.df
 ```
 
-    ## in 0.0019 secs
+    ## in 0.0014 secs
 
 | name\_orig | name\_new                               | status  |
 |:-----------|:----------------------------------------|:--------|
@@ -107,22 +107,22 @@ LNToutput <- lnt_read(x = getwd())
 ```
 
     ## Creating LNToutput from input 1 files...
-    ##  ...files loaded [0.0015 secs]
-    ##  ...articles split [0.012 secs]
-    ##  ...lengths extracted [0.013 secs]
-    ##  ...newspapers extracted [0.014 secs]
-    ##  ...dates extracted [0.016 secs]
-    ##  ...authors extracted [0.017 secs]
-    ##  ...sections extracted [0.017 secs]
-    ##  ...editions extracted [0.018 secs]
-    ##  ...headlines extracted [0.018 secs]
-    ##  ...dates converted [0.025 secs]
-    ##  ...metadata extracted [0.029 secs]
-    ##  ...article texts extracted [0.032 secs]
-    ##  ...paragraphs extracted [0.044 secs]
-    ##  ...superfluous whitespace removed from articles [0.047 secs]
-    ##  ...superfluous whitespace removed from paragraphs [0.05 secs]
-    ## Elapsed time: 0.05 secs
+    ##  ...files loaded [0.0013 secs]
+    ##  ...articles split [0.0077 secs]
+    ##  ...lengths extracted [0.0083 secs]
+    ##  ...newspapers extracted [0.0086 secs]
+    ##  ...dates extracted [0.011 secs]
+    ##  ...authors extracted [0.012 secs]
+    ##  ...sections extracted [0.012 secs]
+    ##  ...editions extracted [0.012 secs]
+    ##  ...headlines extracted [0.013 secs]
+    ##  ...dates converted [0.019 secs]
+    ##  ...metadata extracted [0.023 secs]
+    ##  ...article texts extracted [0.026 secs]
+    ##  ...paragraphs extracted [0.037 secs]
+    ##  ...superfluous whitespace removed from articles [0.04 secs]
+    ##  ...superfluous whitespace removed from paragraphs [0.043 secs]
+    ## Elapsed time: 0.043 secs
 
 The returned object of class `LNToutput` is intended to be an intermediate container. As it stores articles and paragraphs in two separate data.frames, nested in an S4 object, the relevant text data is stored twice in almost the same format. This has the advantage, that there is no need to use special characters, such as "\\n". However, it makes the files rather big when you save them directly.
 
@@ -265,7 +265,7 @@ lnt_diff(duplicates.df, min = 0, max = Inf)
 </p>
 By default, 25 randomly selected articles are displayed one after another, ordered by least to most different within the min and max limits.
 
-After you have chosen a good cutoff value, you can subset the `duplicates.df` data.frame and remove the respective articles:
+After you have chosen a good cut-off value, you can subset the `duplicates.df` data.frame and remove the respective articles:
 
 ``` r
 duplicates.df <- duplicates.df[duplicates.df$rel_dist < 0.2]

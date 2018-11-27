@@ -1,6 +1,6 @@
 Package: LexisNexisTools
 Title: Working with Files from 'LexisNexis'
-Version: 0.2.0
+Version: 0.2.1.9000
 Date: 2018-11-27
 Authors@R: person("Johannes", "Gruber", email = "j.gruber.1@research.gla.ac.uk", 
   role = c("aut", "cre"))
@@ -37,8 +37,10 @@ Suggests:
     tm,
     kableExtra,
     knitr,
-    rmarkdown
+    rmarkdown,
+    spelling
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
 VignetteBuilder: knitr
+Language: en-GB

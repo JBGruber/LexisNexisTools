@@ -229,7 +229,7 @@ lnt_diff(duplicates.df, min = 0, max = Inf)
 
 By default, 25 randomly selected articles are displayed one after another, ordered by least to most different within the min and max limits.
 
-After you have chosen a good cutoff value, you can subset the `duplicates.df` data.frame and remove the respective articles:
+After you have chosen a good cut-off value, you can subset the `duplicates.df` data.frame and remove the respective articles:
 
 ```{r}
 duplicates.df <- duplicates.df[duplicates.df$rel_dist < 0.2]
