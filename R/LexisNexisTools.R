@@ -181,7 +181,7 @@ setMethod("+",
 #' articles.df <- LNToutput@articles
 #' paragraphs.df <- LNToutput@paragraphs
 #' @importFrom stringi stri_read_lines stri_extract_last_regex stri_join
-#'   stri_isempty stri_split_fixed stri_replace_all_regex
+#'   stri_isempty stri_split_fixed stri_replace_all_regex stri_detect_regex
 #' @importFrom utils tail
 #' @importFrom tibble tibble as_tibble
 lnt_read <- function(x,
@@ -258,10 +258,10 @@ lnt_read <- function(x,
     articles.v[grep("^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIC: |^DATELINE: ", articles.v)] <- ""
   }
 
-  beginnings <- grep(start_keyword, articles.v)
+  beginnings <- which(stringi::stri_detect_regex(articles.v, start_keyword))
   articles.l <- lapply(seq_along(beginnings), function(n) {
     if (n < length(beginnings)) {
-      articles.v[beginnings[n]:beginnings[n + 1]]
+      articles.v[beginnings[n]:(beginnings[n + 1] - 1)]
     } else {
       articles.v[beginnings[n]:length(articles.v)]
     }
