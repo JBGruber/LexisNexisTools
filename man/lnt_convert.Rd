@@ -28,7 +28,7 @@ lnt2SQLite(x, file = "LNT.sqlite", ...)
 \item{to}{Which format to convert into. Possible values are "rDNA",
 "corpustools", "tidytext", "tm", "SQLite" and "quanteda".}
 
-\item{what}{Either "Articles" or "Paragraph" to use articles or paragraphs as
+\item{what}{Either "Articles" or "Paragraphs" to use articles or paragraphs as
 text in the output object.}
 
 \item{collapse}{Only has an effect when \code{what = "Articles"}. If set to

@@ -1147,7 +1147,7 @@ lnt_diff <- function(x,
 #' @param x An object of class LNToutput.
 #' @param to Which format to convert into. Possible values are "rDNA",
 #'   "corpustools", "tidytext", "tm", "SQLite" and "quanteda".
-#' @param what Either "Articles" or "Paragraph" to use articles or paragraphs as
+#' @param what Either "Articles" or "Paragraphs" to use articles or paragraphs as
 #'   text in the output object.
 #' @param collapse Only has an effect when \code{what = "Articles"}. If set to
 #'   TRUE, an empty line will be added after each paragraphs. Alternatively you
@@ -1232,7 +1232,7 @@ lnt2rDNA <- function(x, what = "Articles", collapse = TRUE) {
     }
     notes <- paste("ID:", x@meta$ID)
     order <- seq_along(x@meta$ID)
-  } else if (what == "Paragraph") {
+  } else if (what == "Paragraphs") {
     text <- x@paragraphs$Paragraph
     notes <-  paste0("Art_ID: ", x@paragraphs$Art_ID, "; Par_ID", x@paragraphs$Par_ID )
     order <- match(x@paragraphs$Art_ID, x@meta$ID)
@@ -1290,7 +1290,7 @@ lnt2quanteda <- function(x, what = "Articles", collapse = NULL, ...) {
     }
     ID <- x@meta$ID
     meta <- x@meta
-  } else if (what == "Paragraph") {
+  } else if (what == "Paragraphs") {
     text <- x@paragraphs$Paragraph
     ID <- x@paragraphs$Par_ID
     meta <- merge(
@@ -1347,7 +1347,7 @@ lnt2tm <- function(x, what = "Articles", collapse = NULL, ...) {
                            x@meta,
                            by.x = "doc_id",
                            by.y = "ID")
-  } else if (what == "Paragraph") {
+  } else if (what == "Paragraphs") {
     df <- data.frame(doc_id = x@paragraphs$Par_ID,
                      text = x@paragraphs$Paragraph,
                      par_id = x@paragraphs$Par_ID)
@@ -1388,7 +1388,7 @@ lnt2cptools <- function(x, what = "Articles", collapse = NULL, ...) {
     }
     ID <- x@meta$ID
     meta <- x@meta
-  } else if (what == "Paragraph") {
+  } else if (what == "Paragraphs") {
     text <- x@paragraphs$Paragraph
     ID <- x@paragraphs$Par_ID
     meta <- merge(
@@ -1437,7 +1437,7 @@ lnt2tidy <- function(x, what = "Articles", collapse = NULL, ...) {
       output = "Article",
       ...
     )
-  } else if (what == "Paragraph") {
+  } else if (what == "Paragraphs") {
     df <- merge.data.frame(
       x@paragraphs,
       x@meta,
