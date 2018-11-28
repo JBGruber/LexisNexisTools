@@ -1214,6 +1214,9 @@ lnt_convert <- function(x,
 #' @rdname lnt_convert
 #' @export
 lnt2rDNA <- function(x, what = "Articles", collapse = TRUE) {
+  if (!what %in% c("Articles", "Paragraphs")) {
+    stop("Choose either \"Articles\" or \"Paragraphs\" as what argument.")
+  }
   if (isTRUE(collapse)) {
     collapse <- "\n\n"
   } else if (is.logical(collapse) && length(collapse) == 1L && !is.na(collapse) && !collapse) {
@@ -1272,6 +1275,9 @@ lnt2rDNA <- function(x, what = "Articles", collapse = TRUE) {
 #' @export
 #' @importFrom quanteda corpus
 lnt2quanteda <- function(x, what = "Articles", collapse = NULL, ...) {
+  if (!what %in% c("Articles", "Paragraphs")) {
+    stop("Choose either \"Articles\" or \"Paragraphs\" as what argument.")
+  }
   if (isTRUE(collapse)) {
     collapse <- "\n\n"
   } else if (is.logical(collapse) && length(collapse) == 1L && !is.na(collapse) && !collapse) {
@@ -1321,6 +1327,9 @@ lnt2quanteda <- function(x, what = "Articles", collapse = NULL, ...) {
 #' @rdname lnt_convert
 #' @export
 lnt2tm <- function(x, what = "Articles", collapse = NULL, ...) {
+  if (!what %in% c("Articles", "Paragraphs")) {
+    stop("Choose either \"Articles\" or \"Paragraphs\" as what argument.")
+  }
   if (!requireNamespace("tm", quietly = TRUE)) {
     stop("Package \"tm\" is needed for this function to work. Please install it.",
          call. = FALSE)
@@ -1366,6 +1375,9 @@ lnt2tm <- function(x, what = "Articles", collapse = NULL, ...) {
 #' @export
 #' @importFrom methods slot slotNames
 lnt2cptools <- function(x, what = "Articles", collapse = NULL, ...) {
+  if (!what %in% c("Articles", "Paragraphs")) {
+    stop("Choose either \"Articles\" or \"Paragraphs\" as what argument.")
+  }
   if (!requireNamespace("corpustools", quietly = TRUE)) {
     stop("Package \"corpustools\" is needed for this function to work. Please install it.",
          call. = FALSE)
@@ -1410,6 +1422,9 @@ lnt2cptools <- function(x, what = "Articles", collapse = NULL, ...) {
 
 
 lnt2tidy <- function(x, what = "Articles", collapse = NULL, ...) {
+  if (!what %in% c("Articles", "Paragraphs")) {
+    stop("Choose either \"Articles\" or \"Paragraphs\" as what argument.")
+  }
   if (!requireNamespace("tidytext", quietly = TRUE)) {
     stop("Package \"tidytext\" is needed for this function to work. Please install it.",
          call. = FALSE)
