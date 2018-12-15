@@ -79,7 +79,7 @@ report.df <- lnt_rename(x = my_files, report = TRUE)
 report.df
 ```
 
-    ## in 0.0014 secs
+    ## in 0.0013 secs
 
 | name\_orig | name\_new                               | status  |
 |:-----------|:----------------------------------------|:--------|
@@ -107,22 +107,22 @@ LNToutput <- lnt_read(x = getwd())
 ```
 
     ## Creating LNToutput from input 1 files...
-    ##  ...files loaded [0.0013 secs]
-    ##  ...articles split [0.0077 secs]
-    ##  ...lengths extracted [0.0083 secs]
-    ##  ...newspapers extracted [0.0086 secs]
-    ##  ...dates extracted [0.011 secs]
-    ##  ...authors extracted [0.012 secs]
-    ##  ...sections extracted [0.012 secs]
+    ##  ...files loaded [0.0012 secs]
+    ##  ...articles split [0.0073 secs]
+    ##  ...lengths extracted [0.0079 secs]
+    ##  ...newspapers extracted [0.0082 secs]
+    ##  ...dates extracted [0.01 secs]
+    ##  ...authors extracted [0.011 secs]
+    ##  ...sections extracted [0.011 secs]
     ##  ...editions extracted [0.012 secs]
     ##  ...headlines extracted [0.013 secs]
     ##  ...dates converted [0.019 secs]
     ##  ...metadata extracted [0.023 secs]
-    ##  ...article texts extracted [0.026 secs]
-    ##  ...paragraphs extracted [0.037 secs]
-    ##  ...superfluous whitespace removed from articles [0.04 secs]
-    ##  ...superfluous whitespace removed from paragraphs [0.043 secs]
-    ## Elapsed time: 0.043 secs
+    ##  ...article texts extracted [0.025 secs]
+    ##  ...paragraphs extracted [0.036 secs]
+    ##  ...superfluous whitespace removed from articles [0.038 secs]
+    ##  ...superfluous whitespace removed from paragraphs [0.04 secs]
+    ## Elapsed time: 0.04 secs
 
 The returned object of class `LNToutput` is intended to be an intermediate container. As it stores articles and paragraphs in two separate data.frames, nested in an S4 object, the relevant text data is stored twice in almost the same format. This has the advantage, that there is no need to use special characters, such as "\\n". However, it makes the files rather big when you save them directly.
 
@@ -137,18 +137,18 @@ paragraphs.df <- LNToutput@paragraphs
 head(meta.df, n = 3)
 ```
 
-<table style="width:100%;">
+<table>
 <colgroup>
 <col width="1%" />
-<col width="14%" />
+<col width="18%" />
+<col width="8%" />
+<col width="5%" />
+<col width="5%" />
 <col width="7%" />
+<col width="7%" />
+<col width="26%" />
+<col width="13%" />
 <col width="4%" />
-<col width="4%" />
-<col width="6%" />
-<col width="6%" />
-<col width="21%" />
-<col width="31%" />
-<col width="3%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -173,7 +173,7 @@ head(meta.df, n = 3)
 <td align="left">355 words</td>
 <td align="left">NA</td>
 <td align="left">Andrew Sparrow</td>
-<td align="left"></td>
+<td align="left">NA</td>
 <td align="left">Lorem ipsum dolor sit amet</td>
 <td align="left">FALSE</td>
 </tr>
@@ -185,7 +185,7 @@ head(meta.df, n = 3)
 <td align="left">927 words</td>
 <td align="left">NA</td>
 <td align="left">Simon Tisdall</td>
-<td align="left"></td>
+<td align="left">NA</td>
 <td align="left">Lorem ipsum dolor sit amet</td>
 <td align="left">FALSE</td>
 </tr>
@@ -198,7 +198,7 @@ head(meta.df, n = 3)
 <td align="left">FEATURES; Pg. 6</td>
 <td align="left">TREVOR Kavanagh</td>
 <td align="left">Edition 1; Scotland</td>
-<td align="left">Edition 1; Scotland Lorem ipsum dolor sit amet</td>
+<td align="left">Lorem ipsum dolor sit amet</td>
 <td align="left">FALSE</td>
 </tr>
 </tbody>
@@ -284,7 +284,7 @@ LNToutput[1, ]
     ## # A tibble: 1 x 10
     ##      ID Source_File Newspaper Date       Length Section Author Edition
     ##   <int> <chr>       <chr>     <date>     <chr>  <chr>   <chr>  <chr>  
-    ## 1     1 /home/joha… Guardian… 2010-01-11 355 w… <NA>    Andre… ""     
+    ## 1     1 /home/joha… Guardian… 2010-01-11 355 w… <NA>    Andre… <NA>   
     ## # ... with 2 more variables: Headline <chr>, Graphic <lgl>
     ## # A tibble: 1 x 2
     ##      ID Article                                                           
@@ -316,15 +316,15 @@ head(meta.df, n = 3)
 <table style="width:100%;">
 <colgroup>
 <col width="1%" />
-<col width="27%" />
-<col width="5%" />
+<col width="33%" />
+<col width="7%" />
+<col width="4%" />
+<col width="4%" />
+<col width="6%" />
+<col width="6%" />
+<col width="21%" />
+<col width="10%" />
 <col width="3%" />
-<col width="3%" />
-<col width="5%" />
-<col width="5%" />
-<col width="17%" />
-<col width="26%" />
-<col width="2%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -349,7 +349,7 @@ head(meta.df, n = 3)
 <td align="left">355 words</td>
 <td align="left">NA</td>
 <td align="left">Andrew Sparrow</td>
-<td align="left"></td>
+<td align="left">NA</td>
 <td align="left">Lorem ipsum dolor sit amet</td>
 <td align="left">FALSE</td>
 </tr>
@@ -361,7 +361,7 @@ head(meta.df, n = 3)
 <td align="left">927 words</td>
 <td align="left">NA</td>
 <td align="left">Simon Tisdall</td>
-<td align="left"></td>
+<td align="left">NA</td>
 <td align="left">Lorem ipsum dolor sit amet</td>
 <td align="left">FALSE</td>
 </tr>
@@ -374,7 +374,7 @@ head(meta.df, n = 3)
 <td align="left">FEATURES; Pg. 6</td>
 <td align="left">TREVOR Kavanagh</td>
 <td align="left">Edition 1; Scotland</td>
-<td align="left">Edition 1; Scotland Lorem ipsum dolor sit amet</td>
+<td align="left">Lorem ipsum dolor sit amet</td>
 <td align="left">FALSE</td>
 </tr>
 </tbody>

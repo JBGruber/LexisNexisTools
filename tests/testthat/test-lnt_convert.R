@@ -13,7 +13,7 @@ test_that("Convert LNToutput to rDNA", {
 })
 
 # saveRDS(lnt_convert(x = readRDS("../files/LNToutput.RDS"),
-#                     to = "rDNA", what = "Articles"), "../files/rDNA.RDS")
+#                     to = "rDNA", what = "Articles", collapse = TRUE), "../files/rDNA.RDS")
 
 test_that("Convert LNToutput to quanteda", {
   expect_equal({

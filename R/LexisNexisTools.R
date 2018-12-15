@@ -182,6 +182,7 @@ setMethod("+",
 #' paragraphs.df <- LNToutput@paragraphs
 #' @importFrom stringi stri_read_lines stri_extract_last_regex stri_join
 #'   stri_isempty stri_split_fixed stri_replace_all_regex stri_detect_regex
+#'   stri_detect_fixed
 #' @importFrom utils tail
 #' @importFrom tibble tibble as_tibble
 lnt_read <- function(x,
@@ -358,7 +359,7 @@ lnt_read <- function(x,
       d1 <- df.l[[i]]$meta[(date + 1):(date + 2)]
       if (!d1[1] == "") {
         edition.v <- d1[1]
-        if (!d1[2] == "") edition.v <- paste(edition.v, d1[2], collapse = "; ")
+        if (!d1[2] == "") edition.v <- c(edition.v, d1[2])
         edition.v
       } else {
         # Alternatively, the edition is sometimes the first non-empty line in the article
@@ -367,11 +368,11 @@ lnt_read <- function(x,
                           value = TRUE,
                           ignore.case = TRUE)
         ifelse(length(edition.v) == 0,
-               "",
+               NA,
                edition.v)
       }
     } else {
-      ""
+      NA
     }
   })
   if (verbose) cat("\t...editions extracted [", format( (Sys.time() - start_time), digits = 2, nsmall = 2), "]\n", sep = "")
@@ -379,11 +380,24 @@ lnt_read <- function(x,
   ### Headline
   headline.v <- sapply(seq_along(df.l), function(i) {
     headline <- df.l[[i]]$meta
-    headline[c(grep(length.v[i], headline, fixed = TRUE),
-               grep(date.v[i], headline, fixed = TRUE),
-               grep(newspaper.v[i], headline, fixed = TRUE),
-               grep(author.v[i], headline, fixed = TRUE),
-               grep(section.v[i], headline, fixed = TRUE))] <- ""
+    pattern <- c(
+      length.v[i],
+      date.v[i],
+      newspaper.v[i],
+      author.v[i],
+      section.v[i],
+      edition.v[i]
+    )
+    #pattern <- ifelse(nchar(pattern) < 1, NA, pattern)
+    remove.m <- sapply(pattern, function(p) {
+      out <- stringi::stri_detect_fixed(headline, p[1])
+      if (length(p) > 1) {
+        out + stringi::stri_detect_fixed(headline, p[2])
+      } else {
+        out
+      }
+    })
+    headline[as.logical(rowSums(remove.m, na.rm = TRUE))] <- ""
     stringi::stri_join(headline, collapse = " ")
   })
   if (verbose) cat("\t...headlines extracted [", format( (Sys.time() - start_time), digits = 2, nsmall = 2), "]\n", sep = "")
@@ -409,7 +423,7 @@ lnt_read <- function(x,
                     Length = trimws(length.v, which = "both"),
                     Section = trimws(section.v, which = "both"),
                     Author = trimws(author.v, which = "both"),
-                    Edition = trimws(edition.v, which = "both"),
+                    Edition = trimws(sapply(edition.v, stringi::stri_join, collapse = " "), which = "both"),
                     Headline = trimws(headline.v, which = "both"),
                     Graphic = unlist(sapply(df.l, function(i) i[["graphic"]])))
   if (verbose) cat("\t...metadata extracted [", format( (Sys.time() - start_time), digits = 2, nsmall = 2), "]\n", sep = "")
