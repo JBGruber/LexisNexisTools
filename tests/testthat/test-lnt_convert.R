@@ -36,12 +36,21 @@ test_that("Convert LNToutput to corpustools", {
   expect_equal({
     cptools <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
                            to = "corpustools", what = "Articles")
-    cptools
+    out <- list()
+    out[[1]] <- class(cptools)
+    out[[2]] <- cptools$get()
+    out[[3]] <- cptools$get_meta()
   }, readRDS("../files/corpustools.RDS"))
 })
 
-# saveRDS(lnt_convert(x = readRDS("../files/LNToutput.RDS"),
-#                     to = "corpustools", what = "Articles"), "../files/corpustools.RDS")
+# saveRDS({
+#   cptools <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
+#                          to = "corpustools", what = "Articles")
+#   out <- list()
+#   out[[1]] <- class(cptools)
+#   out[[2]] <- cptools$get()
+#   out[[3]] <- cptools$get_meta()
+# }, "../files/corpustools.RDS")
 
 test_that("Convert LNToutput to tidytext", {
   expect_equal({

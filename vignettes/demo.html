@@ -12,7 +12,7 @@
 
 <meta name="author" content="Johannes B. Gruber" />
 
-<meta name="date" content="2018-11-27" />
+<meta name="date" content="2018-12-15" />
 
 <title>Basic Usage</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Basic Usage</h1>
 <h4 class="author"><em>Johannes B. Gruber</em></h4>
-<h4 class="date"><em>2018-11-27</em></h4>
+<h4 class="date"><em>2018-12-15</em></h4>
 
 
 
@@ -144,22 +144,22 @@ report.df</code></pre></div>
 <p>To use the function, you can again provide either file name(s), folder name(s) or nothing—to search the current working directory for TXT files—as <code>x</code> argument:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">LNToutput &lt;-<span class="st"> </span><span class="kw">lnt_read</span>(<span class="dt">x =</span> <span class="kw">getwd</span>())
 <span class="co">#&gt; Creating LNToutput from input 1 files...</span>
-<span class="co">#&gt;  ...files loaded [0.0011 secs]</span>
-<span class="co">#&gt;  ...articles split [0.0068 secs]</span>
-<span class="co">#&gt;  ...lengths extracted [0.0073 secs]</span>
-<span class="co">#&gt;  ...newspapers extracted [0.0075 secs]</span>
-<span class="co">#&gt;  ...dates extracted [0.0097 secs]</span>
-<span class="co">#&gt;  ...authors extracted [0.01 secs]</span>
-<span class="co">#&gt;  ...sections extracted [0.011 secs]</span>
-<span class="co">#&gt;  ...editions extracted [0.011 secs]</span>
-<span class="co">#&gt;  ...headlines extracted [0.011 secs]</span>
-<span class="co">#&gt;  ...dates converted [0.015 secs]</span>
-<span class="co">#&gt;  ...metadata extracted [0.017 secs]</span>
-<span class="co">#&gt;  ...article texts extracted [0.019 secs]</span>
-<span class="co">#&gt;  ...paragraphs extracted [0.025 secs]</span>
-<span class="co">#&gt;  ...superfluous whitespace removed from articles [0.027 secs]</span>
-<span class="co">#&gt;  ...superfluous whitespace removed from paragraphs [0.029 secs]</span>
-<span class="co">#&gt; Elapsed time: 0.03 secs</span></code></pre></div>
+<span class="co">#&gt;  ...files loaded [0.0013 secs]</span>
+<span class="co">#&gt;  ...articles split [0.0076 secs]</span>
+<span class="co">#&gt;  ...lengths extracted [0.0083 secs]</span>
+<span class="co">#&gt;  ...newspapers extracted [0.0086 secs]</span>
+<span class="co">#&gt;  ...dates extracted [0.01 secs]</span>
+<span class="co">#&gt;  ...authors extracted [0.011 secs]</span>
+<span class="co">#&gt;  ...sections extracted [0.012 secs]</span>
+<span class="co">#&gt;  ...editions extracted [0.012 secs]</span>
+<span class="co">#&gt;  ...headlines extracted [0.013 secs]</span>
+<span class="co">#&gt;  ...dates converted [0.017 secs]</span>
+<span class="co">#&gt;  ...metadata extracted [0.019 secs]</span>
+<span class="co">#&gt;  ...article texts extracted [0.021 secs]</span>
+<span class="co">#&gt;  ...paragraphs extracted [0.027 secs]</span>
+<span class="co">#&gt;  ...superfluous whitespace removed from articles [0.03 secs]</span>
+<span class="co">#&gt;  ...superfluous whitespace removed from paragraphs [0.032 secs]</span>
+<span class="co">#&gt; Elapsed time: 0.032 secs</span></code></pre></div>
 <p>The returned object of class <code>LNToutput</code> is intended to be an intermediate container. As it stores articles and paragraphs in two separate data.frames, nested in an S4 object, the relevant text data is stored twice in almost the same format. This has the advantage, that there is no need to use special characters, such as “\n”. However, it makes the files rather big when you save them directly.</p>
 <p>The object can, however, be easily converted to regular data.frames using <code>@</code> to select the data.frame you want:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">meta.df &lt;-<span class="st"> </span>LNToutput<span class="op">@</span>meta
@@ -168,18 +168,18 @@ paragraphs.df &lt;-<span class="st"> </span>LNToutput<span class="op">@</span>pa
 
 <span class="co"># Print meta to get an idea of the data</span>
 <span class="kw">head</span>(meta.df, <span class="dt">n =</span> <span class="dv">3</span>)</code></pre></div>
-<table style="width:100%;">
+<table>
 <colgroup>
 <col width="1%"></col>
-<col width="14%"></col>
+<col width="18%"></col>
+<col width="8%"></col>
+<col width="5%"></col>
+<col width="5%"></col>
 <col width="7%"></col>
+<col width="7%"></col>
+<col width="26%"></col>
+<col width="13%"></col>
 <col width="4%"></col>
-<col width="4%"></col>
-<col width="6%"></col>
-<col width="6%"></col>
-<col width="21%"></col>
-<col width="31%"></col>
-<col width="3%"></col>
 </colgroup>
 <thead>
 <tr class="header">
@@ -204,7 +204,7 @@ paragraphs.df &lt;-<span class="st"> </span>LNToutput<span class="op">@</span>pa
 <td align="left">355 words</td>
 <td align="left">NA</td>
 <td align="left">Andrew Sparrow</td>
-<td align="left"></td>
+<td align="left">NA</td>
 <td align="left">Lorem ipsum dolor sit amet</td>
 <td align="left">FALSE</td>
 </tr>
@@ -216,7 +216,7 @@ paragraphs.df &lt;-<span class="st"> </span>LNToutput<span class="op">@</span>pa
 <td align="left">927 words</td>
 <td align="left">NA</td>
 <td align="left">Simon Tisdall</td>
-<td align="left"></td>
+<td align="left">NA</td>
 <td align="left">Lorem ipsum dolor sit amet</td>
 <td align="left">FALSE</td>
 </tr>
@@ -229,7 +229,7 @@ paragraphs.df &lt;-<span class="st"> </span>LNToutput<span class="op">@</span>pa
 <td align="left">FEATURES; Pg. 6</td>
 <td align="left">TREVOR Kavanagh</td>
 <td align="left">Edition 1; Scotland</td>
-<td align="left">Edition 1; Scotland Lorem ipsum dolor sit amet</td>
+<td align="left">Lorem ipsum dolor sit amet</td>
 <td align="left">FALSE</td>
 </tr>
 </tbody>
@@ -285,7 +285,7 @@ LNToutput &lt;-<span class="st"> </span>LNToutput[<span class="op">!</span>LNTou
 <span class="co">#&gt; # A tibble: 1 x 10</span>
 <span class="co">#&gt;      ID Source_File Newspaper Date       Length Section Author Edition</span>
 <span class="co">#&gt;   &lt;int&gt; &lt;chr&gt;       &lt;chr&gt;     &lt;date&gt;     &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;  </span>
-<span class="co">#&gt; 1     1 /home/joha… Guardian… 2010-01-11 355 w… &lt;NA&gt;    Andre… &quot;&quot;     </span>
+<span class="co">#&gt; 1     1 /home/joha… Guardian… 2010-01-11 355 w… &lt;NA&gt;    Andre… &lt;NA&gt;   </span>
 <span class="co">#&gt; # ... with 2 more variables: Headline &lt;chr&gt;, Graphic &lt;lgl&gt;</span>
 <span class="co">#&gt; # A tibble: 1 x 2</span>
 <span class="co">#&gt;      ID Article                                                           </span>
@@ -308,18 +308,18 @@ paragraphs.df &lt;-<span class="st"> </span>LNToutput<span class="op">@</span>pa
 
 <span class="co"># Print e.g., meta to see how the data changed</span>
 <span class="kw">head</span>(meta.df, <span class="dt">n =</span> <span class="dv">3</span>)</code></pre></div>
-<table>
+<table style="width:100%;">
 <colgroup>
 <col width="1%"></col>
-<col width="29%"></col>
-<col width="5%"></col>
+<col width="35%"></col>
+<col width="7%"></col>
+<col width="4%"></col>
+<col width="4%"></col>
+<col width="6%"></col>
+<col width="6%"></col>
+<col width="21%"></col>
+<col width="10%"></col>
 <col width="3%"></col>
-<col width="3%"></col>
-<col width="5%"></col>
-<col width="5%"></col>
-<col width="17%"></col>
-<col width="25%"></col>
-<col width="2%"></col>
 </colgroup>
 <thead>
 <tr class="header">
@@ -344,7 +344,7 @@ paragraphs.df &lt;-<span class="st"> </span>LNToutput<span class="op">@</span>pa
 <td align="left">355 words</td>
 <td align="left">NA</td>
 <td align="left">Andrew Sparrow</td>
-<td align="left"></td>
+<td align="left">NA</td>
 <td align="left">Lorem ipsum dolor sit amet</td>
 <td align="left">FALSE</td>
 </tr>
@@ -356,7 +356,7 @@ paragraphs.df &lt;-<span class="st"> </span>LNToutput<span class="op">@</span>pa
 <td align="left">927 words</td>
 <td align="left">NA</td>
 <td align="left">Simon Tisdall</td>
-<td align="left"></td>
+<td align="left">NA</td>
 <td align="left">Lorem ipsum dolor sit amet</td>
 <td align="left">FALSE</td>
 </tr>
@@ -369,7 +369,7 @@ paragraphs.df &lt;-<span class="st"> </span>LNToutput<span class="op">@</span>pa
 <td align="left">FEATURES; Pg. 6</td>
 <td align="left">TREVOR Kavanagh</td>
 <td align="left">Edition 1; Scotland</td>
-<td align="left">Edition 1; Scotland Lorem ipsum dolor sit amet</td>
+<td align="left">Lorem ipsum dolor sit amet</td>
 <td align="left">FALSE</td>
 </tr>
 </tbody>

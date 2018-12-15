@@ -9,7 +9,7 @@
 .RData
 .Ruserdata
 LexisNexisTools.Rproj
-Update LN package.R
+Update package.R
 cran-comments.md
 test.R
 README.Rmd
