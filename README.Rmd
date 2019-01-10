@@ -22,7 +22,7 @@ Install via:
 install.packages("LexisNexisTools")
 ```
 
-Or get the development version by installing directly from github (if you do not have `devtools` yet install it via `install.packages("devtools")` first):
+Or get the development version by installing directly from GitHub (if you do not have `devtools` yet install it via `install.packages("devtools")` first):
 
 ```{r, eval=FALSE}
 devtools::install_github("JBGruber/LexisNexisTools")

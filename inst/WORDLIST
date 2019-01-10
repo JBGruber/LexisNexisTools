@@ -1,4 +1,5 @@
 asDate
+checkFiles
 com
 corpustools
 diffPrint
@@ -6,8 +7,6 @@ dist
 documentRange
 endDate
 etc
-Gruber
-knitr
 Levenshtein
 LexisNexis
 lnt
@@ -17,6 +16,7 @@ quanteda
 regex
 rel
 rmarkdown
+SampleFile
 searchTerm
 sim
 simil
@@ -24,11 +24,9 @@ SQLite
 startDate
 stat
 stringdist
+testthat
 textstat
 tidytext
 tm
-VignetteEncoding
-VignetteEngine
-VignetteIndexEntry
 wd
 www

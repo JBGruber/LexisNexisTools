@@ -259,14 +259,10 @@ lnt_read <- function(x,
     articles.v[grep("^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIC: |^DATELINE: ", articles.v)] <- ""
   }
 
-  beginnings <- which(stringi::stri_detect_regex(articles.v, start_keyword))
-  articles.l <- lapply(seq_along(beginnings), function(n) {
-    if (n < length(beginnings)) {
-      articles.v[beginnings[n]:(beginnings[n + 1] - 1)]
-    } else {
-      articles.v[beginnings[n]:length(articles.v)]
-    }
-  })
+  articles.l <- split(articles.v, cumsum(stringi::stri_detect_regex(articles.v, start_keyword)))
+  articles.l[["0"]] <- NULL
+  names(articles.l) <- NULL
+  
   rm(articles.v)
   df.l <- lapply(articles.l, function(a) {
     len <- grep(length_keyword, a)[1]
@@ -379,26 +375,30 @@ lnt_read <- function(x,
 
   ### Headline
   headline.v <- sapply(seq_along(df.l), function(i) {
-    headline <- df.l[[i]]$meta
-    pattern <- c(
-      length.v[i],
-      date.v[i],
-      newspaper.v[i],
-      author.v[i],
-      section.v[i],
-      edition.v[i]
-    )
-    #pattern <- ifelse(nchar(pattern) < 1, NA, pattern)
-    remove.m <- sapply(pattern, function(p) {
-      out <- stringi::stri_detect_fixed(headline, p[1])
-      if (length(p) > 1) {
-        out + stringi::stri_detect_fixed(headline, p[2])
-      } else {
-        out
-      }
-    })
-    headline[as.logical(rowSums(remove.m, na.rm = TRUE))] <- ""
-    stringi::stri_join(headline, collapse = " ")
+    if (!df.l[[i]]$graphic) {
+      headline <- df.l[[i]]$meta
+      pattern <- c(
+        length.v[i],
+        date.v[i],
+        newspaper.v[i],
+        author.v[i],
+        section.v[i],
+        edition.v[i]
+      )
+      
+      remove.m <- sapply(pattern, function(p) {
+        out <- stringi::stri_detect_fixed(headline, p[1])
+        if (length(p) > 1) {
+          out + stringi::stri_detect_fixed(headline, p[2])
+        } else {
+          out
+        }
+      })
+      headline[as.logical(rowSums(remove.m, na.rm = TRUE))] <- ""
+      stringi::stri_join(headline, collapse = " ")
+    } else {
+      ""
+    }
   })
   if (verbose) cat("\t...headlines extracted [", format( (Sys.time() - start_time), digits = 2, nsmall = 2), "]\n", sep = "")
 
@@ -796,7 +796,7 @@ lnt_similarity <- function(texts,
       sim <- as.matrix(quanteda::textstat_simil(text.dfm[text.dfm@Dimnames$docs %in%
                                                            IDs[grep(x, dates)]],
                                                 selection = NULL,
-                                                method = "correlation",
+                                                method = "cosine",
                                                 margin = "documents"))
       diag(sim) <- 0
       . <- reshape2::melt(sim)

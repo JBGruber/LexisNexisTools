@@ -24,7 +24,7 @@ roxygen2::roxygenise(clean = TRUE)
 devtools::check()
 
 ## Check code quality
-lintr::lint()
+lintr::lint_package()
 goodpractice::gp()
 
 ## Check spelling

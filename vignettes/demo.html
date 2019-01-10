@@ -12,7 +12,7 @@
 
 <meta name="author" content="Johannes B. Gruber" />
 
-<meta name="date" content="2018-12-15" />
+<meta name="date" content="2019-01-10" />
 
 <title>Basic Usage</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Basic Usage</h1>
 <h4 class="author"><em>Johannes B. Gruber</em></h4>
-<h4 class="date"><em>2018-12-15</em></h4>
+<h4 class="date"><em>2019-01-10</em></h4>
 
 
 
@@ -110,7 +110,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 report.df &lt;-<span class="st"> </span><span class="kw">lnt_rename</span>(<span class="dt">x =</span> my_files, <span class="dt">report =</span> <span class="ot">TRUE</span>)
 
 report.df</code></pre></div>
-<pre><code>#&gt; in 0.00098 secs</code></pre>
+<pre><code>#&gt; in 0.0011 secs</code></pre>
 <table>
 <thead>
 <tr class="header">
@@ -144,10 +144,10 @@ report.df</code></pre></div>
 <p>To use the function, you can again provide either file name(s), folder name(s) or nothing—to search the current working directory for TXT files—as <code>x</code> argument:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">LNToutput &lt;-<span class="st"> </span><span class="kw">lnt_read</span>(<span class="dt">x =</span> <span class="kw">getwd</span>())
 <span class="co">#&gt; Creating LNToutput from input 1 files...</span>
-<span class="co">#&gt;  ...files loaded [0.0013 secs]</span>
-<span class="co">#&gt;  ...articles split [0.0076 secs]</span>
-<span class="co">#&gt;  ...lengths extracted [0.0083 secs]</span>
-<span class="co">#&gt;  ...newspapers extracted [0.0086 secs]</span>
+<span class="co">#&gt;  ...files loaded [0.0011 secs]</span>
+<span class="co">#&gt;  ...articles split [0.0075 secs]</span>
+<span class="co">#&gt;  ...lengths extracted [0.0081 secs]</span>
+<span class="co">#&gt;  ...newspapers extracted [0.0084 secs]</span>
 <span class="co">#&gt;  ...dates extracted [0.01 secs]</span>
 <span class="co">#&gt;  ...authors extracted [0.011 secs]</span>
 <span class="co">#&gt;  ...sections extracted [0.012 secs]</span>
@@ -155,11 +155,11 @@ report.df</code></pre></div>
 <span class="co">#&gt;  ...headlines extracted [0.013 secs]</span>
 <span class="co">#&gt;  ...dates converted [0.017 secs]</span>
 <span class="co">#&gt;  ...metadata extracted [0.019 secs]</span>
-<span class="co">#&gt;  ...article texts extracted [0.021 secs]</span>
-<span class="co">#&gt;  ...paragraphs extracted [0.027 secs]</span>
-<span class="co">#&gt;  ...superfluous whitespace removed from articles [0.03 secs]</span>
-<span class="co">#&gt;  ...superfluous whitespace removed from paragraphs [0.032 secs]</span>
-<span class="co">#&gt; Elapsed time: 0.032 secs</span></code></pre></div>
+<span class="co">#&gt;  ...article texts extracted [0.023 secs]</span>
+<span class="co">#&gt;  ...paragraphs extracted [0.031 secs]</span>
+<span class="co">#&gt;  ...superfluous whitespace removed from articles [0.034 secs]</span>
+<span class="co">#&gt;  ...superfluous whitespace removed from paragraphs [0.036 secs]</span>
+<span class="co">#&gt; Elapsed time: 0.036 secs</span></code></pre></div>
 <p>The returned object of class <code>LNToutput</code> is intended to be an intermediate container. As it stores articles and paragraphs in two separate data.frames, nested in an S4 object, the relevant text data is stored twice in almost the same format. This has the advantage, that there is no need to use special characters, such as “\n”. However, it makes the files rather big when you save them directly.</p>
 <p>The object can, however, be easily converted to regular data.frames using <code>@</code> to select the data.frame you want:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">meta.df &lt;-<span class="st"> </span>LNToutput<span class="op">@</span>meta
@@ -286,19 +286,19 @@ LNToutput &lt;-<span class="st"> </span>LNToutput[<span class="op">!</span>LNTou
 <span class="co">#&gt;      ID Source_File Newspaper Date       Length Section Author Edition</span>
 <span class="co">#&gt;   &lt;int&gt; &lt;chr&gt;       &lt;chr&gt;     &lt;date&gt;     &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;  </span>
 <span class="co">#&gt; 1     1 /home/joha… Guardian… 2010-01-11 355 w… &lt;NA&gt;    Andre… &lt;NA&gt;   </span>
-<span class="co">#&gt; # ... with 2 more variables: Headline &lt;chr&gt;, Graphic &lt;lgl&gt;</span>
+<span class="co">#&gt; # … with 2 more variables: Headline &lt;chr&gt;, Graphic &lt;lgl&gt;</span>
 <span class="co">#&gt; # A tibble: 1 x 2</span>
-<span class="co">#&gt;      ID Article                                                           </span>
-<span class="co">#&gt;   &lt;int&gt; &lt;chr&gt;                                                             </span>
-<span class="co">#&gt; 1     1 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam la…</span>
+<span class="co">#&gt;      ID Article                                                            </span>
+<span class="co">#&gt;   &lt;int&gt; &lt;chr&gt;                                                              </span>
+<span class="co">#&gt; 1     1 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam lac…</span>
 <span class="co">#&gt; # A tibble: 5 x 3</span>
-<span class="co">#&gt;   Art_ID Par_ID Paragraph                                                 </span>
-<span class="co">#&gt;    &lt;int&gt;  &lt;int&gt; &lt;chr&gt;                                                     </span>
-<span class="co">#&gt; 1      1      1 Lorem ipsum dolor sit amet, consectetur adipiscing elit. …</span>
-<span class="co">#&gt; 2      1      2 Duis eleifend ipsum vehicula nunc luctus vestibulum. Done…</span>
-<span class="co">#&gt; 3      1      3 Sed ut ex quis nisi interdum ornare quis quis velit. Ut e…</span>
-<span class="co">#&gt; 4      1      4 Aliquam ut consectetur urna, et dignissim turpis. Ut matt…</span>
-<span class="co">#&gt; 5      1      5 Fusce sit amet aliquet lorem, id faucibus nisl. Nulla sus…</span></code></pre></div>
+<span class="co">#&gt;   Art_ID Par_ID Paragraph                                                  </span>
+<span class="co">#&gt;    &lt;int&gt;  &lt;int&gt; &lt;chr&gt;                                                      </span>
+<span class="co">#&gt; 1      1      1 Lorem ipsum dolor sit amet, consectetur adipiscing elit. E…</span>
+<span class="co">#&gt; 2      1      2 Duis eleifend ipsum vehicula nunc luctus vestibulum. Donec…</span>
+<span class="co">#&gt; 3      1      3 Sed ut ex quis nisi interdum ornare quis quis velit. Ut el…</span>
+<span class="co">#&gt; 4      1      4 Aliquam ut consectetur urna, et dignissim turpis. Ut matti…</span>
+<span class="co">#&gt; 5      1      5 Fusce sit amet aliquet lorem, id faucibus nisl. Nulla susc…</span></code></pre></div>
 <p>In this case, writing <code>[1, ]</code> delivers an LNToutput object which includes only the first article and the metadata and paragraphs belonging to it.</p>
 <p>Now you can extract the remaining articles or convert them to a format you prefer.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#' generate new dataframes without highly similar duplicates</span>
@@ -410,21 +410,21 @@ LNToutput
 <span class="co">#&gt;      ID Source_File Newspaper Date       Length Section Author Edition</span>
 <span class="co">#&gt;   &lt;int&gt; &lt;chr&gt;       &lt;chr&gt;     &lt;date&gt;     &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;  </span>
 <span class="co">#&gt; 1     9 /home/joha… Sunday M… 2010-01-10 446 w… NEWS; … Ross … 3 Star…</span>
-<span class="co">#&gt; # ... with 3 more variables: Headline &lt;chr&gt;, Graphic &lt;lgl&gt;, stats &lt;list&gt;</span>
+<span class="co">#&gt; # … with 3 more variables: Headline &lt;chr&gt;, Graphic &lt;lgl&gt;, stats &lt;list&gt;</span>
 <span class="co">#&gt; # A tibble: 1 x 2</span>
-<span class="co">#&gt;      ID Article                                                           </span>
-<span class="co">#&gt;   &lt;int&gt; &lt;chr&gt;                                                             </span>
-<span class="co">#&gt; 1     9 R is a programming language and free software environment for sta…</span>
+<span class="co">#&gt;      ID Article                                                            </span>
+<span class="co">#&gt;   &lt;int&gt; &lt;chr&gt;                                                              </span>
+<span class="co">#&gt; 1     9 R is a programming language and free software environment for stat…</span>
 <span class="co">#&gt; # A tibble: 7 x 3</span>
-<span class="co">#&gt;   Art_ID Par_ID Paragraph                                                 </span>
-<span class="co">#&gt;    &lt;int&gt;  &lt;int&gt; &lt;chr&gt;                                                     </span>
-<span class="co">#&gt; 1      9     67 R is a programming language and free software environment…</span>
-<span class="co">#&gt; 2      9     68 R is a GNU package. The source code for the R software en…</span>
-<span class="co">#&gt; 3      9     69 R is an implementation of the S programming language comb…</span>
-<span class="co">#&gt; 4      9     70 R was created by Ross Ihaka and Robert Gentleman at the U…</span>
-<span class="co">#&gt; 5      9     71 R and its libraries implement a wide variety of statistic…</span>
-<span class="co">#&gt; 6      9     72 Another strength of R is static graphics, which can produ…</span>
-<span class="co">#&gt; # ... with 1 more row</span></code></pre></div>
+<span class="co">#&gt;   Art_ID Par_ID Paragraph                                                  </span>
+<span class="co">#&gt;    &lt;int&gt;  &lt;int&gt; &lt;chr&gt;                                                      </span>
+<span class="co">#&gt; 1      9     67 R is a programming language and free software environment …</span>
+<span class="co">#&gt; 2      9     68 R is a GNU package. The source code for the R software env…</span>
+<span class="co">#&gt; 3      9     69 R is an implementation of the S programming language combi…</span>
+<span class="co">#&gt; 4      9     70 R was created by Ross Ihaka and Robert Gentleman at the Un…</span>
+<span class="co">#&gt; 5      9     71 R and its libraries implement a wide variety of statistica…</span>
+<span class="co">#&gt; 6      9     72 Another strength of R is static graphics, which can produc…</span>
+<span class="co">#&gt; # … with 1 more row</span></code></pre></div>
 <p>Another use of the function is to find out which versions of your keyword are in the set. You can do so by using regular expressions. The following looks for words starting with the ‘stat’, followed by more characters, up until the end of the word (the pattern internally always starts and ends at a word boundary).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">lnt_lookup</span>(LNToutput, <span class="dt">pattern =</span> <span class="st">&quot;stat.*?&quot;</span>)
 <span class="co">#&gt; $`9`</span>
