@@ -1,3 +1,11 @@
+# LexisNexisTools 0.2.1
+
+* Improved headline cleaning in lnt_read() (Edition is now removed from headline).
+* Minor bug fixes in lnt_similarity().
+* Corrected inconsistency in lnt_convert().
+* Some better error messages.
+* Updated tests for lnt_diff() .
+
 # LexisNexisTools 0.2.0
 
 * Rewrote lnt_read() to be more stable (and faster) which rendered lnt_checkFiles() unnecessary (now deprecated).

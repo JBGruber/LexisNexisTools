@@ -262,8 +262,8 @@ lnt_read <- function(x,
   articles.l <- split(articles.v, cumsum(stringi::stri_detect_regex(articles.v, start_keyword)))
   articles.l[["0"]] <- NULL
   names(articles.l) <- NULL
-  
   rm(articles.v)
+
   df.l <- lapply(articles.l, function(a) {
     len <- grep(length_keyword, a)[1]
     if (!is.na(len)) {
@@ -385,8 +385,8 @@ lnt_read <- function(x,
         section.v[i],
         edition.v[i]
       )
-      
-      remove.m <- sapply(pattern, function(p) {
+
+        remove.m <- sapply(pattern, function(p) {
         out <- stringi::stri_detect_fixed(headline, p[1])
         if (length(p) > 1) {
           out + stringi::stri_detect_fixed(headline, p[2])

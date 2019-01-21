@@ -1,7 +1,7 @@
 Package: LexisNexisTools
 Title: Working with Files from 'LexisNexis'
-Version: 0.2.1.9000
-Date: 2018-12-15
+Version: 0.2.1
+Date: 2019-01-20
 Authors@R: person("Johannes", "Gruber", email = "j.gruber.1@research.gla.ac.uk", 
   role = c("aut", "cre"))
 Description: My PhD supervisor once told me that everyone doing newspaper
