@@ -79,7 +79,7 @@ report.df <- lnt_rename(x = my_files, report = TRUE)
 report.df
 ```
 
-    ## in 0.0013 secs
+    ## in 0.0012 secs
 
 | name\_orig | name\_new                               | status  |
 |:-----------|:----------------------------------------|:--------|
@@ -107,22 +107,22 @@ LNToutput <- lnt_read(x = getwd())
 ```
 
     ## Creating LNToutput from input 1 files...
-    ##  ...files loaded [0.0012 secs]
-    ##  ...articles split [0.0075 secs]
-    ##  ...lengths extracted [0.008 secs]
-    ##  ...newspapers extracted [0.0083 secs]
+    ##  ...files loaded [0.0011 secs]
+    ##  ...articles split [0.0072 secs]
+    ##  ...lengths extracted [0.0078 secs]
+    ##  ...newspapers extracted [0.0081 secs]
     ##  ...dates extracted [0.01 secs]
     ##  ...authors extracted [0.011 secs]
     ##  ...sections extracted [0.011 secs]
-    ##  ...editions extracted [0.011 secs]
+    ##  ...editions extracted [0.012 secs]
     ##  ...headlines extracted [0.013 secs]
-    ##  ...dates converted [0.019 secs]
-    ##  ...metadata extracted [0.023 secs]
-    ##  ...article texts extracted [0.026 secs]
-    ##  ...paragraphs extracted [0.039 secs]
-    ##  ...superfluous whitespace removed from articles [0.041 secs]
-    ##  ...superfluous whitespace removed from paragraphs [0.044 secs]
-    ## Elapsed time: 0.044 secs
+    ##  ...dates converted [0.034 secs]
+    ##  ...metadata extracted [0.04 secs]
+    ##  ...article texts extracted [0.043 secs]
+    ##  ...paragraphs extracted [0.058 secs]
+    ##  ...superfluous whitespace removed from articles [0.06 secs]
+    ##  ...superfluous whitespace removed from paragraphs [0.062 secs]
+    ## Elapsed time: 0.063 secs
 
 The returned object of class `LNToutput` is intended to be an intermediate container. As it stores articles and paragraphs in two separate data.frames, nested in an S4 object, the relevant text data is stored twice in almost the same format. This has the advantage, that there is no need to use special characters, such as "\\n". However, it makes the files rather big when you save them directly.
 

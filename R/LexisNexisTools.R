@@ -1117,10 +1117,7 @@ lnt_diff <- function(x,
   if (!"lnt_sim" %in% class(x)) {
     warning("'x' should be an object returned by lnt_similarity().")
   }
-  if (!requireNamespace("diffobj", quietly = TRUE)) {
-    stop("Package \"diffobj\" is needed for this function to work. Please install it.",
-         call. = FALSE)
-  }
+  check_install("diffobj")
   if (!"rel_dist" %in% colnames(x)) {
     stop("'x' must contain a column with rel_dist information (see ?lnt_similarity)")
   }
@@ -1344,10 +1341,7 @@ lnt2tm <- function(x, what = "Articles", collapse = NULL, ...) {
   if (!what %in% c("Articles", "Paragraphs")) {
     stop("Choose either \"Articles\" or \"Paragraphs\" as what argument.")
   }
-  if (!requireNamespace("tm", quietly = TRUE)) {
-    stop("Package \"tm\" is needed for this function to work. Please install it.",
-         call. = FALSE)
-  }
+  check_install("tm")
   if (isTRUE(collapse)) {
     collapse <- "\n\n"
   } else if (is.logical(collapse) && length(collapse) == 1L && !is.na(collapse) && !collapse) {
@@ -1392,10 +1386,7 @@ lnt2cptools <- function(x, what = "Articles", collapse = NULL, ...) {
   if (!what %in% c("Articles", "Paragraphs")) {
     stop("Choose either \"Articles\" or \"Paragraphs\" as what argument.")
   }
-  if (!requireNamespace("corpustools", quietly = TRUE)) {
-    stop("Package \"corpustools\" is needed for this function to work. Please install it.",
-         call. = FALSE)
-  }
+  check_install("corpustools")
   if (isTRUE(collapse)) {
     collapse <- "\n\n"
   } else if (is.logical(collapse) && length(collapse) == 1L && !is.na(collapse) && !collapse) {
@@ -1439,10 +1430,7 @@ lnt2tidy <- function(x, what = "Articles", collapse = NULL, ...) {
   if (!what %in% c("Articles", "Paragraphs")) {
     stop("Choose either \"Articles\" or \"Paragraphs\" as what argument.")
   }
-  if (!requireNamespace("tidytext", quietly = TRUE)) {
-    stop("Package \"tidytext\" is needed for this function to work. Please install it.",
-         call. = FALSE)
-  }
+  check_install("tidytext")
   if (isTRUE(collapse)) {
     collapse <- "\n\n"
   } else if (is.logical(collapse) && length(collapse) == 1L && !is.na(collapse) && !collapse) {
@@ -1463,7 +1451,7 @@ lnt2tidy <- function(x, what = "Articles", collapse = NULL, ...) {
     tidy <- tidytext::unnest_tokens(
       tbl = df,
       input = "Article",
-      output = "Article",
+      output = "Token",
       ...
     )
   } else if (what == "Paragraphs") {
@@ -1475,7 +1463,7 @@ lnt2tidy <- function(x, what = "Articles", collapse = NULL, ...) {
     tidy <- tidytext::unnest_tokens(
       tbl = df,
       input = "Paragraph",
-      output = "Paragraph",
+      output = "Token",
       ...
     )
   }
@@ -1487,10 +1475,7 @@ lnt2tidy <- function(x, what = "Articles", collapse = NULL, ...) {
 #' @export
 #' @importFrom methods slot slotNames
 lnt2SQLite <- function(x, file = "LNT.sqlite", ...) {
-  if (!requireNamespace("RSQLite", quietly = TRUE)) {
-    stop("Package \"RSQLite\" is needed for this function to work. Please install it.",
-         call. = FALSE)
-  }
+  check_install("RSQLite")
   db <- RSQLite::dbConnect(RSQLite::SQLite(), file)
   for (i in slotNames(x)) {
     RSQLite::dbWriteTable(conn = db,
@@ -1504,6 +1489,35 @@ lnt2SQLite <- function(x, file = "LNT.sqlite", ...) {
 
 
 # Miscellaneous ------------------------------------------------------------
+
+#' Title
+#'
+#' @param pkg 
+#' 
+#' @noRd
+#'
+#' @importFrom utils install.packages menu
+check_install <- function(pkg) {
+  tested <- try(find.package(pkg), silent = TRUE)
+  if(class(tested)[1] == "try-error") {
+    if(interactive()) {
+      msg <- paste0(
+        "Package \"", 
+        pkg, 
+        "\" is needed for this function to work. ",
+        "Should I install it for you?"
+      )
+      cat(msg)
+      installChoice <- menu(c("yes", "no"))
+      if (installChoice == 1) install.packages(pkgs = pkg)
+    } else {
+      stop("Package \"", pkg, "\" is needed for this function to work.", 
+           " Please install it.",
+           call. = FALSE)
+    }
+  }
+}
+
 
 #' @title Adds or replaces articles
 #'
