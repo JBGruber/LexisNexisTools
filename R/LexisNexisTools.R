@@ -790,11 +790,10 @@ lnt_similarity <- function(texts,
                             verbose = FALSE)
   if (verbose) cat("\t...quanteda dfm construced for similarity comparison [",
                    format( (Sys.time() - start_time), digits = 2, nsmall = 2), "].", sep = "")
-  text.dfm@Dimnames$docs <- IDs
+  quanteda::docnames(text.dfm) <- as.character(IDs)
   duplicates.df <- lapply(dates.d, function(x){
     if (length(grep(x, dates)) > 1) {
-      sim <- as.matrix(quanteda::textstat_simil(text.dfm[text.dfm@Dimnames$docs %in%
-                                                           IDs[grep(x, dates)]],
+      sim <- as.matrix(quanteda::textstat_simil(text.dfm[as.character(IDs[which(dates == x)]), ],
                                                 selection = NULL,
                                                 method = "cosine",
                                                 margin = "documents"))
