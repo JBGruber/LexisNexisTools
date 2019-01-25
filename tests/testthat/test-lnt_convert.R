@@ -96,7 +96,4 @@ test_that("Test error messages", {
 
 # saveRDS(conn, "../files/SQLite.RDS")
 
-teardown(unlink(c(
-  lnt_sample(verbose = FALSE),
-  "../files/LNT.sqlite"
-)))
+teardown(unlink("../files/LNT.sqlite"))

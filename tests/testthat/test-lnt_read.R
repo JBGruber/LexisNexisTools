@@ -1,8 +1,8 @@
 context("Read sample file")
 
-files <- lnt_sample(verbose = TRUE)
-file.copy(files, paste0(files, "2.TXT"))
-files <- c(files, paste0(files, "2.TXT"))
+files <- system.file("extdata", "sample.TXT", package = "LexisNexisTools")
+file.copy(files, paste0(basename(files), "2.TXT"))
+files <- c(files, paste0(basename(files), "2.TXT"))
 
 test_that("Read in sample file(2)", {
   expect_equal({
@@ -29,4 +29,4 @@ test_that("Read in sample file(2)", {
   }, readRDS("../files/LNToutput2.RDS"))
 })
 
-teardown(unlink(files))
+teardown(unlink(files[2]))

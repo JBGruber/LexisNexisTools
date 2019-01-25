@@ -1,10 +1,13 @@
 context("Display diff")
 library(LexisNexisTools)
 
-duplicates.df <- lnt_similarity(LNToutput = lnt_read(lnt_sample(verbose = FALSE),
-                                                     verbose = FALSE),
-                                threshold = 0.95,
-                                verbose = FALSE)
+duplicates.df <- lnt_similarity(
+  LNToutput = lnt_read(system.file("extdata", "sample.TXT", 
+                                   package = "LexisNexisTools"),
+                       verbose = FALSE),
+  threshold = 0.95,
+  verbose = FALSE
+)
 
 test_that("Show method", {
   expect_known_output(object = lnt_diff(duplicates.df,
@@ -31,5 +34,3 @@ test_that("lnt_diff warnings and errors", {
   },
   "'x' should be an object returned by lnt_similarity().")
 })
-
-teardown(unlink(lnt_sample(verbose = FALSE)))
