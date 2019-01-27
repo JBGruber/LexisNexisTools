@@ -1,3 +1,8 @@
+# LexisNexisTools 0.2.2
+
+* Minor bug fixes in lnt_similarity().
+* Improved way of telling users about missing packages (can now be installed directly).
+
 # LexisNexisTools 0.2.1
 
 * Improved headline cleaning in lnt_read() (Edition is now removed from headline).

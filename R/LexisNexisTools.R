@@ -1502,8 +1502,8 @@ lnt2SQLite <- function(x, file = "LNT.sqlite", ...) {
 #' @importFrom utils install.packages menu
 check_install <- function(pkg) {
   tested <- try(find.package(pkg), silent = TRUE)
-  if(class(tested)[1] == "try-error") {
-    if(interactive()) {
+  if (class(tested)[1] == "try-error") {
+    if (interactive()) {
       msg <- paste0(
         "Package \"",
         pkg,
@@ -1511,8 +1511,8 @@ check_install <- function(pkg) {
         "Should I install it for you?"
       )
       cat(msg)
-      installChoice <- menu(c("yes", "no"))
-      if (installChoice == 1) install.packages(pkgs = pkg)
+      installchoice <- menu(c("yes", "no"))
+      if (installchoice == 1) install.packages(pkgs = pkg)
     } else {
       stop("Package \"", pkg, "\" is needed for this function to work.",
            " Please install it.",

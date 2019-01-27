@@ -1,5 +1,5 @@
 ## Update Summary
-I decided to submit this update as some tests were failing on (https://cran.r-project.org/web/checks/check_results_LexisNexisTools.html) due to an update to package `diffobj`.
+Even though the last version is only a week old, this release is neccessary as changes in `quanteda` broke one of the functions [see](https://github.com/quanteda/quanteda/issues/1572). The release solves this problem and uses `quanteda`'s functions a little more consistently.
 
 ## Test environments
 * win-builder.r-project.org, R-release, R-oldrelease
@@ -10,5 +10,6 @@ I decided to submit this update as some tests were failing on (https://cran.r-pr
 
 ## R CMD check results
 There were no ERRORs or WARNINGs.
-There were two NOTEs on win-builder.r-project.org R-oldrelease, both stating that running examples for lnt_diff() took more than 10s to run (12.32s on 'i386' and 13.68 on 'x64').
+There was one NOTE: "Days since last update: 6" (see above for explanation).
+There were two NOTEs on win-builder.r-project.org R-oldrelease, both stating that running examples for lnt_diff() took more than 10s to run (18s on 'i386' and 19s on 'x64').
 On the other test environments this was not the case.

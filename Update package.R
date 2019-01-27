@@ -58,3 +58,12 @@ system("R CMD Rd2pdf ../LexisNexisTools")
 
 ## build vignette
 knitr::knit("README.Rmd")
+
+# For release on CRAN
+## test on winbuilder
+devtools::check_win_devel()
+devtools::check_win_oldrelease()
+devtools::check_win_release()
+
+## release
+devtools::release()
