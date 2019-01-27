@@ -41,6 +41,8 @@ Suggests:
     spelling
 Encoding: UTF-8
 LazyData: true
+URL: https://github.com/JBGruber/LexisNexisTools
+BugReports: https://github.com/JBGruber/LexisNexisTools/issues
 RoxygenNote: 6.1.1
 VignetteBuilder: knitr
 Language: en-GB
