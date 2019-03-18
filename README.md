@@ -53,20 +53,20 @@ lnt_sample()
 
 ### Rename Files
 
-'LexisNexis' does not give the TXT files proper names. The function `lnt_rename()` renames files to a standard format: "searchTerm\_startDate-endDate\_documentRange.txt" (e.g., "Obama\_20091201-20100511\_1-500.txt"). Note, that this will not work if your TXT files lack a cover page with this information. Currently, it seems, like 'LexisNexis' only delivers those cover pages when you first create a link to your search ("link to this search" on the results page), follow this link, and then download the TXT files from there. If you do not want to rename files, you can skip to the next section. The rest of the package's functionality stays untouched by whether you rename your files or not. However, in a larger database, you will profit from a consistent naming scheme.
+'LexisNexis' does not give the TXT files proper names. The function `lnt_rename()` renames files to a standard format: "searchTerm\_startDate-endDate\_documentRange.txt" (e.g., "Obama\_20091201-20100511\_1-500.txt"). Note, that this will not work if your TXT files lack a cover page with this information. Currently, it seems, like 'LexisNexis' only delivers those cover pages when you first create a link to your search ("link to this search" on the results page), follow this link, and then download the TXT files from there (see here for a [visual explanation](https://github.com/JBGruber/LexisNexisTools/wiki/Downloading-from-nexis)). If you do not want to rename files, you can skip to the next section. The rest of the package's functionality stays untouched by whether you rename your files or not. However, in a larger database, you will profit from a consistent naming scheme.
 
 There are three ways in which you can rename the files:
 
 -   Run lnt\_rename() directly in your working directory without the x argument, which will prompt an option to scan for TXT files in your current working directory:
 
 ``` r
-report.df <- lnt_rename()
+report <- lnt_rename()
 ```
 
 -   Provide a folder path (and set `recursive = TRUE` if you want to scan for files recursively):
 
 ``` r
-report.df <- lnt_rename(x = getwd(), report = TRUE)
+report <- lnt_rename(x = getwd(), report = TRUE)
 ```
 
 -   Provide a character object with file names. Use `list.files()` to search for files in a certain path.
@@ -74,12 +74,10 @@ report.df <- lnt_rename(x = getwd(), report = TRUE)
 ``` r
 my_files <- list.files(pattern = ".txt", path = getwd(),
                        full.names = TRUE, recursive = TRUE, ignore.case = TRUE)
-report.df <- lnt_rename(x = my_files, report = TRUE)
+report <- lnt_rename(x = my_files, report = TRUE)
 
-report.df
+report
 ```
-
-    ## in 0.0012 secs
 
 | name\_orig | name\_new                               | status  |
 |:-----------|:----------------------------------------|:--------|

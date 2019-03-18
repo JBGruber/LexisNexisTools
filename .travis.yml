@@ -18,6 +18,7 @@ matrix:
 
 before_install:
     - Rscript -e 'install.packages(c("devtools", "quanteda"))' # needs to be installed for every version separatly
+    - Rscript -e 'remotes::install_version("statnet.common", version = "4.1.4")' # oldrel needs a special version
 
 r_github_packages:
     - r-lib/covr

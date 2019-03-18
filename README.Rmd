@@ -56,7 +56,7 @@ lnt_sample()
 'LexisNexis' does not give the TXT files proper names.
 The function `lnt_rename()` renames files to a standard format: "searchTerm_startDate-endDate_documentRange.txt" (e.g., "Obama_20091201-20100511_1-500.txt").
 Note, that this will not work if your TXT files lack a cover page with this information.
-Currently, it seems, like 'LexisNexis' only delivers those cover pages when you first create a link to your search ("link to this search" on the results page), follow this link, and then download the TXT files from there.
+Currently, it seems, like 'LexisNexis' only delivers those cover pages when you first create a link to your search ("link to this search" on the results page), follow this link, and then download the TXT files from there (see here for a [visual explanation](https://github.com/JBGruber/LexisNexisTools/wiki/Downloading-from-nexis)).
 If you do not want to rename files, you can skip to the next section.
 The rest of the package's functionality stays untouched by whether you rename your files or not.
 However, in a larger database, you will profit from a consistent naming scheme.
@@ -66,13 +66,13 @@ There are three ways in which you can rename the files:
  - Run lnt_rename() directly in your working directory without the x argument, which will prompt an option to scan for TXT files in your current working directory:
 
 ```{r, eval=FALSE}
-report.df <- lnt_rename()
+report <- lnt_rename()
 ```
 
  - Provide a folder path (and set `recursive = TRUE` if you want to scan for files recursively):
 
 ```{r, eval=FALSE}
-report.df <- lnt_rename(x = getwd(), report = TRUE)
+report <- lnt_rename(x = getwd(), report = TRUE)
 ```
 
  - Provide a character object with file names.
@@ -81,18 +81,18 @@ Use `list.files()` to search for files in a certain path.
 ```{r, eval=FALSE}
 my_files <- list.files(pattern = ".txt", path = getwd(),
                        full.names = TRUE, recursive = TRUE, ignore.case = TRUE)
-report.df <- lnt_rename(x = my_files, report = TRUE)
+report <- lnt_rename(x = my_files, report = TRUE)
 
-report.df
+report
 ```
 
 ```{r, echo=FALSE}
 library(kableExtra)
 unlink("SampleFile_20091201-20100511_1-10.txt")
-report.df <- lnt_rename(x = lnt_sample(overwrite = TRUE), simulate = FALSE, report = TRUE, verbose = FALSE)
-report.df$name_orig <- basename(report.df$name_orig)
-report.df$name_new <- basename(report.df$name_new)
-kable(report.df, format = "markdown")
+report <- lnt_rename(x = lnt_sample(overwrite = TRUE), simulate = FALSE, report = TRUE, verbose = FALSE)
+report$name_orig <- basename(report$name_orig)
+report$name_new <- basename(report$name_new)
+kable(report, format = "markdown")
 ```
 
 Using `list.files()` instead of the built-in mechanism allows you to specify a file pattern.

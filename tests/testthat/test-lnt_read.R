@@ -29,4 +29,14 @@ test_that("Read in sample file(2)", {
   }, readRDS("../files/LNToutput2.RDS"))
 })
 
-teardown(unlink(files[2]))
+test_that("no articles found", {
+  expect_error({
+    writeLines("", "../files/emtpy.txt")
+    lnt_read("../files/emtpy.txt", verbose = FALSE, extract_paragraphs = FALSE)
+  }, "No articles found in provided file(s)", fixed = TRUE)
+})
+
+teardown(unlink(c(
+  files[2],
+  "../files/emtpy.txt"
+)))

@@ -12,7 +12,7 @@
 
 <meta name="author" content="Johannes B. Gruber" />
 
-<meta name="date" content="2019-01-22" />
+<meta name="date" content="2019-03-18" />
 
 <title>Basic Usage</title>
 
@@ -92,7 +92,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Basic Usage</h1>
 <h4 class="author"><em>Johannes B. Gruber</em></h4>
-<h4 class="date"><em>2019-01-22</em></h4>
+<h4 class="date"><em>2019-03-18</em></h4>
 
 
 
@@ -114,25 +114,24 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </div>
 <div id="rename-files" class="section level3">
 <h3>Rename Files</h3>
-<p>‘LexisNexis’ does not give the TXT files proper names. The function <code>lnt_rename()</code> renames files to a standard format: “searchTerm_startDate-endDate_documentRange.txt” (e.g., “Obama_20091201-20100511_1-500.txt”). Note, that this will not work if your TXT files lack a cover page with this information. Currently, it seems, like ‘LexisNexis’ only delivers those cover pages when you first create a link to your search (“link to this search” on the results page), follow this link, and then download the TXT files from there. If you do not want to rename files, you can skip to the next section. The rest of the package’s functionality stays untouched by whether you rename your files or not. However, in a larger database, you will profit from a consistent naming scheme.</p>
+<p>‘LexisNexis’ does not give the TXT files proper names. The function <code>lnt_rename()</code> renames files to a standard format: “searchTerm_startDate-endDate_documentRange.txt” (e.g., “Obama_20091201-20100511_1-500.txt”). Note, that this will not work if your TXT files lack a cover page with this information. Currently, it seems, like ‘LexisNexis’ only delivers those cover pages when you first create a link to your search (“link to this search” on the results page), follow this link, and then download the TXT files from there (see here for a <a href="https://github.com/JBGruber/LexisNexisTools/wiki/Downloading-from-nexis">visual explanation</a>). If you do not want to rename files, you can skip to the next section. The rest of the package’s functionality stays untouched by whether you rename your files or not. However, in a larger database, you will profit from a consistent naming scheme.</p>
 <p>There are three ways in which you can rename the files:</p>
 <ul>
 <li>Run lnt_rename() directly in your working directory without the x argument, which will prompt an option to scan for TXT files in your current working directory:</li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">report.df &lt;-<span class="st"> </span><span class="kw">lnt_rename</span>()</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">report &lt;-<span class="st"> </span><span class="kw">lnt_rename</span>()</code></pre></div>
 <ul>
 <li>Provide a folder path (and set <code>recursive = TRUE</code> if you want to scan for files recursively):</li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">report.df &lt;-<span class="st"> </span><span class="kw">lnt_rename</span>(<span class="dt">x =</span> <span class="kw">getwd</span>(), <span class="dt">report =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">report &lt;-<span class="st"> </span><span class="kw">lnt_rename</span>(<span class="dt">x =</span> <span class="kw">getwd</span>(), <span class="dt">report =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <ul>
 <li>Provide a character object with file names. Use <code>list.files()</code> to search for files in a certain path.</li>
 </ul>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_files &lt;-<span class="st"> </span><span class="kw">list.files</span>(<span class="dt">pattern =</span> <span class="st">&quot;.txt&quot;</span>, <span class="dt">path =</span> <span class="kw">getwd</span>(),
                        <span class="dt">full.names =</span> <span class="ot">TRUE</span>, <span class="dt">recursive =</span> <span class="ot">TRUE</span>, <span class="dt">ignore.case =</span> <span class="ot">TRUE</span>)
-report.df &lt;-<span class="st"> </span><span class="kw">lnt_rename</span>(<span class="dt">x =</span> my_files, <span class="dt">report =</span> <span class="ot">TRUE</span>)
+report &lt;-<span class="st"> </span><span class="kw">lnt_rename</span>(<span class="dt">x =</span> my_files, <span class="dt">report =</span> <span class="ot">TRUE</span>)
 
-report.df</code></pre></div>
-<pre><code>#&gt; in 0.001 secs</code></pre>
+report</code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -167,21 +166,21 @@ report.df</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">LNToutput &lt;-<span class="st"> </span><span class="kw">lnt_read</span>(<span class="dt">x =</span> <span class="kw">getwd</span>())
 <span class="co">#&gt; Creating LNToutput from input 1 files...</span>
 <span class="co">#&gt;  ...files loaded [0.0011 secs]</span>
-<span class="co">#&gt;  ...articles split [0.0075 secs]</span>
-<span class="co">#&gt;  ...lengths extracted [0.008 secs]</span>
-<span class="co">#&gt;  ...newspapers extracted [0.0083 secs]</span>
-<span class="co">#&gt;  ...dates extracted [0.01 secs]</span>
-<span class="co">#&gt;  ...authors extracted [0.011 secs]</span>
-<span class="co">#&gt;  ...sections extracted [0.011 secs]</span>
-<span class="co">#&gt;  ...editions extracted [0.012 secs]</span>
-<span class="co">#&gt;  ...headlines extracted [0.013 secs]</span>
-<span class="co">#&gt;  ...dates converted [0.016 secs]</span>
-<span class="co">#&gt;  ...metadata extracted [0.018 secs]</span>
-<span class="co">#&gt;  ...article texts extracted [0.021 secs]</span>
-<span class="co">#&gt;  ...paragraphs extracted [0.026 secs]</span>
-<span class="co">#&gt;  ...superfluous whitespace removed from articles [0.029 secs]</span>
-<span class="co">#&gt;  ...superfluous whitespace removed from paragraphs [0.031 secs]</span>
-<span class="co">#&gt; Elapsed time: 0.031 secs</span></code></pre></div>
+<span class="co">#&gt;  ...articles split [0.0081 secs]</span>
+<span class="co">#&gt;  ...lengths extracted [0.0087 secs]</span>
+<span class="co">#&gt;  ...newspapers extracted [0.009 secs]</span>
+<span class="co">#&gt;  ...dates extracted [0.011 secs]</span>
+<span class="co">#&gt;  ...authors extracted [0.012 secs]</span>
+<span class="co">#&gt;  ...sections extracted [0.012 secs]</span>
+<span class="co">#&gt;  ...editions extracted [0.013 secs]</span>
+<span class="co">#&gt;  ...headlines extracted [0.014 secs]</span>
+<span class="co">#&gt;  ...dates converted [0.018 secs]</span>
+<span class="co">#&gt;  ...metadata extracted [0.02 secs]</span>
+<span class="co">#&gt;  ...article texts extracted [0.023 secs]</span>
+<span class="co">#&gt;  ...paragraphs extracted [0.028 secs]</span>
+<span class="co">#&gt;  ...superfluous whitespace removed from articles [0.031 secs]</span>
+<span class="co">#&gt;  ...superfluous whitespace removed from paragraphs [0.034 secs]</span>
+<span class="co">#&gt; Elapsed time: 0.034 secs</span></code></pre></div>
 <p>The returned object of class <code>LNToutput</code> is intended to be an intermediate container. As it stores articles and paragraphs in two separate data.frames, nested in an S4 object, the relevant text data is stored twice in almost the same format. This has the advantage, that there is no need to use special characters, such as “\n”. However, it makes the files rather big when you save them directly.</p>
 <p>The object can, however, be easily converted to regular data.frames using <code>@</code> to select the data.frame you want:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">meta.df &lt;-<span class="st"> </span>LNToutput<span class="op">@</span>meta

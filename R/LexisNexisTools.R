@@ -191,7 +191,7 @@ lnt_read <- function(x,
                      convert_date = TRUE,
                      start_keyword = "auto",
                      end_keyword = "auto",
-                     length_keyword = "^LENGTH: |^L\u00c4NGE: |^LONGUEUR: ",
+                     length_keyword = "auto",
                      exclude_lines = "^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIC: |^DATELINE: ",
                      recursive = FALSE,
                      verbose = TRUE,
@@ -229,7 +229,7 @@ lnt_read <- function(x,
     stop("Provide either file name(s) ending on '.txt' or folder name(s) to x or leave black to search wd.")
   }
   if (start_keyword == "auto") {
-    start_keyword <- "\\d+ of \\d+ DOCUMENTS$| Dokument \\d+ von \\d+$| Document \\d+ de \\d+$"
+    start_keyword <- "\\d+ of \\d+ DOCUMENTS$|\\d+ of \\d+ DOCUMENT$| Dokument \\d+ von \\d+$| Document \\d+ de \\d+$"
   }
   if (end_keyword == "auto") {
     end_keyword <- "^LANGUAGE: |^SPRACHE: |^LANGUE: "
@@ -263,6 +263,10 @@ lnt_read <- function(x,
   articles.l[["0"]] <- NULL
   names(articles.l) <- NULL
   rm(articles.v)
+
+  if (length(articles.l) == 0) {
+    stop("No articles found in provided file(s)")
+  }
 
   df.l <- lapply(articles.l, function(a) {
     len <- grep(length_keyword, a)[1]
@@ -661,8 +665,14 @@ lnt_rename <- function(x,
     cat(sum(grepl("empty", renamed$status, fixed = TRUE)), "not renamed (no search term or time range found), ")
   }
   renamed$status <- as.factor(renamed$status)
-  cat("in", format( (Sys.time() - start_time), digits = 2, nsmall = 2), if (simulate) "[changes were only simulated]")
-  if (report) renamed
+  elapsed <- Sys.time() - start_time
+  if (verbose) {
+    cat(
+      "in", format(elapsed, digits = 2, nsmall = 2), 
+      if (simulate) "[changes were only simulated]"
+    )
+  }
+  if (report) return(renamed)
 }
 
 
