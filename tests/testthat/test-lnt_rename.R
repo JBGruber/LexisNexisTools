@@ -14,7 +14,7 @@ test_that("Rename Sample", {
     file$name_new
     file.exists(file$name_new)
   }, TRUE)
-  expect_message({
+  expect_warning({
     files <- list.files()
     x <- lnt_rename(files, simulate = TRUE, verbose = FALSE)
   }, "Not all provided files were TXT files. Other formats are ignored.")

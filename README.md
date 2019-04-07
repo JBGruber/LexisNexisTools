@@ -104,23 +104,23 @@ To use the function, you can again provide either file name(s), folder name(s) o
 LNToutput <- lnt_read(x = getwd())
 ```
 
-    ## Creating LNToutput from input 1 files...
-    ##  ...files loaded [0.0011 secs]
-    ##  ...articles split [0.0072 secs]
-    ##  ...lengths extracted [0.0078 secs]
-    ##  ...newspapers extracted [0.0081 secs]
-    ##  ...dates extracted [0.01 secs]
-    ##  ...authors extracted [0.011 secs]
-    ##  ...sections extracted [0.011 secs]
-    ##  ...editions extracted [0.012 secs]
-    ##  ...headlines extracted [0.013 secs]
-    ##  ...dates converted [0.034 secs]
-    ##  ...metadata extracted [0.04 secs]
-    ##  ...article texts extracted [0.043 secs]
-    ##  ...paragraphs extracted [0.058 secs]
-    ##  ...superfluous whitespace removed from articles [0.06 secs]
-    ##  ...superfluous whitespace removed from paragraphs [0.062 secs]
-    ## Elapsed time: 0.063 secs
+    ## Creating LNToutput from 1 file...
+    ##  ...files loaded [0.0016 secs]
+    ##  ...articles split [0.0089 secs]
+    ##  ...lengths extracted [0.0097 secs]
+    ##  ...newspapers extracted [0.01 secs]
+    ##  ...dates extracted [0.012 secs]
+    ##  ...authors extracted [0.013 secs]
+    ##  ...sections extracted [0.014 secs]
+    ##  ...editions extracted [0.014 secs]
+    ##  ...headlines extracted [0.016 secs]
+    ##  ...dates converted [0.023 secs]
+    ##  ...metadata extracted [0.026 secs]
+    ##  ...article texts extracted [0.029 secs]
+    ##  ...paragraphs extracted [0.041 secs]
+    ##  ...superfluous whitespace removed from articles [0.044 secs]
+    ##  ...superfluous whitespace removed from paragraphs [0.046 secs]
+    ## Elapsed time: 0.047 secs
 
 The returned object of class `LNToutput` is intended to be an intermediate container. As it stores articles and paragraphs in two separate data.frames, nested in an S4 object, the relevant text data is stored twice in almost the same format. This has the advantage, that there is no need to use special characters, such as "\\n". However, it makes the files rather big when you save them directly.
 
@@ -251,6 +251,17 @@ duplicates.df <- lnt_similarity(texts = LNToutput@articles$Article,
                                 IDs = LNToutput@articles$ID,
                                 threshold = 0.97)
 ```
+
+    ## Checking similiarity for 10 articles over 4 dates...
+
+    ##  ...quanteda dfm construced for similarity comparison [0.067 secs].
+
+    ## 
+        ...processing date 2010-01-08: 0 duplicates found [0.068 secs].         
+        ...processing date 2010-01-09: 0 duplicates found [0.068 secs].         
+        ...processing date 2010-01-10: 0 duplicates found [0.31 secs].      
+        ...processing date 2010-01-11: 5 duplicates found [3.32 secs].      
+    ## Threshold = 0.97; 4 days processed; 5 duplicates found; in 3.32 secs
 
 Now you can inspect the results using the function `lnt_diff()`:
 

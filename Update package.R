@@ -30,6 +30,7 @@ goodpractice::gp()
 ## Check spelling
 spelling::spell_check_package()
 spelling::update_wordlist()
+spelling::spell_check_files("README.Rmd", ignore = readLines("./inst/WORDLIST"), lang = "en-GB")
 
 ## Update Citation
 update_citation <- function() {

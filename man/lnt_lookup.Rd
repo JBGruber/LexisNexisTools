@@ -49,8 +49,10 @@ If an LNToutput object is provided, the function will look for the
 LNToutput <- lnt_read(lnt_sample())
 
 # Lookup keywords
-LNToutput@meta$Keyword <- lnt_lookup(LNToutput,
-                                     "statistical computing")
+LNToutput@meta$Keyword <- lnt_lookup(
+  LNToutput,
+  "statistical computing"
+)
 
 # Keep only articles which mention the keyword
 LNToutput_stat <- LNToutput[!sapply(LNToutput@meta$Keyword, is.null)]

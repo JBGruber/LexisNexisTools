@@ -14,10 +14,12 @@ LNToutput@meta$Source_File <- basename(LNToutput@meta$Source_File)
 # })
 
 test_that("Plus operator", {
-  expect_length({
-    test <- LNToutput + LNToutput
-    test@meta$ID
-  }, n = 20)
+  expect_warning({
+    expect_length({
+      test <- LNToutput + LNToutput
+      test@meta$ID
+    }, n = 20)
+  }, "After objects were merged, there were duplicated IDs. This was fixed.")
 })
 
 test_that("Subset method", {
