@@ -202,42 +202,9 @@ lnt_read <- function(x,
                      recursive = FALSE,
                      verbose = TRUE,
                      ...) {
-  if (missing(x)) {
-    if (readline(prompt = "No path was given. Should files in working directory be read? [y/n]")
-    %in% c("y", "yes", "Y", "Yes")) {
-      x <- paste0(getwd(), "/")
-    } else {
-      stop("Aborted by user")
-    }
-  }
-  if (all(grepl(".txt$", x, ignore.case = TRUE))) {
-    files <- x
-  } else if (any(grepl(".txt$", x, ignore.case = TRUE))) {
-    warning("Not all provided files were TXT files. Other formats are ignored.")
-    files <- grep(".txt$", x, ignore.case = TRUE, value = TRUE)
-  } else if (any(grepl("\\\\|/", x))) {
-    if (length(x) > 1) {
-      files <- unlist(lapply(x, function(f) {
-        list.files(
-          path = f,
-          pattern = ".txt$",
-          ignore.case = TRUE,
-          full.names = TRUE,
-          recursive = recursive
-        )
-      }))
-    } else {
-      files <- list.files(
-        path = x,
-        pattern = ".txt$",
-        ignore.case = TRUE,
-        full.names = TRUE,
-        recursive = recursive
-      )
-    }
-  } else {
-    stop("Provide either file name(s) ending on '.txt' or folder name(s) to x or leave black to search wd.")
-  }
+  
+  files <- get_files(x, recursive = recursive)
+  
   if (start_keyword == "auto") {
     start_keyword <- "\\d+ of \\d+ DOCUMENTS$|\\d+ of \\d+ DOCUMENT$| Dokument \\d+ von \\d+$| Document \\d+ de \\d+$"
   }
@@ -696,46 +663,7 @@ lnt_rename <- function(x,
                        report = TRUE,
                        simulate = TRUE,
                        verbose = FALSE) {
-  # Check how files are provided
-  # 1. nothing (search wd)
-  # 2. txt file or files
-  # 3. folder name(s)
-  if (missing(x)) {
-    if (readline(prompt = "No path was given. Should files in working directory be renamed? [y/n]")
-    %in% c("y", "yes", "Y", "Yes")) {
-      x <- paste0(getwd(), "/")
-    } else {
-      stop("Aborted by user")
-    }
-  }
-  if (all(grepl(".txt$", x, ignore.case = TRUE))) {
-    files <- x
-  } else if (any(grepl(".txt$", x, ignore.case = TRUE))) {
-    warning("Not all provided files were TXT files. Other formats are ignored.")
-    files <- grep(".txt$", x, ignore.case = TRUE, value = TRUE)
-  } else if (any(grepl("\\\\|/", x))) {
-    if (length(x) > 1) {
-      files <- unlist(sapply(x, USE.NAMES = FALSE, function(f) {
-        list.files(
-          path = f,
-          pattern = ".txt$",
-          ignore.case = TRUE,
-          full.names = TRUE,
-          recursive = recursive
-        )
-      }))
-    } else {
-      files <- list.files(
-        path = x,
-        pattern = ".txt$",
-        ignore.case = TRUE,
-        full.names = TRUE,
-        recursive = recursive
-      )
-    }
-  } else {
-    stop("Provide either file name(s) ending on '.txt' or folder name(s) to x or leave black to search wd.")
-  }
+  files <- get_files(x)
   # Track the time
   start_time <- Sys.time()
   if (verbose) message("Checking LN files...")
@@ -1963,3 +1891,84 @@ trim <- function(object, n, e = "...") {
     object
   )
 }
+
+#' Get files
+#'
+#' Internal function, used to find input files
+#'
+#' @param x character, name or names of file(s) or folder(s) to be searched.
+#' @param pattern file pattern to be searched
+#' @param recursive logical. Should the listing recurse into directories?
+#' @param ignore_case logical. Should pattern-matching be case-insensitive?
+#'
+#' @importFrom stringi stri_replace_all_fixed
+#'
+#' @noRd
+#' @author Johannes B. Gruber
+#' 
+get_files <- function(x,
+                      pattern = ".txt$",
+                      recursive = TRUE,
+                      ignore_case = TRUE) {
+  # Check how files are provided
+  # 1. nothing (search wd)
+  # 2. txt file or files
+  # 3. folder name(s)
+  if (missing(x)) {
+    message("No path was given. Should files",
+            "in working directory be renamed? [y/n]")
+    if (menu(c("yes", "no")) == 1) {
+      x <- getwd()
+    } else {
+      stop("Aborted by user")
+    }
+  }
+  if (all(grepl(pattern, x, ignore.case = ignore_case))) {
+    files <- x
+  } else if (any(grepl(pattern, x, ignore.case = ignore_case))) {
+    warning("Not all provided files were TXT files. Other formats are ignored.")
+    files <- grep(pattern, x, ignore.case = ignore_case, value = TRUE)
+  } else if (any(dir.exists(x))) {
+    if (length(x) > 1) {
+      files <- unlist(sapply(x, USE.NAMES = FALSE, function(f) {
+        list.files(
+          path = f,
+          pattern = pattern,
+          ignore.case = ignore_case,
+          full.names = TRUE,
+          recursive = recursive
+        )
+      }))
+    } else {
+      files <- list.files(
+        path = x,
+        pattern = pattern,
+        ignore.case = ignore_case,
+        full.names = TRUE,
+        recursive = recursive
+      )
+    }
+  } else {
+    stop("Provide either file name(s) ending on ",
+         stri_replace_all_fixed(
+           pattern,
+           c("$", "|"),
+           c("", "or"),
+           vectorize_all = FALSE
+         ), 
+         " or folder name(s) to x or leave black to search wd.")
+  }
+  if (length(files) > 0) {
+    return(files)
+  } else {
+    stop("No ",
+         stri_replace_all_fixed(
+           pattern,
+           c("$", "|"),
+           c("", "or"),
+           vectorize_all = FALSE
+         ), 
+         " files found.")
+  }
+}
+

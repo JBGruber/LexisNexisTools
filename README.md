@@ -53,7 +53,7 @@ lnt_sample()
 
 ### Rename Files
 
-'LexisNexis' does not give the TXT files proper names. The function `lnt_rename()` renames files to a standard format: "searchTerm\_startDate-endDate\_documentRange.txt" (e.g., "Obama\_20091201-20100511\_1-500.txt"). Note, that this will not work if your TXT files lack a cover page with this information. Currently, it seems, like 'LexisNexis' only delivers those cover pages when you first create a link to your search ("link to this search" on the results page), follow this link, and then download the TXT files from there (see here for a [visual explanation](https://github.com/JBGruber/LexisNexisTools/wiki/Downloading-from-nexis)). If you do not want to rename files, you can skip to the next section. The rest of the package's functionality stays untouched by whether you rename your files or not. However, in a larger database, you will profit from a consistent naming scheme.
+'LexisNexis' does not give the TXT files proper names. The function `lnt_rename()` renames files to a standard format: "searchTerm\_startDate-endDate\_documentRange.txt" (e.g., "Obama\_20091201-20100511\_1-500.txt"). Note, that this will not work if your TXT files lack a cover page with this information. Currently, it seems, like 'LexisNexis' only delivers those cover pages when you first create a link to your search ("link to this search" on the results page), follow this link, and then download the TXT files from there (see here for a [visual explanation](https://github.com/JBGruber/LexisNexisTools/wiki/Downloading-TXT-Files-From-Nexis)). If you do not want to rename files, you can skip to the next section. The rest of the package's functionality stays untouched by whether you rename your files or not. However, in a larger database, you will profit from a consistent naming scheme.
 
 There are three ways in which you can rename the files:
 
@@ -127,12 +127,12 @@ The returned object of class `LNToutput` is intended to be an intermediate conta
 The object can, however, be easily converted to regular data.frames using `@` to select the data.frame you want:
 
 ``` r
-meta.df <- LNToutput@meta
-articles.df <- LNToutput@articles
-paragraphs.df <- LNToutput@paragraphs
+meta_df <- LNToutput@meta
+articles_df <- LNToutput@articles
+paragraphs_df <- LNToutput@paragraphs
 
 # Print meta to get an idea of the data
-head(meta.df, n = 3)
+head(meta_df, n = 3)
 ```
 
 <table>
@@ -206,12 +206,12 @@ If you want to keep only one data.frame including metadata and text data you can
 
 ``` r
 library("dplyr")
-meta_articles.df <- meta.df %>%
-  right_join(articles.df, by = "ID")
+meta_articles_df <- meta_df %>%
+  right_join(articles_df, by = "ID")
 
 # Or keep the paragraphs
-meta_paragraphs.df <- meta.df %>%
-  right_join(paragraphs.df, by = c("ID" = "Art_ID"))
+meta_paragraphs_df <- meta_df %>%
+  right_join(paragraphs_df, by = c("ID" = "Art_ID"))
 ```
 
 Alternatively, you can convert LNToutput objects to formats common in other packages using the function `lnt_convert`:
@@ -230,7 +230,7 @@ Corpus <- lnt_convert(LNToutput, to = "tm")
 dbloc <- lnt_convert(LNToutput, to = "lnt2SQLite")
 ```
 
-See `?lnt_convert` for details and pleas comment in [this issue](https://github.com/JBGruber/LexisNexisTools/issues/2) if you want a format added to the convert function.
+See `?lnt_convert` for details and comment in [this issue](https://github.com/JBGruber/LexisNexisTools/issues/2) if you want a format added to the convert function.
 
 ### Identify Highly Similar Articles
 
@@ -240,33 +240,30 @@ The function `lnt_similarity()` combines the fast similarity measure from [quant
 
 ``` r
 # Either provide a LNToutput
-duplicates.df <- lnt_similarity(LNToutput = LNToutput,
+duplicates_df <- lnt_similarity(LNToutput = LNToutput,
                                 threshold = 0.97)
 ```
 
 ``` r
 # Or the important parts separatley
-duplicates.df <- lnt_similarity(texts = LNToutput@articles$Article,
+duplicates_df <- lnt_similarity(texts = LNToutput@articles$Article,
                                 dates = LNToutput@meta$Date,
                                 IDs = LNToutput@articles$ID,
                                 threshold = 0.97)
 ```
 
     ## Checking similiarity for 10 articles over 4 dates...
-
-    ##  ...quanteda dfm construced for similarity comparison [0.067 secs].
-
-    ## 
-        ...processing date 2010-01-08: 0 duplicates found [0.068 secs].         
-        ...processing date 2010-01-09: 0 duplicates found [0.068 secs].         
-        ...processing date 2010-01-10: 0 duplicates found [0.31 secs].      
-        ...processing date 2010-01-11: 5 duplicates found [3.32 secs].      
-    ## Threshold = 0.97; 4 days processed; 5 duplicates found; in 3.32 secs
+    ##  ...quanteda dfm construced for similarity comparison [0.063 secs].
+    ##  ...processing date 2010-01-08: 0 duplicates found [0.064 secs].         
+    ##  ...processing date 2010-01-09: 0 duplicates found [0.064 secs].         
+    ##  ...processing date 2010-01-10: 0 duplicates found [0.25 secs].      
+    ##  ...processing date 2010-01-11: 5 duplicates found [3.05 secs].      
+    ## Threshold = 0.97; 4 days processed; 5 duplicates found; in 3.05 secs
 
 Now you can inspect the results using the function `lnt_diff()`:
 
 ``` r
-lnt_diff(duplicates.df, min = 0, max = Inf)
+lnt_diff(duplicates_df, min = 0, max = Inf)
 ```
 
 <p align="center">
@@ -274,11 +271,11 @@ lnt_diff(duplicates.df, min = 0, max = Inf)
 </p>
 By default, 25 randomly selected articles are displayed one after another, ordered by least to most different within the min and max limits.
 
-After you have chosen a good cut-off value, you can subset the `duplicates.df` data.frame and remove the respective articles:
+After you have chosen a good cut-off value, you can subset the `duplicates_df` data.frame and remove the respective articles:
 
 ``` r
-duplicates.df <- duplicates.df[duplicates.df$rel_dist < 0.2]
-LNToutput <- LNToutput[!LNToutput@meta$ID %in% duplicates.df$ID_duplicate, ]
+duplicates_df <- duplicates_df[duplicates_df$rel_dist < 0.2]
+LNToutput <- LNToutput[!LNToutput@meta$ID %in% duplicates_df$ID_duplicate, ]
 ```
 
 Note, that you can subset LNToutput objects almost like you would in a regular data.frame using the square brackets.
@@ -314,12 +311,12 @@ Now you can extract the remaining articles or convert them to a format you prefe
 
 ``` r
 #' generate new dataframes without highly similar duplicates
-meta.df <- LNToutput@meta
-articles.df <- LNToutput@articles
-paragraphs.df <- LNToutput@paragraphs
+meta_df <- LNToutput@meta
+articles_df <- LNToutput@articles
+paragraphs_df <- LNToutput@paragraphs
 
 # Print e.g., meta to see how the data changed
-head(meta.df, n = 3)
+head(meta_df, n = 3)
 ```
 
 <table style="width:100%;">

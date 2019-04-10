@@ -4,7 +4,7 @@ files <- system.file("extdata", "sample.TXT", package = "LexisNexisTools")
 file.copy(files, paste0(basename(files), "2.TXT"))
 files <- c(files, paste0(basename(files), "2.TXT"))
 
-test_that("Read in sample file(2)", {
+test_that("Read in sample file", {
   expect_equal({
     test <- lnt_read(files[1], verbose = TRUE)
     test@meta$Source_File <- basename(test@meta$Source_File)
@@ -27,6 +27,16 @@ test_that("Read in sample file(2)", {
     attributes(test)$created$Version <- "0.2.1.9000"
     test
   }, readRDS("../files/LNToutput2.RDS"))
+})
+
+test_that("Read in folder", {
+  expect_error({
+    lnt_read("../")
+  }, "No .txt files found.", fixed = TRUE)
+  expect_that({
+    test <- lnt_read("../../", recursive = TRUE, extract_paragraphs = FALSE)
+    length(test@meta$ID)
+  }, is_more_than(19))
 })
 
 test_that("no articles found", {
