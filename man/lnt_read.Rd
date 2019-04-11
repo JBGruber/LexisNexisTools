@@ -2,7 +2,7 @@
 % Please edit documentation in R/LexisNexisTools.R
 \name{lnt_read}
 \alias{lnt_read}
-\title{Read in a LexisNexis TXT file}
+\title{Read in a LexisNexis file}
 \usage{
 lnt_read(x, encoding = "UTF-8", extract_paragraphs = TRUE,
   convert_date = TRUE, start_keyword = "auto", end_keyword = "auto",
@@ -11,7 +11,7 @@ lnt_read(x, encoding = "UTF-8", extract_paragraphs = TRUE,
   recursive = FALSE, verbose = TRUE, ...)
 }
 \arguments{
-\item{x}{Name or names of LexisNexis TXT file to be converted.}
+\item{x}{Name or names of file from LexisNexis to be converted.}
 
 \item{encoding}{Encoding to be assumed for input files. Defaults to UTF-8
 (the LexisNexis standard value).}
@@ -44,7 +44,7 @@ same way as start_keyword and end_keyword. A common regex would be
 Set to \code{character()} if you want to turn off this feature.}
 
 \item{recursive}{A logical flag indicating whether subdirectories are
-searched for more TXT files.}
+searched for more files.}
 
 \item{verbose}{A logical flag indicating whether information should be
 printed to the screen.}
@@ -56,8 +56,8 @@ An LNToutput S4 object consisting of 3 data.frames for metadata,
   articles and paragraphs.
 }
 \description{
-Read a LexisNexis TXT file and convert it to a object of class
-\link{LNToutput}.
+Read a file from LexisNexis in a supported format and convert it to a object
+of class \link{LNToutput}. Supported formats are .TXT and .RTF files.
 }
 \details{
 The function can produce an \link{LNToutput} S4 object with two or

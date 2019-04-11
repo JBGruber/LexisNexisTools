@@ -17,7 +17,7 @@ test_that("Rename Sample", {
   expect_warning({
     files <- list.files()
     x <- lnt_rename(files, simulate = TRUE, verbose = FALSE)
-  }, "Not all provided files were TXT files. Other formats are ignored.")
+  }, "Not all provided files were TXT or RTF files. Other formats are ignored.")
 })
 
 teardown(unlink(c(

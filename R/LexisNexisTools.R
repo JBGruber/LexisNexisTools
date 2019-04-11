@@ -129,11 +129,12 @@ setMethod("+",
 # Main Functions ------------------------------------------------------------
 
 
-#' Read in a LexisNexis TXT file
+#' Read in a LexisNexis file
 #'
-#' Read a LexisNexis TXT file and convert it to a object of class
-#' \link{LNToutput}.
-#' @param x Name or names of LexisNexis TXT file to be converted.
+#' Read a file from LexisNexis in a supported format and convert it to a object
+#' of class \link{LNToutput}. Supported formats are .TXT and .RTF files.
+#'
+#' @param x Name or names of file from LexisNexis to be converted.
 #' @param encoding Encoding to be assumed for input files. Defaults to UTF-8
 #'   (the LexisNexis standard value).
 #' @param extract_paragraphs A logical flag indicating if the returned object
@@ -158,7 +159,7 @@ setMethod("+",
 #' @param exclude_lines Lines in which these keywords are found are excluded.
 #'   Set to \code{character()} if you want to turn off this feature.
 #' @param recursive A logical flag indicating whether subdirectories are
-#'   searched for more TXT files.
+#'   searched for more files.
 #' @param verbose A logical flag indicating whether information should be
 #'   printed to the screen.
 #' @param ... Additional arguments passed on to \link{lnt_asDate}.
@@ -186,9 +187,8 @@ setMethod("+",
 #' meta.df <- LNToutput@meta
 #' articles.df <- LNToutput@articles
 #' paragraphs.df <- LNToutput@paragraphs
-#' @importFrom stringi stri_read_lines stri_extract_last_regex stri_join
-#'   stri_isempty stri_split_fixed stri_replace_all_regex stri_detect_regex
-#'   stri_detect_fixed
+#' @importFrom stringi stri_extract_last_regex stri_join stri_isempty
+#'   stri_split_fixed stri_replace_all_regex stri_detect_regex stri_detect_fixed
 #' @importFrom utils tail
 #' @importFrom tibble tibble as_tibble
 lnt_read <- function(x,
@@ -202,17 +202,17 @@ lnt_read <- function(x,
                      recursive = FALSE,
                      verbose = TRUE,
                      ...) {
-  
+
   files <- get_files(x, recursive = recursive)
-  
+
   if (start_keyword == "auto") {
-    start_keyword <- "\\d+ of \\d+ DOCUMENTS$|\\d+ of \\d+ DOCUMENT$| Dokument \\d+ von \\d+$| Document \\d+ de \\d+$"
+    start_keyword <- "\\d+ of \\d+ DOCUMENTS$|\\d+ of \\d+ DOCUMENT$|Dokument \\d+ von \\d+$| Document \\d+ de \\d+$"
   }
   if (end_keyword == "auto") {
     end_keyword <- "^LANGUAGE: |^SPRACHE: |^LANGUE: "
   }
   if (length_keyword == "auto") {
-    length_keyword <- "^LENGTH: |^L\u00c4NGE:  |^LONGUEUR: "
+    length_keyword <- "^LENGTH: |^L\u00c4NGE: |^LONGUEUR: "
   }
 
   # Track the time
@@ -227,17 +227,8 @@ lnt_read <- function(x,
     )
   }
 
-  ### read in file
-  if (length(files) > 1) {
-    articles.v <- unlist(lapply(files, function(f) {
-      out <- stringi::stri_read_lines(f, encoding = encoding)
-      names(out) <- rep(f, times = length(out))
-      out
-    }))
-  } else {
-    articles.v <- stringi::stri_read_lines(files, encoding = encoding)
-    names(articles.v) <- rep(files, times = length(articles.v))
-  }
+  lines <- lnt_read_lines(files, encoding)
+
   if (verbose) {
     message("\t...files loaded [", format(
       (Sys.time() - start_time),
@@ -247,13 +238,15 @@ lnt_read <- function(x,
 
   # exclude some lines
   if (length(exclude_lines) > 0) {
-    articles.v[grep("^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIC: |^DATELINE: ", articles.v)] <- ""
+    lines[grep("^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIC: |^DATELINE: ", lines)] <- ""
   }
 
-  articles.l <- split(articles.v, cumsum(stringi::stri_detect_regex(articles.v, start_keyword)))
+  articles.l <- split(
+    lines, cumsum(stringi::stri_detect_regex(lines, start_keyword))
+  )
   articles.l[["0"]] <- NULL
   names(articles.l) <- NULL
-  rm(articles.v)
+  rm(lines)
 
   if (length(articles.l) == 0) {
     stop("No articles found in provided file(s)")
@@ -297,7 +290,7 @@ lnt_read <- function(x,
     grep(pattern = length_keyword, x = i$meta, value = TRUE)[1]
   })
   length.v <- stri_replace_all_regex(., length_keyword, "")
-  if (verbose) {
+    if (verbose) {
     message("\t...lengths extracted [", format(
       (Sys.time() - start_time),
       digits = 2, nsmall = 2
@@ -602,25 +595,25 @@ lnt_checkFiles <- function(...) {
 }
 
 
-#' Assign proper names to LexisNexis TXT files
+#' Assign proper names to LexisNexis files
 #'
-#' Give proper names to TXT files downloaded from 'LexisNexis' based on search
+#' Give proper names to files downloaded from 'LexisNexis' based on search
 #' term and period retrieved from each file cover page. This information is not
 #' always delivered by LexisNexis though. If the information is not present in
 #' the file, new file names will be empty.
 #'
-#' Warning: This will rename all TXT files in a give folder.
+#' Warning: This will rename all supported files in a give folder.
 #'
-#' @param x Can be either a character vector of LexisNexis TXT file name(s),
+#' @param x Can be either a character vector of LexisNexis file name(s),
 #'   folder name(s) or can be left blank (see example).
 #' @param encoding Encoding to be assumed for input files. Defaults to UTF-8
 #'   (the LexisNexis standard value).
 #' @param recursive A logical flag indicating whether subdirectories are
-#'   searched for more TXT files.
+#'   searched for more files.
 #' @param report A logical flag indicating whether the function will return a
 #'   report which files were renamed.
 #' @param simulate Should the renaming be simulated instead of actually done?
-#'   This can help prevent accidental renaming of unrelated TXT files which
+#'   This can help prevent accidental renaming of unrelated files which
 #'   happen to be in the same directory as the files from 'LexisNexis'.
 #' @param verbose A logical flag indicating whether information should be
 #'   printed to the screen.
@@ -971,10 +964,10 @@ lnt_similarity <- function(texts,
           })
         }
         message(
-          "\r\t...processing date ", 
-          as.character(x), 
-          ": ", 
-          length(unique(duplicates.df$ID_duplicate)), 
+          "\r\t...processing date ",
+          as.character(x),
+          ": ",
+          length(unique(duplicates.df$ID_duplicate)),
           " duplicates found [",
           format(
             (Sys.time() - start_time), digits = 2, nsmall = 2
@@ -1905,14 +1898,14 @@ trim <- function(object, n, e = "...") {
 #'
 #' @noRd
 #' @author Johannes B. Gruber
-#' 
+#'
 get_files <- function(x,
-                      pattern = ".txt$",
+                      pattern = ".txt$|.rtf$",
                       recursive = TRUE,
                       ignore_case = TRUE) {
   # Check how files are provided
   # 1. nothing (search wd)
-  # 2. txt file or files
+  # 2. file or files
   # 3. folder name(s)
   if (missing(x)) {
     message("No path was given. Should files",
@@ -1926,7 +1919,7 @@ get_files <- function(x,
   if (all(grepl(pattern, x, ignore.case = ignore_case))) {
     files <- x
   } else if (any(grepl(pattern, x, ignore.case = ignore_case))) {
-    warning("Not all provided files were TXT files. Other formats are ignored.")
+    warning("Not all provided files were TXT or RTF files. Other formats are ignored.")
     files <- grep(pattern, x, ignore.case = ignore_case, value = TRUE)
   } else if (any(dir.exists(x))) {
     if (length(x) > 1) {
@@ -1955,7 +1948,7 @@ get_files <- function(x,
            c("$", "|"),
            c("", "or"),
            vectorize_all = FALSE
-         ), 
+         ),
          " or folder name(s) to x or leave black to search wd.")
   }
   if (length(files) > 0) {
@@ -1965,10 +1958,62 @@ get_files <- function(x,
          stri_replace_all_fixed(
            pattern,
            c("$", "|"),
-           c("", "or"),
+           c("", " or "),
            vectorize_all = FALSE
-         ), 
+         ),
          " files found.")
   }
 }
 
+#' Get files
+#'
+#' Internal function, used read files of differnt formats
+#'
+#' @param files character, name or names of files to be read.
+#' @param encoding Encoding to be assumed for input files.
+#'
+#' @importFrom stringi stri_extract_last_regex stri_read_lines
+#'
+#' @noRd
+#' @author Johannes B. Gruber
+#'
+lnt_read_lines <- function(files,
+                           encoding) {
+
+  files <- split(files, tolower(stri_extract_last_regex(files, ".{4}$")))
+
+  ### read in txt file
+  if (length(files$.txt) > 0) {
+    if (length(files$.txt) > 1) {
+      lines_txt <- unlist(lapply(files$.txt, function(f) {
+        out <- stri_read_lines(f, encoding = encoding)
+        names(out) <- rep(f, times = length(out))
+        out
+      }))
+    } else {
+      lines_txt <- stri_read_lines(files$.txt, encoding = encoding)
+      names(lines_txt) <- rep(files, times = length(lines_txt))
+    }
+  } else {
+    lines_txt <- character()
+  }
+
+  ### read in rtf file
+  if (length(files$.rtf) > 0) {
+    check_install("striprtf")
+    if (length(files$.rtf) > 1) {
+      lines_rtf <- unlist(lapply(files$.rtf, function(f) {
+        out <- striprtf::read_rtf(f)
+        names(out) <- rep(f, times = length(out))
+        out
+      }))
+    } else {
+      lines_rtf <- striprtf::read_rtf(files$.rtf)
+      names(lines_rtf) <- rep(files, times = length(lines_rtf))
+    }
+  } else {
+    lines_rtf <- character()
+  }
+
+  return(c(lines_txt, lines_rtf))
+}
