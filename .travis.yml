@@ -20,12 +20,12 @@ matrix:
           before_install:
               - brew install libgit2
 
-r_github_packages:
-    - r-lib/covr
+r_packages:
+  - covr
 
 script:
     - R CMD build .
     - R CMD check *tar.gz
     
 after_success:
-  - Rscript -e 'R.Version();covr::codecov()'
+  - Rscript -e 'library(covr);codecov()'

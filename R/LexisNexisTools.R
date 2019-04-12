@@ -1513,21 +1513,29 @@ lnt2quanteda <- function(x, what = "Articles", collapse = NULL, ...) {
       all.y = TRUE
     )
   }
-  names(text) <- ID
+  df <- data.frame(
+    text = text,
+    docid = ID,
+    meta,
+    stringsAsFactors = FALSE
+  )
   dots <- list(...)
   if (any(grepl("metacorpus", names(dots)))) {
-    metacorpus <- list(
-      Converted = "LexiNexisTools",
+    metacorpus <- c(list(
+      Converted = "LexiNexisTools"),
       dots$metacorpus
     )
+    dots$metacorpus <- NULL
   } else {
     metacorpus <- list(Converted = "LexiNexisTools")
   }
   dta <- corpus(
-    x = text,
-    docvars = meta,
+    x = df,
+    docid_field = "docid",
+    text_field = "text",
     metacorpus = metacorpus,
-    ...
+    compress = FALSE,
+    dots
   )
   return(dta)
 }
