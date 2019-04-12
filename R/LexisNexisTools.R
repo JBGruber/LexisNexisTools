@@ -1722,6 +1722,61 @@ lnt2SQLite <- function(x, file = "LNT.sqlite", ...) {
 }
 
 
+#' Convert LNToutput to other formats
+#'
+#' Takes output from \link{lnt_read} and converts chosen articles to a bibtex citation.
+#'
+#' @param x An object of class LNToutput.
+#' @param art_id The ID(s) of the article(s) to convert.
+#' @param ... unused.
+#'
+#' @importFrom tools toTitleCase
+#' @export
+#'
+#' @examples
+#' LNToutput <- lnt_read(lnt_sample())
+#'
+#' docs <- lnt_convert(LNToutput, art_id = 1)
+lnt2bibtex <- function(x, art_id, ...) {
+  
+  dat <- x[x@meta$ID %in% art_id]
+  
+  out <- lapply(seq_len(nrow(dat)), function(i) {
+    
+    meta <- dat[i]@meta
+    
+    bib <- c(
+      "@article{",
+      paste0("  author = {", tools::toTitleCase(tolower(meta$Author)), "},"),
+      paste0("  year = {", meta$Date, "},"),
+      paste0("  title = {", meta$Headline, "},"),
+      paste0("  volume = {", format(meta$Date, "%Y"), "},"),
+      paste0("  journal = {", meta$Newspaper, "}"),
+      "}"
+    )
+    
+    attr(bib, "names") <- c(
+      "",
+      "author",
+      "year",
+      "title",
+      "volume",
+      "journal",
+      ""
+    )
+    
+    class(bib) <- "Bibtex"
+    return(bib)
+  })
+  
+  if (length(out) > 1) {
+    return(out)
+  } else {
+    return(out[[1]])
+  }
+}
+
+
 # Miscellaneous ------------------------------------------------------------
 
 #' Title

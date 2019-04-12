@@ -104,4 +104,16 @@ test_that("Test error messages", {
 
 # saveRDS(conn, "../files/SQLite.RDS")
 
+
+test_that("Convert LNToutput to bibtex", {
+  expect_equal({
+    test <- lnt2bibtex(x = readRDS("../files/LNToutput.RDS"),
+                       art_id = 1)
+    test
+  }, readRDS("../files/bibtex.RDS"))
+})
+
+# saveRDS(test, "../files/bibtex.RDS")
+lnt2bibtex
+
 teardown(unlink("../files/LNT.sqlite"))
