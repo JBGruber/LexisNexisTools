@@ -14,7 +14,8 @@ lnt2bibtex(x, art_id, ...)
 \item{...}{unused.}
 }
 \description{
-Takes output from \link{lnt_read} and converts chosen articles to a bibtex citation.
+Takes output from \link{lnt_read} and converts chosen articles to a BibTeX
+citation.
 }
 \examples{
 LNToutput <- lnt_read(lnt_sample())

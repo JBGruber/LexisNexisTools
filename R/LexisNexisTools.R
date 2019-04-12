@@ -1724,7 +1724,8 @@ lnt2SQLite <- function(x, file = "LNT.sqlite", ...) {
 
 #' Convert LNToutput to other formats
 #'
-#' Takes output from \link{lnt_read} and converts chosen articles to a bibtex citation.
+#' Takes output from \link{lnt_read} and converts chosen articles to a BibTeX
+#' citation.
 #'
 #' @param x An object of class LNToutput.
 #' @param art_id The ID(s) of the article(s) to convert.
