@@ -50,3 +50,13 @@ test_that("Subset method", {
        "The Times (London)", "The Times (London)",
        "MAIL ON SUNDAY (London)", "Sunday Mirror", "DAILY MAIL (London)"))
 })
+
+test_that("add", {
+  expect_equal({
+    test <- readRDS("../files/LNToutput.RDS")
+    meta <- test@meta
+    meta$Graphic <- NULL
+    test <- lnt_add(test, meta, where = "meta")
+    ncol(test@meta)
+  }, 9)
+})

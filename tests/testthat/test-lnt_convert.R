@@ -16,9 +16,11 @@ test_that("Convert LNToutput to rDNA", {
 #                     to = "rDNA", what = "Articles", collapse = TRUE), "../files/rDNA.RDS")
 
 test_that("Convert LNToutput to quanteda", {
+  skip_if(packageVersion("quanteda") > "1.4.89")
   expect_equal({
     corpus <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
-                          to = "quanteda", what = "Articles", collapse = FALSE)
+                          to = "quanteda", what = "Articles", 
+                          collapse = FALSE)
     quanteda::metacorpus(corpus, "created") <- "Wed Jul 25 19:33:20 2018"
     quanteda::metacorpus(corpus, "source") <- 
       "/home/johannes/Documents/Github/LexisNexisTools/tests/testthat/* on x86_64 by johannes"
@@ -30,8 +32,8 @@ test_that("Convert LNToutput to quanteda", {
                           what = "Paragraphs", 
                           collapse = FALSE,
                           metacorpus = list(notes = "test"))
-    quanteda::metacorpus(corpus, "notes")
-  }, list(notes = "test"))
+    unname(unlist(quanteda::metacorpus(corpus, "notes")))
+  }, "test")
 })
 
 # corpus <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),

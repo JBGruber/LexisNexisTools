@@ -1477,7 +1477,7 @@ lnt2rDNA <- function(x, what = "Articles", collapse = TRUE) {
 
 #' @rdname lnt_convert
 #' @export
-#' @importFrom quanteda corpus
+#' @importFrom quanteda corpus metacorpus
 lnt2quanteda <- function(x, what = "Articles", collapse = NULL, ...) {
   if (!what %in% c("Articles", "Paragraphs")) {
     stop("Choose either \"Articles\" or \"Paragraphs\" as what argument.")
@@ -1513,30 +1513,27 @@ lnt2quanteda <- function(x, what = "Articles", collapse = NULL, ...) {
       all.y = TRUE
     )
   }
-  df <- data.frame(
-    text = text,
-    docid = ID,
-    meta,
-    stringsAsFactors = FALSE
-  )
   dots <- list(...)
+
   if (any(grepl("metacorpus", names(dots)))) {
     metacorpus <- c(list(
-      Converted = "LexiNexisTools"),
+      converted_from = "LexiNexisTools"),
       dots$metacorpus
     )
     dots$metacorpus <- NULL
   } else {
-    metacorpus <- list(Converted = "LexiNexisTools")
+    metacorpus <- list(converted_from = "LexiNexisTools")
   }
+  
   dta <- corpus(
-    x = df,
-    docid_field = "docid",
-    text_field = "text",
-    metacorpus = metacorpus,
-    compress = FALSE,
+    x = text,
+    docnames = as.character(ID),
+    docvars = meta,
     dots
   )
+  
+  quanteda::metacorpus(dta, names(metacorpus)) <- unname(unlist(unname(metacorpus)))
+  
   return(dta)
 }
 
