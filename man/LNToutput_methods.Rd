@@ -3,11 +3,14 @@
 \docType{methods}
 \name{LNToutput_methods}
 \alias{LNToutput_methods}
+\alias{dim,LNToutput-method}
 \alias{show,LNToutput-method}
 \alias{[,LNToutput,ANY,ANY,ANY-method}
 \alias{+,LNToutput,LNToutput-method}
 \title{Methods for LNToutput output objects}
 \usage{
+\S4method{dim}{LNToutput}(x)
+
 \S4method{show}{LNToutput}(object)
 
 \S4method{[}{LNToutput,ANY,ANY,ANY}(x, i, j, invert = FALSE)

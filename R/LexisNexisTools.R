@@ -54,6 +54,23 @@ NULL
 
 
 #' @rdname LNToutput_methods
+setMethod("dim",
+          signature = "LNToutput",
+          definition = function(x) {
+            c(
+              Articles = length(x@meta[[1]]),
+              Meta_variable = length(x@meta[1, ]),
+              data.frames = ifelse(
+                all(is.na(x@paragraphs)),
+                2,
+                3
+              )
+            )
+          }
+)
+
+
+#' @rdname LNToutput_methods
 setMethod("show",
   signature = "LNToutput",
   definition = function(object) {

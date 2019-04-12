@@ -58,3 +58,15 @@ test_that("add", {
     ncol(test@meta)
   }, 9)
 })
+
+
+test_that("dim", {
+  expect_equal({
+    test <- readRDS("../files/LNToutput.RDS")
+    dim(test)
+  }, c(
+    Articles = 10,
+    Meta_variable = 10,
+    data.frames = 3
+  ))
+})
