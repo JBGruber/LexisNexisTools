@@ -1,5 +1,4 @@
 context("Create sample")
-library(LexisNexisTools)
 
 test_that("sample exists", {
   expect_equal(basename(lnt_sample(verbose = FALSE)), "sample.TXT")

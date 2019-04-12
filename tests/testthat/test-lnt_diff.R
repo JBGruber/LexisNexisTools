@@ -1,8 +1,7 @@
 context("Display diff")
-library(LexisNexisTools)
 
 duplicates.df <- lnt_similarity(
-  LNToutput = lnt_read(system.file("extdata", "sample.TXT", 
+  LNToutput = lnt_read(system.file("extdata", "sample.TXT",
                                    package = "LexisNexisTools"),
                        verbose = FALSE),
   threshold = 0.95,

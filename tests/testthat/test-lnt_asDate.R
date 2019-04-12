@@ -1,5 +1,4 @@
 context("Date Conversion")
-library(LexisNexisTools)
 
 ## Languages
 # English

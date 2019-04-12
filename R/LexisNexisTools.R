@@ -132,7 +132,7 @@ setMethod("+",
 #' Read in a LexisNexis file
 #'
 #' Read a file from LexisNexis in a supported format and convert it to a object
-#' of class \link{LNToutput}. Supported formats are .TXT and .RTF files.
+#' of class \link{LNToutput}. Supported formats are TXT, DOC and RTF files.
 #'
 #' @param x Name or names of file from LexisNexis to be converted.
 #' @param encoding Encoding to be assumed for input files. Defaults to UTF-8
@@ -297,7 +297,7 @@ lnt_read <- function(x,
     ), "]")
   }
 
-  ### Newspaper. First non-emtpy line
+  ### Newspaper. First non emtpy line
   newspaper.v <- sapply(df.l, function(i) {
     grep(
       pattern = "^$",
@@ -1090,7 +1090,7 @@ lnt_asDate <- function(x,
     format == "auto",
     locale == "auto"
   )) {
-    correct <- mapply(function(format, locale) {
+    correct <- mapply(formats, locales, FUN = function(format, locale) {
       out <- stringi::stri_datetime_parse(
         str = x,
         format = format,
@@ -1099,7 +1099,7 @@ lnt_asDate <- function(x,
       )
       out <- 1 - sum(is.na(out)) / length(x)
       out * 100
-    }, formats, locales)
+    })
     most <- head(sort(correct[correct > 0.01], decreasing = TRUE), n = 3)
     if (is.na(most[1])) stop("No valid dates found.")
     if (most[1] < 100) {
@@ -1524,16 +1524,16 @@ lnt2quanteda <- function(x, what = "Articles", collapse = NULL, ...) {
   } else {
     metacorpus <- list(converted_from = "LexiNexisTools")
   }
-  
+
   dta <- corpus(
     x = text,
     docnames = as.character(ID),
     docvars = meta,
     dots
   )
-  
+
   quanteda::metacorpus(dta, names(metacorpus)) <- unname(unlist(unname(metacorpus)))
-  
+
   return(dta)
 }
 
@@ -1849,7 +1849,7 @@ lnt_add <- function(to,
 #' @export
 lnt_sample <- function(overwrite = FALSE,
                        verbose = TRUE) {
-  if (all(file.exists(paste0(getwd(), "/sample.TXT")), !overwrite)) {
+  if (all(file.exists(paste0(getwd(), "/", "sample.TXT")), !overwrite)) {
     if (verbose) {
       warning(
         "Sample file exists in wd. Use overwrite = TRUE to create fresh sample file."
@@ -1858,11 +1858,11 @@ lnt_sample <- function(overwrite = FALSE,
   } else {
     file.copy(
       from = system.file("extdata", "sample.TXT", package = "LexisNexisTools"),
-      to = paste0(getwd(), "/sample.TXT"),
+      to = paste0(getwd(), "/", "sample.TXT"),
       overwrite = TRUE
     )
   }
-  return(paste0(getwd(), "/sample.TXT"))
+  return(paste0(getwd(), "/", "sample.TXT"))
 }
 
 
@@ -1905,7 +1905,7 @@ trim <- function(object, n, e = "...") {
 #' @author Johannes B. Gruber
 #'
 get_files <- function(x,
-                      pattern = ".txt$|.rtf$",
+                      pattern = ".txt$|.rtf$|.doc$",
                       recursive = TRUE,
                       ignore_case = TRUE) {
   # Check how files are provided
@@ -1924,7 +1924,7 @@ get_files <- function(x,
   if (all(grepl(pattern, x, ignore.case = ignore_case))) {
     files <- x
   } else if (any(grepl(pattern, x, ignore.case = ignore_case))) {
-    warning("Not all provided files were TXT or RTF files. Other formats are ignored.")
+    warning("Not all provided files were TXT, DOC or RTF files. Other formats are ignored.")
     files <- grep(pattern, x, ignore.case = ignore_case, value = TRUE)
   } else if (any(dir.exists(x))) {
     if (length(x) > 1) {
@@ -2003,6 +2003,23 @@ lnt_read_lines <- function(files,
     lines_txt <- character()
   }
 
+  ### read in doc file
+  if (length(files$.doc) > 0) {
+    check_install("striprtf")
+    if (length(files$.doc) > 1) {
+      lines_doc <- unlist(lapply(files$.doc, function(f) {
+        out <- striprtf::read_rtf(f)
+        names(out) <- rep(f, times = length(out))
+        out
+      }))
+    } else {
+      lines_doc <- striprtf::read_rtf(files$.doc)
+      names(lines_doc) <- rep(files, times = length(lines_doc))
+    }
+  } else {
+    lines_doc <- character()
+  }
+
   ### read in rtf file
   if (length(files$.rtf) > 0) {
     check_install("striprtf")
@@ -2020,5 +2037,5 @@ lnt_read_lines <- function(files,
     lines_rtf <- character()
   }
 
-  return(c(lines_txt, lines_rtf))
+  return(c(lines_txt, lines_doc, lines_rtf))
 }

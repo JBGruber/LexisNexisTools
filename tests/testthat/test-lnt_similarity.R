@@ -1,9 +1,7 @@
 context("Lookup keyword")
-library(LexisNexisTools)
 
-
-LNToutput <- lnt_read(system.file("extdata", "sample.TXT", 
-                                  package = "LexisNexisTools"), 
+LNToutput <- lnt_read(system.file("extdata", "sample.TXT",
+                                  package = "LexisNexisTools"),
                       verbose = FALSE)
 
 test_that("Test similarity", {

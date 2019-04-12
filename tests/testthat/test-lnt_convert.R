@@ -1,6 +1,4 @@
 context("LNToutput Conversion")
-library(LexisNexisTools)
-
 
 # LNToutput <- lnt_read(lnt_sample(verbose = FALSE), verbose = FALSE)
 
@@ -19,17 +17,17 @@ test_that("Convert LNToutput to quanteda", {
   skip_if(packageVersion("quanteda") > "1.4.89")
   expect_equal({
     corpus <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
-                          to = "quanteda", what = "Articles", 
+                          to = "quanteda", what = "Articles",
                           collapse = FALSE)
     quanteda::metacorpus(corpus, "created") <- "Wed Jul 25 19:33:20 2018"
-    quanteda::metacorpus(corpus, "source") <- 
+    quanteda::metacorpus(corpus, "source") <-
       "/home/johannes/Documents/Github/LexisNexisTools/tests/testthat/* on x86_64 by johannes"
     corpus
   }, readRDS("../files/quanteda.RDS"))
   expect_equal({
     corpus <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
-                          to = "quanteda", 
-                          what = "Paragraphs", 
+                          to = "quanteda",
+                          what = "Paragraphs",
                           collapse = FALSE,
                           metacorpus = list(notes = "test"))
     unname(unlist(quanteda::metacorpus(corpus, "notes")))
@@ -101,7 +99,7 @@ test_that("Test error messages", {
   expect_error ({
     lnt_convert(x = readRDS("../files/LNToutput.RDS"),
                 to = "quanteda", what = "Paragraph")
-  },"Choose either \"Articles\" or \"Paragraphs\" as what argument.", fixed = TRUE)
+  }, "Choose either \"Articles\" or \"Paragraphs\" as what argument.", fixed = TRUE)
 })
 
 # saveRDS(conn, "../files/SQLite.RDS")

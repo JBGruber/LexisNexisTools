@@ -1,9 +1,7 @@
 context("LNToutput methods")
-library(LexisNexisTools)
-
 
 LNToutput <- lnt_read(
-  system.file("extdata", "sample.TXT", package = "LexisNexisTools"), 
+  system.file("extdata", "sample.TXT", package = "LexisNexisTools"),
   verbose = FALSE
 )
 LNToutput@meta$Source_File <- basename(LNToutput@meta$Source_File)

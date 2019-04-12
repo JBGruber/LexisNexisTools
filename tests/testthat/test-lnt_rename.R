@@ -1,5 +1,4 @@
 context("LNToutput methods")
-library(LexisNexisTools)
 
 lnt_sample(verbose = FALSE)
 
@@ -17,12 +16,10 @@ test_that("Rename Sample", {
   expect_warning({
     files <- list.files()
     x <- lnt_rename(files, simulate = TRUE, verbose = FALSE)
-  }, "Not all provided files were TXT or RTF files. Other formats are ignored.")
+  }, "Not all provided files were TXT, DOC or RTF files. Other formats are ignored.")
 })
 
 teardown(unlink(c(
-  "sample.TXT", 
+  "sample.TXT",
   "SampleFile_20091201-20100511_1-10.txt"
 )))
-
-

@@ -57,7 +57,7 @@ An LNToutput S4 object consisting of 3 data.frames for metadata,
 }
 \description{
 Read a file from LexisNexis in a supported format and convert it to a object
-of class \link{LNToutput}. Supported formats are .TXT and .RTF files.
+of class \link{LNToutput}. Supported formats are TXT, DOC and RTF files.
 }
 \details{
 The function can produce an \link{LNToutput} S4 object with two or

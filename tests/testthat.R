@@ -1,4 +1,4 @@
-library(testthat)
-library(LexisNexisTools)
+library("testthat")
+library("LexisNexisTools")
 
 test_check("LexisNexisTools")
