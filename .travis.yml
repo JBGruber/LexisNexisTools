@@ -4,49 +4,28 @@ cache: packages
   
 matrix:
     include:
-        - os: linux
-          sudo: required
-          r: release
-          addons:
-            apt:
-            sources:
-              - sourceline: 'ppa:opencpu/poppler'
-            packages:
-              - libwebp-dev
-              - libpoppler-cpp-dev
-              - poppler-data
-        - os: linux
-          sudo: required
-          r: oldrel
-          addons:
-            apt:
-            sources:
-              - sourceline: 'ppa:opencpu/poppler'
-            packages:
-              - libwebp-dev
-              - libpoppler-cpp-dev
-              - poppler-data
-          before_install:
-              - Rscript -e 'remotes::install_version("statnet.common", version = "4.1.4")' # oldrel needs a special version
-        - os: linux
-          sudo: required
-          r: devel
-          addons:
-            apt:
-            sources:
-              - sourceline: 'ppa:opencpu/poppler'
-            packages:
-              - libwebp-dev
-              - libpoppler-cpp-dev
-              - poppler-data
-        - os: osx
-          r: release
-          brew_packages: poppler
-          before_install:
-              - brew install libgit2
+      - os: linux
+        sudo: required
+        r: release
+      - os: linux
+        sudo: required
+        r: oldrel
+      - os: linux
+        sudo: required
+        r: devel
+      - os: osx
+        r: release
+        brew_packages: poppler
+        before_install:
+          - brew install libgit2
 
 r_packages:
   - covr
+  
+addons:
+  apt:
+    packages:
+      - libpoppler-cpp-dev
 
 script:
     - R CMD build .
