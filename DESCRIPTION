@@ -35,6 +35,7 @@ Suggests:
     tm,
     kableExtra,
     knitr,
+    pdftools,
     rmarkdown,
     spelling,
     striprtf

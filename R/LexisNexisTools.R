@@ -149,7 +149,7 @@ setMethod("+",
 #' Read in a LexisNexis file
 #'
 #' Read a file from LexisNexis in a supported format and convert it to a object
-#' of class \link{LNToutput}. Supported formats are TXT, DOC and RTF files.
+#' of class \link{LNToutput}. Supported formats are TXT, DOC, RTF and PDF files.
 #'
 #' @param x Name or names of file from LexisNexis to be converted.
 #' @param encoding Encoding to be assumed for input files. Defaults to UTF-8
@@ -177,6 +177,7 @@ setMethod("+",
 #'   Set to \code{character()} if you want to turn off this feature.
 #' @param recursive A logical flag indicating whether subdirectories are
 #'   searched for more files.
+#' @param file_pattern Pattern of file types to be included in search for files.
 #' @param verbose A logical flag indicating whether information should be
 #'   printed to the screen.
 #' @param ... Additional arguments passed on to \link{lnt_asDate}.
@@ -217,10 +218,11 @@ lnt_read <- function(x,
                      length_keyword = "auto",
                      exclude_lines = "^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIC: |^DATELINE: ",
                      recursive = FALSE,
+                     file_pattern = ".txt$|.rtf$|.doc$|.pdf$",
                      verbose = TRUE,
                      ...) {
 
-  files <- get_files(x, recursive = recursive)
+  files <- get_files(x, recursive = recursive, pattern = file_pattern)
 
   if (start_keyword == "auto") {
     start_keyword <- "\\d+ of \\d+ DOCUMENTS$|\\d+ of \\d+ DOCUMENT$|Dokument \\d+ von \\d+$| Document \\d+ de \\d+$"
@@ -272,13 +274,10 @@ lnt_read <- function(x,
   df.l <- lapply(articles.l, function(a) {
     len <- grep(length_keyword, a)[1]
     if (!is.na(len)) {
-      source <- names(a)[1]
-      meta <- unname(a[2:len])
-      article <- unname(a[(len + 1):(length(a) - 1)])
       list(
-        source = source,
-        meta = meta,
-        article = article,
+        source = names(a)[1],
+        meta = unname(a[2:len]),
+        article = unname(a[(len + 1):(length(a) - 1)]),
         graphic = FALSE
       )
     } else {
@@ -1730,13 +1729,13 @@ lnt2SQLite <- function(x, file = "LNT.sqlite", ...) {
 #'
 #' docs <- lnt_convert(LNToutput, art_id = 1)
 lnt2bibtex <- function(x, art_id, ...) {
-  
+
   dat <- x[x@meta$ID %in% art_id]
-  
+
   out <- lapply(seq_len(nrow(dat)), function(i) {
-    
+
     meta <- dat[i]@meta
-    
+
     bib <- c(
       "@article{",
       paste0("  author = {", tools::toTitleCase(tolower(meta$Author)), "},"),
@@ -1746,7 +1745,7 @@ lnt2bibtex <- function(x, art_id, ...) {
       paste0("  journal = {", meta$Newspaper, "}"),
       "}"
     )
-    
+
     attr(bib, "names") <- c(
       "",
       "author",
@@ -1756,11 +1755,11 @@ lnt2bibtex <- function(x, art_id, ...) {
       "journal",
       ""
     )
-    
+
     class(bib) <- "Bibtex"
     return(bib)
   })
-  
+
   if (length(out) > 1) {
     return(out)
   } else {
@@ -1969,7 +1968,7 @@ trim <- function(object, n, e = "...") {
 #' @author Johannes B. Gruber
 #'
 get_files <- function(x,
-                      pattern = ".txt$|.rtf$|.doc$",
+                      pattern = ".txt$|.rtf$|.doc$|.pdf$",
                       recursive = TRUE,
                       ignore_case = TRUE) {
   # Check how files are provided
@@ -1988,7 +1987,7 @@ get_files <- function(x,
   if (all(grepl(pattern, x, ignore.case = ignore_case))) {
     files <- x
   } else if (any(grepl(pattern, x, ignore.case = ignore_case))) {
-    warning("Not all provided files were TXT, DOC or RTF files. Other formats are ignored.")
+    warning("Not all provided files were TXT, DOC, RTF or PDF files. Other formats are ignored.")
     files <- grep(pattern, x, ignore.case = ignore_case, value = TRUE)
   } else if (any(dir.exists(x))) {
     if (length(x) > 1) {
@@ -2041,11 +2040,11 @@ get_files <- function(x,
 #' @param files character, name or names of files to be read.
 #' @param encoding Encoding to be assumed for input files.
 #'
-#' @importFrom stringi stri_extract_last_regex stri_read_lines
+#' @importFrom stringi stri_extract_last_regex stri_read_lines stri_paste
 #'
 #' @noRd
 #' @author Johannes B. Gruber
-#'
+#'   
 lnt_read_lines <- function(files,
                            encoding) {
 
@@ -2061,7 +2060,7 @@ lnt_read_lines <- function(files,
       }))
     } else {
       lines_txt <- stri_read_lines(files$.txt, encoding = encoding)
-      names(lines_txt) <- rep(files, times = length(lines_txt))
+      names(lines_txt) <- rep(files$.txt, times = length(lines_txt))
     }
   } else {
     lines_txt <- character()
@@ -2078,7 +2077,7 @@ lnt_read_lines <- function(files,
       }))
     } else {
       lines_doc <- striprtf::read_rtf(files$.doc)
-      names(lines_doc) <- rep(files, times = length(lines_doc))
+      names(lines_doc) <- rep(files$.doc, times = length(lines_doc))
     }
   } else {
     lines_doc <- character()
@@ -2095,11 +2094,39 @@ lnt_read_lines <- function(files,
       }))
     } else {
       lines_rtf <- striprtf::read_rtf(files$.rtf)
-      names(lines_rtf) <- rep(files, times = length(lines_rtf))
+      names(lines_rtf) <- rep(files$.rtf, times = length(lines_rtf))
     }
   } else {
     lines_rtf <- character()
   }
 
-  return(c(lines_txt, lines_doc, lines_rtf))
+  ### read in pdf file
+  if (length(files$.pdf) > 0) {
+    check_install("pdftools")
+    if (length(files$.pdf) > 1) {
+      lines_pdf <- unlist(lapply(files$.pdf, function(f) {
+        out <- pdftools::pdf_text(f)
+        out <- stri_paste(out, collapse = "\n")
+        out <- unlist(stri_split_fixed(out, "\n"))
+        # remove page number
+        out <- out[!stri_detect_regex(out, "^\\s{75,}")]
+        # remove page break
+        out <- out[!stri_detect_regex(out, "^$")]
+        names(out) <- rep(f, times = length(out))
+        out
+      }))
+    } else {
+      lines_pdf <- pdftools::pdf_text(files$.pdf)
+      lines_pdf <- stri_paste(lines_pdf, collapse = "\n")
+      lines_pdf <- unlist(stri_split_fixed(lines_pdf, "\n"))
+      lines_pdf <- lines_pdf[!stri_detect_regex(lines_pdf, "^\\s{75,}")]
+      lines_pdf <- lines_pdf[!stri_detect_regex(lines_pdf, "^$")]
+      names(lines_pdf) <- rep(files$.pdf, times = length(lines_pdf))
+    }
+    warning("Reading PDFs is experimental. Extracting paragraphs from PDFs does ",
+            "not work correctly. Page headers end up in articles.")
+  } else {
+    lines_pdf <- character()
+  }
+  return(c(lines_txt, lines_doc, lines_rtf, lines_pdf))
 }

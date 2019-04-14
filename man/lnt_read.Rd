@@ -8,7 +8,8 @@ lnt_read(x, encoding = "UTF-8", extract_paragraphs = TRUE,
   convert_date = TRUE, start_keyword = "auto", end_keyword = "auto",
   length_keyword = "auto",
   exclude_lines = "^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIC: |^DATELINE: ",
-  recursive = FALSE, verbose = TRUE, ...)
+  recursive = FALSE, file_pattern = ".txt$|.rtf$|.doc$|.pdf$",
+  verbose = TRUE, ...)
 }
 \arguments{
 \item{x}{Name or names of file from LexisNexis to be converted.}
@@ -46,6 +47,8 @@ Set to \code{character()} if you want to turn off this feature.}
 \item{recursive}{A logical flag indicating whether subdirectories are
 searched for more files.}
 
+\item{file_pattern}{Pattern of file types to be included in search for files.}
+
 \item{verbose}{A logical flag indicating whether information should be
 printed to the screen.}
 
@@ -57,7 +60,7 @@ An LNToutput S4 object consisting of 3 data.frames for metadata,
 }
 \description{
 Read a file from LexisNexis in a supported format and convert it to a object
-of class \link{LNToutput}. Supported formats are TXT, DOC and RTF files.
+of class \link{LNToutput}. Supported formats are TXT, DOC, RTF and PDF files.
 }
 \details{
 The function can produce an \link{LNToutput} S4 object with two or
