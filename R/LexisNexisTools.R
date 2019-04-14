@@ -603,15 +603,6 @@ lnt_read <- function(x,
 }
 
 
-#' Check LexisNexis TXT files (deprecated)
-#'
-#' @param ... No functionality as this was deprecated.
-#' @export
-lnt_checkFiles <- function(...) {
-  .Deprecated(msg = "lnt_checkFiles() has been deprecated as it is no longer necessary to check files. Simply run lnt_read().")
-}
-
-
 #' Assign proper names to LexisNexis files
 #'
 #' Give proper names to files downloaded from 'LexisNexis' based on search
