@@ -1,5 +1,5 @@
 language: r
-sudo: false
+dist: xenial
 cache: packages
   
 matrix:
