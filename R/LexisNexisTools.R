@@ -173,6 +173,7 @@ setMethod("+",
 #'   same way as start_keyword and end_keyword. A common regex would be
 #'   "^LENGTH: " which catches length in all caps at the beginning of the line
 #'   (usually the last line of the metadata).
+#' @param author_keyword A keyword to identify the author(s) in the metadata.
 #' @param exclude_lines Lines in which these keywords are found are excluded.
 #'   Set to \code{character()} if you want to turn off this feature.
 #' @param recursive A logical flag indicating whether subdirectories are
@@ -205,8 +206,7 @@ setMethod("+",
 #' meta.df <- LNToutput@meta
 #' articles.df <- LNToutput@articles
 #' paragraphs.df <- LNToutput@paragraphs
-#' @importFrom stringi stri_extract_last_regex stri_join stri_isempty
-#'   stri_split_fixed stri_replace_all_regex stri_detect_regex stri_detect_fixed
+#' @import stringi
 #' @importFrom utils tail
 #' @importFrom tibble tibble as_tibble
 lnt_read <- function(x,
@@ -216,6 +216,7 @@ lnt_read <- function(x,
                      start_keyword = "auto",
                      end_keyword = "auto",
                      length_keyword = "auto",
+                     author_keyword = "AUTOR: |VON |BYLINE: ",
                      exclude_lines = "^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIC: |^DATELINE: ",
                      recursive = FALSE,
                      file_pattern = ".txt$|.rtf$|.doc$|.pdf$",
@@ -302,11 +303,11 @@ lnt_read <- function(x,
 
   # make data.frame
   ### length
-  . <- sapply(df.l, function(i) {
+  . <- vapply(df.l, FUN.VALUE = character(1), function(i) {
     grep(pattern = length_keyword, x = i$meta, value = TRUE)[1]
   })
   length.v <- stri_replace_all_regex(., length_keyword, "")
-    if (verbose) {
+  if (verbose) {
     message("\t...lengths extracted [", format(
       (Sys.time() - start_time),
       digits = 2, nsmall = 2
@@ -314,7 +315,7 @@ lnt_read <- function(x,
   }
 
   ### Newspaper. First non emtpy line
-  newspaper.v <- sapply(df.l, function(i) {
+  newspaper.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
     grep(
       pattern = "^$",
       x = i$meta,
@@ -341,7 +342,7 @@ lnt_read <- function(x,
   }
 
   ### Date
-  date.v <- sapply(df.l, function(i) {
+  date.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
     . <- stringi::stri_extract_last_regex(
       str = i$meta[seq_len(10)],
       pattern = "\\w+ \\d+, \\d+|\\d+ \\w+ \\d+|\\d+. \\w+ \\d+"
@@ -356,8 +357,9 @@ lnt_read <- function(x,
   }
 
   ### Author (where available)
-  author.v <- sapply(df.l, function(i) {
-    a <- head(grep(pattern = "AUTOR: |VON |BYLINE: ", x = i$meta),
+  author.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
+    a <- head(
+      which(stri_detect_regex(i$meta, pattern = author_keyword)),
       n = 1
     )
     if (length(a) > 0) {
@@ -366,9 +368,10 @@ lnt_read <- function(x,
       }
       stringi::stri_join(i$meta[a], collapse = " ")
     } else {
-      NA
+      ""
     }
   })
+  author.v[author.v == ""] <- NA
 
   if (verbose) {
     message("\t...authors extracted [", format(
@@ -379,7 +382,7 @@ lnt_read <- function(x,
 
 
   ### section (where available)
-  section.v <- sapply(df.l, function(i) {
+  section.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
     grep(pattern = "SECTION: |RUBRIK: ", x = i$meta, value = TRUE)[1]
   })
   if (verbose) {
@@ -391,13 +394,15 @@ lnt_read <- function(x,
 
 
   ### edition (where available)
-  edition.v <- sapply(seq_along(df.l), function(i) {
+  edition.v <- lapply(seq_along(df.l), function(i) {
     date <- grep(date.v[i], x = df.l[[i]]$meta, fixed = TRUE)
     if (length(date) == 1) {
       d1 <- df.l[[i]]$meta[(date + 1):(date + 2)]
       if (!d1[1] == "") {
         edition.v <- d1[1]
-        if (!d1[2] == "") edition.v <- c(edition.v, d1[2])
+        if (!d1[2] == "") {
+          edition.v <- c(edition.v, d1[2])
+        }
         edition.v
       } else {
         # Alternatively, the edition is sometimes the first non-empty line in the article
@@ -407,14 +412,15 @@ lnt_read <- function(x,
           ignore.case = TRUE
         )
         ifelse(length(edition.v) == 0,
-          NA,
-          edition.v
+               NA,
+               edition.v
         )
       }
     } else {
       NA
     }
   })
+
   if (verbose) {
     message("\t...editions extracted [", format(
       (Sys.time() - start_time),
@@ -423,19 +429,19 @@ lnt_read <- function(x,
   }
 
   ### Headline
-  headline.v <- sapply(seq_along(df.l), function(i) {
+  headline.v <- vapply(seq_along(df.l), FUN.VALUE = character(1), function(i) {
     if (!df.l[[i]]$graphic) {
       headline <- df.l[[i]]$meta
-      pattern <- c(
+      pattern <- na.omit(c(
         length.v[i],
         date.v[i],
         newspaper.v[i],
         author.v[i],
         section.v[i],
-        edition.v[i]
-      )
+        edition.v[[i]]
+      ))
 
-      remove.m <- sapply(pattern, function(p) {
+      remove.m <- vapply(pattern, FUN.VALUE = matrix(nrow = length(headline)), function(p) {
         out <- stringi::stri_detect_fixed(headline, p[1])
         if (length(p) > 1) {
           out + stringi::stri_detect_fixed(headline, p[2])
@@ -444,7 +450,8 @@ lnt_read <- function(x,
         }
       })
       headline[as.logical(rowSums(remove.m, na.rm = TRUE))] <- ""
-      stringi::stri_join(headline, collapse = " ")
+      headline <- stringi::stri_join(headline, collapse = " ")
+      stri_replace_all_regex(headline, "\\s+", " ")
     } else {
       ""
     }
@@ -469,7 +476,7 @@ lnt_read <- function(x,
   # Clean the clutter from objects
   author.v <- stri_replace_all_regex(
     str = author.v,
-    pattern = "AUTOR: |VON |BYLINE: ",
+    pattern = author_keyword,
     replacement = ""
   )
   section.v <- stri_replace_all_regex(
@@ -477,19 +484,26 @@ lnt_read <- function(x,
     pattern = "SECTION: |RUBRIK: ",
     replacement = ""
   )
+  edition.v <- vapply(edition.v, FUN.VALUE = character(1), function(e) {
+    out <- stri_paste(e, collapse = " ")
+    out <- stri_replace_all_regex(out, "\\s+", " ")
+    out[out == ""] <- NA
+    stri_trim_both(out)
+  })
+
 
   ### make data.frame
   meta.df <- tibble(
     ID = seq_along(df.l),
-    Source_File = unlist(sapply(df.l, function(i) i[["source"]])),
+    Source_File = unlist(lapply(df.l, function(i) i[["source"]])),
     Newspaper = trimws(newspaper.v, which = "both"),
     Date = date.v,
     Length = trimws(length.v, which = "both"),
     Section = trimws(section.v, which = "both"),
     Author = trimws(author.v, which = "both"),
-    Edition = trimws(sapply(edition.v, stringi::stri_join, collapse = " "), which = "both"),
+    Edition = edition.v,
     Headline = trimws(headline.v, which = "both"),
-    Graphic = unlist(sapply(df.l, function(i) i[["graphic"]]))
+    Graphic = unlist(lapply(df.l, function(i) i[["graphic"]]))
   )
   if (verbose) {
     message("\t...metadata extracted [", format(
@@ -509,7 +523,7 @@ lnt_read <- function(x,
   })
   articles.df <- tibble(
     ID = seq_along(df.l),
-    Article = sapply(df.l, function(i) {
+    Article = vapply(df.l, FUN.VALUE = character(1), function(i) {
       stringi::stri_join(i, collapse = "\n")
     })
   )
@@ -884,7 +898,7 @@ lnt_similarity <- function(texts,
     warning("You supplied NA values to 'dates'. Those will be ignored.")
     dates.d <- dates.d[!is.na(dates.d)]
   }
-  lenghts <- sapply(texts, nchar, USE.NAMES = FALSE)
+  lenghts <- vapply(texts, nchar, FUN.VALUE = 1, USE.NAMES = FALSE)
   if (any(lenghts < 1)) {
     warning(
       "\nAt least one of the supplied texts had length 0. These articles with the following IDs will be ignored: ",
@@ -948,7 +962,7 @@ lnt_similarity <- function(texts,
         )]
 
         if (rel_dist) {
-          duplicates.df$rel_dist <- sapply(seq_len(nrow(duplicates.df)), function(i) {
+          duplicates.df$rel_dist <- vapply(seq_len(nrow(duplicates.df)), FUN.VALUE = 1, function(i) {
             # length of longer string
             mxln <- max(c(nchar(duplicates.df$text_original[i]), nchar(duplicates.df$text_duplicate[i])))
             if (isTRUE(
@@ -1039,6 +1053,7 @@ lnt_similarity <- function(texts,
 lnt_asDate <- function(x,
                        format = "auto",
                        locale = "auto") {
+  dat <- x
   formats <- c(
     English = "MMMM d,yyyy",
     German = "d MMMM yyyy",
@@ -1062,8 +1077,8 @@ lnt_asDate <- function(x,
 
   if (!locale == "auto") locales <- locale
   for (loc in locales) {
-    x <- stri_replace_all_regex(
-      str = x,
+    dat <- stri_replace_all_regex(
+      str = dat,
       pattern = paste0(
         "\\b",
         c(
@@ -1077,8 +1092,8 @@ lnt_asDate <- function(x,
       opts_regex = stri_opts_regex(case_insensitive = TRUE)
     )
   }
-  x <- stri_replace_all_regex(
-    str = x,
+  dat <- stri_replace_all_regex(
+    str = dat,
     pattern = c(
       "[A-Z]{3}$",
       "((?:(?:[0-1][0-9])|(?:[2][0-3])|(?:[0-9])):(?:[0-5][0-9])(?::[0-5][0-9])?(?:\\s?(?:am|AM|pm|PM))?)"
@@ -1086,8 +1101,8 @@ lnt_asDate <- function(x,
     replacement = "",
     vectorize_all = FALSE
   )
-  x <- stri_replace_all_fixed(
-    str = x,
+  dat <- stri_replace_all_fixed(
+    str = dat,
     pattern = "Maerz",
     replacement = "M\u00c4rz",
     vectorize_all = FALSE
@@ -1099,12 +1114,12 @@ lnt_asDate <- function(x,
   )) {
     correct <- mapply(formats, locales, FUN = function(format, locale) {
       out <- stringi::stri_datetime_parse(
-        str = x,
+        str = dat,
         format = format,
         locale = locale,
         tz = NULL
       )
-      out <- 1 - sum(is.na(out)) / length(x)
+      out <- 1 - sum(is.na(out)) / length(dat)
       out * 100
     })
     most <- head(sort(correct[correct > 0.01], decreasing = TRUE), n = 3)
@@ -1143,20 +1158,24 @@ lnt_asDate <- function(x,
     } else {
       input <- 1
     }
-    format <- formats[names(formats) == names(most)[input]]
-    locale <- locales[names(locales) == names(most)[input]]
+    if (input > 0) {
+      format <- formats[names(formats) == names(most)[input]]
+      locale <- locales[names(locales) == names(most)[input]]
+    } else {
+      return(x)
+    }
   }
   if (!format[1] %in% formats) {
     message("A non-standard format was provided. Conversion is tried but might fail.")
   }
-  x <- stringi::stri_datetime_parse(
-    str = x,
+  dat <- stringi::stri_datetime_parse(
+    str = dat,
     format = format,
     tz = "UTC",
     locale = locale
   )
-  x <- as.Date(x)
-  return(x)
+  dat <- as.Date(dat)
+  return(dat)
 }
 
 
@@ -1430,7 +1449,7 @@ lnt2rDNA <- function(x, what = "Articles", collapse = TRUE) {
     if (is.null(collapse)) {
       text <- x@articles$Article
     } else if (!is.null(collapse)) {
-      text <- sapply(x@meta$ID, function(id) {
+      text <- vapply(x@meta$ID, FUN.VALUE = character(1), function(id) {
         stringi::stri_join(x@paragraphs$Paragraph[x@paragraphs$Art_ID == id],
           sep = "",
           collapse = collapse,
@@ -1447,10 +1466,11 @@ lnt2rDNA <- function(x, what = "Articles", collapse = TRUE) {
   }
   dta <- data.frame(
     id = seq_along(order),
-    title = sapply(x@meta$Headline[order],
-      trim,
-      n = 197,
-      USE.NAMES = FALSE
+    title = vapply(x@meta$Headline[order],
+                   FUN.VALUE = character(1),
+                   trim,
+                   n = 197,
+                   USE.NAMES = FALSE
     ),
     text = text,
     coder = 1,
@@ -1498,7 +1518,7 @@ lnt2quanteda <- function(x, what = "Articles", collapse = NULL, ...) {
     if (is.null(collapse)) {
       text <- x@articles$Article
     } else if (!is.null(collapse)) {
-      text <- sapply(x@meta$ID, function(id) {
+      text <- vapply(x@meta$ID, FUN.VALUE = character(1), function(id) {
         stringi::stri_join(x@paragraphs$Paragraph[x@paragraphs$Art_ID == id],
           sep = "",
           collapse = collapse,
@@ -1561,7 +1581,7 @@ lnt2tm <- function(x, what = "Articles", collapse = NULL, ...) {
     if (is.null(collapse)) {
       text <- x@articles$Article
     } else if (!is.null(collapse)) {
-      text <- sapply(x@meta$ID, function(id) {
+      text <- vapply(x@meta$ID, FUN.VALUE = character(1), function(id) {
         stringi::stri_join(x@paragraphs$Paragraph[x@paragraphs$Art_ID == id],
           sep = "",
           collapse = collapse,
@@ -1613,7 +1633,7 @@ lnt2cptools <- function(x, what = "Articles", collapse = NULL, ...) {
     if (is.null(collapse)) {
       text <- x@articles$Article
     } else if (!is.null(collapse)) {
-      text <- sapply(x@meta$ID, function(id) {
+      text <- vapply(x@meta$ID, FUN.VALUE = character(1), function(id) {
         stringi::stri_join(x@paragraphs$Paragraph[x@paragraphs$Art_ID == id],
           sep = "",
           collapse = collapse,
@@ -1657,7 +1677,7 @@ lnt2tidy <- function(x, what = "Articles", collapse = NULL, ...) {
   }
   if (what == "Articles") {
     if (!is.null(collapse)) {
-      x@articles$Article <- sapply(x@meta$ID, function(id) {
+      x@articles$Article <- vapply(x@meta$ID, FUN.VALUE = character(1), function(id) {
         stringi::stri_join(x@paragraphs$Paragraph[x@paragraphs$Art_ID == id],
           sep = "",
           collapse = collapse,
@@ -1887,7 +1907,7 @@ lnt_add <- function(to,
   if (!isTRUE(
     all.equal(length(to@meta$ID), length(to@articles$ID), length(unique(to@paragraphs$Art_ID)))
   )) {
-    warning("Returned object is out of balnace (one slot has more or less entries than another.")
+    warning("Returned object is out of balance (one slot has more or less entries than another.")
   }
   return(to)
 }
@@ -1991,7 +2011,7 @@ get_files <- function(x,
     files <- grep(pattern, x, ignore.case = ignore_case, value = TRUE)
   } else if (any(dir.exists(x))) {
     if (length(x) > 1) {
-      files <- unlist(sapply(x, USE.NAMES = FALSE, function(f) {
+      files <- unlist(lapply(x, function(f) {
         list.files(
           path = f,
           pattern = pattern,
@@ -2044,7 +2064,7 @@ get_files <- function(x,
 #'
 #' @noRd
 #' @author Johannes B. Gruber
-#'   
+#'
 lnt_read_lines <- function(files,
                            encoding) {
 

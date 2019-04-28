@@ -6,7 +6,7 @@
 \usage{
 lnt_read(x, encoding = "UTF-8", extract_paragraphs = TRUE,
   convert_date = TRUE, start_keyword = "auto", end_keyword = "auto",
-  length_keyword = "auto",
+  length_keyword = "auto", author_keyword = "AUTOR: |VON |BYLINE: ",
   exclude_lines = "^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIC: |^DATELINE: ",
   recursive = FALSE, file_pattern = ".txt$|.rtf$|.doc$|.pdf$",
   verbose = TRUE, ...)
@@ -40,6 +40,8 @@ an article).}
 same way as start_keyword and end_keyword. A common regex would be
 "^LENGTH: " which catches length in all caps at the beginning of the line
 (usually the last line of the metadata).}
+
+\item{author_keyword}{A keyword to identify the author(s) in the metadata.}
 
 \item{exclude_lines}{Lines in which these keywords are found are excluded.
 Set to \code{character()} if you want to turn off this feature.}
