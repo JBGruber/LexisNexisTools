@@ -1197,9 +1197,11 @@ lnt_asDate <- function(x,
 #'   if TRUE, case is ignored during matching.
 #' @param unique_pattern If TRUE, duplicated mentions of the same pattern are
 #'   removed.
-#' @param word_boundaries If TRUE, lookup is performed with word boundaries at
-#'   beginning and end of the pattern (i.e., pattern "protest" will not identify
-#'   "protesters" etc.).
+#' @param word_boundaries If TRUE or "both", lookup is performed with word
+#'   boundaries at beginning and end of the pattern (i.e., pattern "protest"
+#'   will not identify "protesters" etc.). Additionally word boundaries can be
+#'   either just in front of the pattern ("before") or after the pattern
+#'   ("after"). FALSE searches without word boundaries.
 #' @param verbose A logical flag indicating whether a status bar is printed to
 #'   the screen.
 #' @return A list keyword hits.
@@ -1228,7 +1230,7 @@ lnt_lookup <- function(x,
                        pattern,
                        case_insensitive = FALSE,
                        unique_pattern = FALSE,
-                       word_boundaries = TRUE,
+                       word_boundaries = c("both", "before", "after"),
                        cores = NULL,
                        verbose = TRUE) {
   if ("character" %in% class(x)) {
@@ -1244,12 +1246,27 @@ lnt_lookup <- function(x,
       stop("'x' must be either a character vector or LNToutput object.")
     )
   }
-  if (word_boundaries) {
-    pattern <- paste0(
-      "\\b",
-      pattern,
-      "\\b"
-    )
+  if (!is.null(word_boundaries) | isFALSE(word_boundaries)) {
+    if (word_boundaries[1] == "both" | isTRUE(word_boundaries)) {
+      pattern <- paste0(
+        "\\b",
+        pattern,
+        "\\b"
+      )
+    }
+    if (word_boundaries[1] == "before") {
+      pattern <- paste0(
+        "\\b",
+        pattern
+      )
+    }
+    if (word_boundaries[1] == "after") {
+      pattern <- paste0(
+        pattern,
+        "\\b"
+      )
+    }
+    
   }
   if (!verbose) {
     pbapply::pboptions(type = "none")
