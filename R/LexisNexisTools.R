@@ -782,10 +782,10 @@ lnt_rename <- function(x,
   elapsed <- Sys.time() - start_time
   if (verbose) {
     message(
-      " in ", format(elapsed, digits = 2, nsmall = 2),
-      if (simulate) "[changes were only simulated]"
+      " in ", format(elapsed, digits = 2, nsmall = 2), appendLF = FALSE
     )
   }
+  if (simulate) message(" [changes were only simulated]")
   if (report) return(renamed)
 }
 
@@ -1049,7 +1049,7 @@ lnt_similarity <- function(texts,
 #' @importFrom stringi stri_replace_all_fixed stri_replace_all_regex
 #'   stri_datetime_parse stri_opts_fixed stri_datetime_symbols
 #'   stri_datetime_format
-#' @importFrom utils head
+#' @importFrom utils head menu
 lnt_asDate <- function(x,
                        format = "auto",
                        locale = "auto") {
@@ -1125,42 +1125,28 @@ lnt_asDate <- function(x,
     most <- head(sort(correct[correct > 0.01], decreasing = TRUE), n = 3)
     if (is.na(most[1])) stop("No valid dates found.")
     if (most[1] < 100) {
-      if (length(most) > 1) {
-        if (length(most) == 2) {
-          input <- readline(prompt = paste0(
-            "Most likely languages for dates: ", names(most)[1],
-            " (", most[1], "%", "), ", names(most)[2],
-            " (", most[2], "%", "). Select language",
-            " for date conversion (1/2) or 'abort':"
-          ))
-        } else if (length(most) == 3) {
-          input <- readline(prompt = paste0(
-            "Most likely languages for dates: ", names(most)[1],
-            " (", most[1], "%", "), ", names(most)[2],
-            " (", most[2], "%", "), ", names(most)[3],
-            " (", most[3], "%", "). Select language",
-            " for date conversion (1/2/3) or 'abort':"
-          ))
-        }
-        if (grepl("1|2|3", input)) {
-          input <- as.numeric(input)
-        } else {
-          input <- FALSE
-        }
+      if (interactive()) {
+        langchoice <- menu(
+          choices = c(
+            "Don't convert dates",
+            paste0(names(most)[1], " (", round(most[1], 2), "%", ")"),
+            paste0(names(most)[2], " (", round(most[2], 2), "%", ")"),
+            if (length(most) == 3) paste0(names(most)[3], " (", round(most[3], 2), "%", ")")
+          ),
+          title = "More than one language was detected. Choose one:"
+        )
       } else {
-        input <- readline(prompt = paste0(
-          "Most likely language for dates: ", names(most),
-          " (", most, "%", "). Proceed date ",
-          "conversion with this language? (y/n)"
-        ))
-        input <- grepl("y|yes", input, ignore.case = TRUE)
+        warning("More than one language was detected. The most likely one was chosen (",
+                paste0(names(most)[1], " ", round(most[1], 2), "%", ""),
+                ")")
+        langchoice <- 1
       }
     } else {
-      input <- 1
+      langchoice <- 1
     }
-    if (input > 0) {
-      format <- formats[names(formats) == names(most)[input]]
-      locale <- locales[names(locales) == names(most)[input]]
+    if (langchoice > 0) {
+      format <- formats[names(formats) == names(most)[langchoice]]
+      locale <- locales[names(locales) == names(most)[langchoice]]
     } else {
       return(x)
     }
@@ -1332,8 +1318,8 @@ lnt_lookup <- function(x,
 #' @export
 #' @importFrom quanteda tokens
 lnt_diff <- function(x,
-                     min,
-                     max,
+                     min = 0.15,
+                     max = 0.3,
                      n = 25,
                      output_html = FALSE,
                      ...) {

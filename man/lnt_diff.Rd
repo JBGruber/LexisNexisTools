@@ -4,7 +4,8 @@
 \alias{lnt_diff}
 \title{Display diff of similar articles}
 \usage{
-lnt_diff(x, min, max, n = 25, output_html = FALSE, ...)
+lnt_diff(x, min = 0.15, max = 0.3, n = 25, output_html = FALSE,
+  ...)
 }
 \arguments{
 \item{x}{lnt_sim object as returned by \link{lnt_similarity}.}
