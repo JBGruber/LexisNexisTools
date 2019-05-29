@@ -1139,14 +1139,14 @@ lnt_asDate <- function(x,
         warning("More than one language was detected. The most likely one was chosen (",
                 paste0(names(most)[1], " ", round(most[1], 2), "%", ""),
                 ")")
-        langchoice <- 1
+        langchoice <- 2
       }
     } else {
-      langchoice <- 1
+      langchoice <- 2
     }
     if (langchoice > 0) {
-      format <- formats[names(formats) == names(most)[langchoice]]
-      locale <- locales[names(locales) == names(most)[langchoice]]
+      format <- formats[names(formats) == names(most)[langchoice - 1]]
+      locale <- locales[names(locales) == names(most)[langchoice - 1]]
     } else {
       return(x)
     }
