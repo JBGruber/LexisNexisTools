@@ -934,12 +934,12 @@ lnt_similarity <- function(texts,
   duplicates.df <- lapply(dates.d, function(x) {
     if (sum(x == na.omit(dates)) > 1) {
       text_dfm_day <- quanteda::dfm_subset(text_dfm, subset = (dates == x))
-      sim <- quanteda::textstat_simil(
+      sim <- stats::as.dist(quanteda::textstat_simil(
         text_dfm_day,
         selection = NULL,
         method = "cosine",
         margin = "documents"
-      )
+      ))
       . <- t(combn(as.numeric(quanteda::docnames(text_dfm_day)), 2))
       colnames(.) <- c("ID_original", "ID_duplicate")
       duplicates.df <- data.frame(
