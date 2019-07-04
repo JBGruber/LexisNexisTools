@@ -54,7 +54,7 @@ path <- devtools::build(vignettes = TRUE, manual = TRUE)
 devtools::check_built(path = path)
 
 ## build manual
-unlink("../LexisNexisTools.pdf")
+unlink("LexisNexisTools.pdf")
 system("R CMD Rd2pdf ../LexisNexisTools")
 
 ## build vignette

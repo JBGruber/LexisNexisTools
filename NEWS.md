@@ -1,3 +1,11 @@
+# LexisNexisTools 0.2.3
+
+* Added support for different download formats (.RTF, .DOC, .PDF[limited]).
+* Fixed problems with changes in quanteda 1.5.
+* Added function retrieve BibTeX entries from LNToutput.
+* Added dim() method for LNToutput class.
+* Improved lnt_lookup() by adding more word boundary options.
+
 # LexisNexisTools 0.2.2
 
 * Minor bug fixes in lnt_similarity().

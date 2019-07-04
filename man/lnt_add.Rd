@@ -18,7 +18,7 @@ to which data is added.}
 }
 \description{
 This functions adds a dataframe to a slot in an LNToutput object
-  or overwrite existing entries. The main use of the function is to add an
+  or overwrites existing entries. The main use of the function is to add an
   extract of one of the data.frames back to an LNToutput object after
   operations were performed on it.
 }

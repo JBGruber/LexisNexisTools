@@ -179,9 +179,9 @@ meta_paragraphs_df <- meta_df %>%
 Alternatively, you can convert LNToutput objects to formats common in other packages using the function `lnt_convert`:
 
 ```{r}
-quanteda_corpus <- lnt_convert(LNToutput, to = "rDNA")
+rDNA_docs <- lnt_convert(LNToutput, to = "rDNA")
 
-corpus <- lnt_convert(LNToutput, to = "quanteda")
+quanteda_corpus <- lnt_convert(LNToutput, to = "quanteda")
 
 tCorpus <- lnt_convert(LNToutput, to = "corpustools")
 

@@ -20,5 +20,5 @@ citation.
 \examples{
 LNToutput <- lnt_read(lnt_sample())
 
-docs <- lnt_convert(LNToutput, art_id = 1)
+bib <- lnt2bibtex(LNToutput, art_id = 1)
 }

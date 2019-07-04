@@ -12,7 +12,8 @@ lnt_read(x, encoding = "UTF-8", extract_paragraphs = TRUE,
   verbose = TRUE, ...)
 }
 \arguments{
-\item{x}{Name or names of file from LexisNexis to be converted.}
+\item{x}{Name(s) of file(s) or one or multiple directories containing files
+from LexisNexis to be converted.}
 
 \item{encoding}{Encoding to be assumed for input files. Defaults to UTF-8
 (the LexisNexis standard value).}
@@ -61,7 +62,7 @@ An LNToutput S4 object consisting of 3 data.frames for metadata,
   articles and paragraphs.
 }
 \description{
-Read a file from LexisNexis in a supported format and convert it to a object
+Read a file from LexisNexis in a supported format and convert it to an object
 of class \link{LNToutput}. Supported formats are TXT, DOC, RTF and PDF files.
 }
 \details{

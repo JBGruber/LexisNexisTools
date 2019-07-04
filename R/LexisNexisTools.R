@@ -148,10 +148,11 @@ setMethod("+",
 
 #' Read in a LexisNexis file
 #'
-#' Read a file from LexisNexis in a supported format and convert it to a object
+#' Read a file from LexisNexis in a supported format and convert it to an object
 #' of class \link{LNToutput}. Supported formats are TXT, DOC, RTF and PDF files.
 #'
-#' @param x Name or names of file from LexisNexis to be converted.
+#' @param x Name(s) of file(s) or one or multiple directories containing files
+#'   from LexisNexis to be converted.
 #' @param encoding Encoding to be assumed for input files. Defaults to UTF-8
 #'   (the LexisNexis standard value).
 #' @param extract_paragraphs A logical flag indicating if the returned object
@@ -1190,7 +1191,7 @@ lnt_asDate <- function(x,
 #'   ("after"). FALSE searches without word boundaries.
 #' @param verbose A logical flag indicating whether a status bar is printed to
 #'   the screen.
-#' @return A list keyword hits.
+#' @return A list of keyword hits.
 #'
 #' @examples
 #' # Make LNToutput object from sample
@@ -1252,7 +1253,6 @@ lnt_lookup <- function(x,
         "\\b"
       )
     }
-    
   }
   if (!verbose) {
     pbapply::pboptions(type = "none")
@@ -1750,7 +1750,7 @@ lnt2SQLite <- function(x, file = "LNT.sqlite", ...) {
 #' @examples
 #' LNToutput <- lnt_read(lnt_sample())
 #'
-#' docs <- lnt_convert(LNToutput, art_id = 1)
+#' bib <- lnt2bibtex(LNToutput, art_id = 1)
 lnt2bibtex <- function(x, art_id, ...) {
 
   dat <- x[x@meta$ID %in% art_id]
@@ -1825,7 +1825,7 @@ check_install <- function(pkg) {
 #' @title Adds or replaces articles
 #'
 #' @description This functions adds a dataframe to a slot in an LNToutput object
-#'   or overwrite existing entries. The main use of the function is to add an
+#'   or overwrites existing entries. The main use of the function is to add an
 #'   extract of one of the data.frames back to an LNToutput object after
 #'   operations were performed on it.
 #' @details Note, that when adding paragraphs, the Par_ID column is used to
@@ -1978,18 +1978,16 @@ trim <- function(object, n, e = "...") {
 
 #' Get files
 #'
-#' Internal function, used to find input files
+#' Find files from LexisNexis in folder(s).
 #'
 #' @param x character, name or names of file(s) or folder(s) to be searched.
-#' @param pattern file pattern to be searched
+#' @param pattern file pattern to be searched.
 #' @param recursive logical. Should the listing recurse into directories?
 #' @param ignore_case logical. Should pattern-matching be case-insensitive?
 #'
 #' @importFrom stringi stri_replace_all_fixed
 #'
 #' @noRd
-#' @author Johannes B. Gruber
-#'
 get_files <- function(x,
                       pattern = ".txt$|.rtf$|.doc$|.pdf$",
                       recursive = TRUE,

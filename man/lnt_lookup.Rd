@@ -33,7 +33,7 @@ turn off.}
 the screen.}
 }
 \value{
-A list keyword hits.
+A list of keyword hits.
 }
 \description{
 This function looks for the provided pattern in the string or
