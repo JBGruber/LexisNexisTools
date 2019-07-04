@@ -13,3 +13,4 @@ cran-comments.md
 test.R
 README.Rmd
 ^codecov\.yml$
+^CRAN-RELEASE$

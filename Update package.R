@@ -66,5 +66,8 @@ devtools::check_win_devel()
 devtools::check_win_oldrelease()
 devtools::check_win_release()
 
+## check r_hub
+devtools::check_rhub()
+
 ## release
 devtools::release()
