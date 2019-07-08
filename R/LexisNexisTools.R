@@ -1310,7 +1310,7 @@ lnt_lookup <- function(x,
 #' # Test similarity of articles
 #' duplicates.df <- lnt_similarity(
 #'   LNToutput = lnt_read(lnt_sample()),
-#'   threshold = 0.95
+#'   threshold = 0.97
 #' )
 #'
 #' lnt_diff(duplicates.df, min = 0.18, max = 0.30)

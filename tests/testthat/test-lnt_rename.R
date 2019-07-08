@@ -1,8 +1,8 @@
 context("LNToutput methods")
 
-lnt_sample(verbose = FALSE)
-
 test_that("Rename Sample", {
+  skip_on_cran()
+  setup(lnt_sample(verbose = FALSE))
   expect_equal({
     file <- lnt_rename(getwd(), simulate = TRUE,
                        verbose = FALSE)
@@ -17,9 +17,8 @@ test_that("Rename Sample", {
     files <- list.files()
     x <- lnt_rename(files, simulate = TRUE, verbose = FALSE)
   }, "Not all provided files were TXT, DOC, RTF or PDF files. Other formats are ignored.")
+  teardown(unlink(c(
+    "sample.TXT",
+    "SampleFile_20091201-20100511_1-10.txt"
+  )))
 })
-
-teardown(unlink(c(
-  "sample.TXT",
-  "SampleFile_20091201-20100511_1-10.txt"
-)))

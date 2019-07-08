@@ -40,6 +40,34 @@ test_that("Convert LNToutput to quanteda", {
 # corpus
 # saveRDS(corpus, "../files/quanteda.RDS")
 
+
+test_that("Convert LNToutput to quanteda", {
+  skip_if(packageVersion("quanteda") < "1.5.0")
+  expect_equal({
+    corpus <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
+                          to = "quanteda", what = "Articles",
+                          collapse = FALSE)
+    quanteda::metacorpus(corpus, "created") <- "Mon Jul  8 10:34:12 2019"
+    quanteda::metacorpus(corpus, "source") <-
+      "/home/johannes/Documents/Github/LexisNexisTools/tests/testthat/* on x86_64 by johannes"
+    corpus
+  }, readRDS("../files/quanteda_1.5.RDS"))
+  expect_equal({
+    corpus <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
+                          to = "quanteda",
+                          what = "Paragraphs",
+                          collapse = FALSE,
+                          metacorpus = list(notes = "test"))
+    unname(unlist(quanteda::metacorpus(corpus, "notes")))
+  }, "test")
+})
+
+# corpus <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
+#                       to = "quanteda", what = "Articles")
+# corpus$metadata$created <- "Mon Jul  8 10:34:12 2019"
+# corpus
+# saveRDS(corpus, "../files/quanteda_1.5.RDS")
+
 test_that("Convert LNToutput to corpustools", {
   expect_equal({
     cptools <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),

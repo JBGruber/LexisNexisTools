@@ -1,7 +1,7 @@
 Package: LexisNexisTools
 Title: Working with Files from 'LexisNexis'
 Version: 0.2.3
-Date: 2019-07-04
+Date: 2019-07-08
 Authors@R: person("Johannes", "Gruber", email = "j.gruber.1@research.gla.ac.uk", 
   role = c("aut", "cre"))
 Description: My PhD supervisor once told me that everyone doing newspaper
@@ -11,7 +11,7 @@ Description: My PhD supervisor once told me that everyone doing newspaper
     the time. This package takes TXT files downloaded from the newspaper archive of
     'LexisNexis', reads them into R and offers functions for further processing.
 Depends:
-    R (>= 3.3.0)
+    R (>= 3.5.0)
 License: GPL-3
 Imports:
     data.table (>= 1.10.4.3),
