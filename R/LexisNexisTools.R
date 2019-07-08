@@ -685,9 +685,9 @@ lnt_parse_nexis <- function(lines,
 }
 
 
-#' lnt_parse_nexis
+#' lnt_parse_uni
 #'
-#' Internal function to parse lines from nexis.com files.
+#' Internal function to parse lines from Nexis Uni files.
 #'
 #' @param lines Input lines from \link{lnt_read_lines}.
 #' @param start_time Time the task was started (for status messages).
@@ -963,7 +963,7 @@ lnt_parse_uni <- function(lines,
 
   if (extract_paragraphs) {
     names(df.l) <- seq_along(df.l)
-    par <- setNames(unlist(df.l, use.names= FALSE),
+    par <- setNames(unlist(df.l, use.names = FALSE),
                     rep(names(df.l), lengths(df.l)))
     paragraphs.df <- tibble(
       Art_ID = as.integer(names(par)),
