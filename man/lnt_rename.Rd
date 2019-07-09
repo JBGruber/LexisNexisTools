@@ -37,17 +37,17 @@ the file, new file names will be empty.
 Warning: This will rename all supported files in a give folder.
 }
 \examples{
-
+\dontrun{
 # Copy sample file to current wd
 lnt_sample()
 
 # Rename files in current wd and report back if successful
-\dontrun{
+
 report.df <- lnt_rename(
   recursive = FALSE,
   report = TRUE
 )
-}
+
 
 # Or provide file name(s)
 my_files <- list.files(
@@ -64,6 +64,7 @@ report.df <- lnt_rename(
 report.df <- lnt_rename(x = getwd())
 
 report.df
+}
 }
 \author{
 Johannes B. Gruber

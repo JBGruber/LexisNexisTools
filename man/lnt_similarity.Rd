@@ -70,11 +70,13 @@ accurate but is very computationally demanding, especially if more than two
 texts are compared at once.
 }
 \examples{
+\dontrun{
 # Copy sample file to current wd
 lnt_sample()
+}
 
 # Convert raw file to LNToutput object
-LNToutput <- lnt_read(lnt_sample())
+LNToutput <- lnt_read(lnt_sample(copy = FALSE))
 
 # Test similarity of articles
 duplicates.df <- lnt_similarity(

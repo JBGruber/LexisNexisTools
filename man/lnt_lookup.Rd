@@ -48,7 +48,7 @@ If an LNToutput object is provided, the function will look for the
 }
 \examples{
 # Make LNToutput object from sample
-LNToutput <- lnt_read(lnt_sample())
+LNToutput <- lnt_read(lnt_sample(copy = FALSE))
 
 # Lookup keywords
 LNToutput@meta$Keyword <- lnt_lookup(

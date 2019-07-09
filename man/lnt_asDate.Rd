@@ -24,7 +24,7 @@ Converts dates from string formats common in LexisNexis to a
   date object.
 }
 \examples{
-LNToutput <- lnt_read(lnt_sample(), convert_date = FALSE)
+LNToutput <- lnt_read(lnt_sample(copy = FALSE), convert_date = FALSE)
 d <- lnt_asDate(LNToutput@meta$Date)
 d
 }

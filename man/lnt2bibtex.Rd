@@ -18,7 +18,7 @@ Takes output from \link{lnt_read} and converts chosen articles to a BibTeX
 citation.
 }
 \examples{
-LNToutput <- lnt_read(lnt_sample())
+LNToutput <- lnt_read(lnt_sample(copy = FALSE))
 
 bib <- lnt2bibtex(LNToutput, art_id = 1)
 }

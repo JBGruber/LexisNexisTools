@@ -645,17 +645,17 @@ lnt_read <- function(x,
 #' @importFrom stats na.omit
 #' @importFrom stringi stri_extract_all_regex stri_join
 #' @examples
-#'
+#' \dontrun{
 #' # Copy sample file to current wd
 #' lnt_sample()
 #'
 #' # Rename files in current wd and report back if successful
-#' \dontrun{
+#' 
 #' report.df <- lnt_rename(
 #'   recursive = FALSE,
 #'   report = TRUE
 #' )
-#' }
+#' 
 #'
 #' # Or provide file name(s)
 #' my_files <- list.files(
@@ -672,6 +672,7 @@ lnt_read <- function(x,
 #' report.df <- lnt_rename(x = getwd())
 #'
 #' report.df
+#' }
 lnt_rename <- function(x,
                        encoding = "UTF-8",
                        recursive = FALSE,
@@ -846,11 +847,13 @@ lnt_rename <- function(x,
 #' @importFrom quanteda dfm docnames textstat_simil
 #' @importFrom utils combn
 #' @examples
+#' \dontrun{
 #' # Copy sample file to current wd
 #' lnt_sample()
+#' }
 #'
 #' # Convert raw file to LNToutput object
-#' LNToutput <- lnt_read(lnt_sample())
+#' LNToutput <- lnt_read(lnt_sample(copy = FALSE))
 #'
 #' # Test similarity of articles
 #' duplicates.df <- lnt_similarity(
@@ -1044,7 +1047,7 @@ lnt_similarity <- function(texts,
 #' @export
 #'
 #' @examples
-#' LNToutput <- lnt_read(lnt_sample(), convert_date = FALSE)
+#' LNToutput <- lnt_read(lnt_sample(copy = FALSE), convert_date = FALSE)
 #' d <- lnt_asDate(LNToutput@meta$Date)
 #' d
 #' @importFrom stringi stri_replace_all_fixed stri_replace_all_regex
@@ -1195,7 +1198,7 @@ lnt_asDate <- function(x,
 #'
 #' @examples
 #' # Make LNToutput object from sample
-#' LNToutput <- lnt_read(lnt_sample())
+#' LNToutput <- lnt_read(lnt_sample(copy = FALSE))
 #'
 #' # Lookup keywords
 #' LNToutput@meta$Keyword <- lnt_lookup(
@@ -1309,7 +1312,7 @@ lnt_lookup <- function(x,
 #' @examples
 #' # Test similarity of articles
 #' duplicates.df <- lnt_similarity(
-#'   LNToutput = lnt_read(lnt_sample()),
+#'   LNToutput = lnt_read(lnt_sample(copy = FALSE)),
 #'   threshold = 0.97
 #' )
 #'
@@ -1400,7 +1403,7 @@ lnt_diff <- function(x,
 #'   * lnt2SQLite ... passed on to [RSQLite::dbWriteTable()].
 #'
 #' @examples
-#' LNToutput <- lnt_read(lnt_sample())
+#' LNToutput <- lnt_read(lnt_sample(copy = FALSE))
 #'
 #' docs <- lnt_convert(LNToutput, to = "rDNA")
 #'
@@ -1748,7 +1751,7 @@ lnt2SQLite <- function(x, file = "LNT.sqlite", ...) {
 #' @export
 #'
 #' @examples
-#' LNToutput <- lnt_read(lnt_sample())
+#' LNToutput <- lnt_read(lnt_sample(copy = FALSE))
 #'
 #' bib <- lnt2bibtex(LNToutput, art_id = 1)
 lnt2bibtex <- function(x, art_id, ...) {
@@ -1839,7 +1842,7 @@ check_install <- function(pkg) {
 #'
 #' @examples
 #' # Make LNToutput object from sample
-#' LNToutput <- lnt_read(lnt_sample())
+#' LNToutput <- lnt_read(lnt_sample(copy = FALSE))
 #'
 #' # extract meta and make corrections
 #' correction <- LNToutput@meta[grepl("Wikipedia", LNToutput@meta$Headline), ]

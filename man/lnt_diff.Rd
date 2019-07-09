@@ -30,7 +30,7 @@ This function is a wrapper for \link[diffobj]{diffPrint}. It is
 \examples{
 # Test similarity of articles
 duplicates.df <- lnt_similarity(
-  LNToutput = lnt_read(lnt_sample()),
+  LNToutput = lnt_read(lnt_sample(copy = FALSE)),
   threshold = 0.97
 )
 

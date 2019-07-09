@@ -29,7 +29,7 @@ Note, that when adding paragraphs, the Par_ID column is used to
 }
 \examples{
 # Make LNToutput object from sample
-LNToutput <- lnt_read(lnt_sample())
+LNToutput <- lnt_read(lnt_sample(copy = FALSE))
 
 # extract meta and make corrections
 correction <- LNToutput@meta[grepl("Wikipedia", LNToutput@meta$Headline), ]

@@ -60,7 +60,7 @@ for tuning the outcome:
 }
 }
 \examples{
-LNToutput <- lnt_read(lnt_sample())
+LNToutput <- lnt_read(lnt_sample(copy = FALSE))
 
 docs <- lnt_convert(LNToutput, to = "rDNA")
 
