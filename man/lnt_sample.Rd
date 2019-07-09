@@ -4,13 +4,20 @@
 \alias{lnt_sample}
 \title{Provides a small sample TXT file}
 \usage{
-lnt_sample(overwrite = FALSE, verbose = TRUE)
+lnt_sample(overwrite = FALSE, verbose = TRUE, path = NULL,
+  copy = TRUE)
 }
 \arguments{
 \item{overwrite}{Should sample.TXT be overwritten if found in the current
 working directory?}
 
 \item{verbose}{Display warning message if file exists in current wd.}
+
+\item{path}{The destination path for the sample file (current working
+directory if \code{NULL})}
+
+\item{copy}{Logical. Should the file be copied to path/working directory? If
+\code{FALSE}, the function only returns the location of the sample file.}
 }
 \description{
 Copies a small TXT sample file to the current working directory and returns
@@ -22,7 +29,9 @@ copyright laws and can not be shared.
 A small sample database to test the functions of LexisNexisTools
 }
 \examples{
-lnt_sample()
+\dontrun{
+  lnt_sample()
+}
 }
 \author{
 Johannes Gruber

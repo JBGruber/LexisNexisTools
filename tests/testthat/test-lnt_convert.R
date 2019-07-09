@@ -1,8 +1,5 @@
 context("LNToutput Conversion")
 
-# LNToutput <- lnt_read(lnt_sample(verbose = FALSE), verbose = FALSE)
-
-
 test_that("Convert LNToutput to rDNA", {
   expect_equal({
     lnt_convert(x = readRDS("../files/LNToutput.RDS"),

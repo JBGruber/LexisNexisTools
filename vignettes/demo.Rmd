@@ -76,9 +76,16 @@ report
 
 ```{r, echo=FALSE}
 library(kableExtra)
-unlink("SampleFile_20091201-20100511_1-10.txt")
-report <- lnt_rename(x = lnt_sample(overwrite = TRUE), simulate = FALSE, report = TRUE, verbose = FALSE)
-report$name_orig <- basename(report$name_orig)
+temp <- paste0(tempfile(), ".TXT")
+file.copy(
+  from = system.file("extdata", "sample.TXT", package = "LexisNexisTools"),
+  to = temp,
+  overwrite = TRUE
+)
+
+report <- lnt_rename(x = temp, simulate = FALSE, report = TRUE, verbose = FALSE)
+report$name_orig <- "sample.TXT"
+newfile <- report$name_new
 report$name_new <- basename(report$name_new)
 kable(report, format = "markdown")
 ```
@@ -115,8 +122,11 @@ In these cases, you should remove the whole article after inspecting it.
 
 To use the function, you can again provide either file name(s), folder name(s) or nothing---to search the current working directory for TXT files---as `x` argument:
 
-```{r message=FALSE}
+```{r eval=FALSE}
 LNToutput <- lnt_read(x = getwd())
+```
+```{r echo=FALSE, message=FALSE}
+LNToutput <- lnt_read(x = newfile)
 ```
 
     ## Creating LNToutput from 1 file...
@@ -312,3 +322,6 @@ table(unlist(lnt_lookup(LNToutput, pattern = "stat.+?\\b")))
 ```
 
 
+```{r echo = FALSE}
+unlink("sample.TXT")
+```

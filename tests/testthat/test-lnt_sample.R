@@ -1,10 +1,14 @@
 context("Create sample")
 
+dir <- paste0(tempdir(check = TRUE), "/test")
+dir.create(dir)
+
 test_that("sample exists", {
-  expect_equal(basename(lnt_sample(verbose = FALSE)), "sample.TXT")
-  expect_equal(file.exists(lnt_sample(verbose = FALSE)), TRUE)
-  expect_warning(lnt_sample(verbose = TRUE),
+  skip_on_cran()
+  expect_equal(basename(lnt_sample(verbose = FALSE, path = dir)), "sample.TXT")
+  expect_equal(file.exists(lnt_sample(verbose = FALSE, path = dir)), TRUE)
+  expect_warning(lnt_sample(verbose = TRUE, path = dir),
   "Sample file exists in wd. Use overwrite = TRUE to create fresh sample file.")
 })
 
-teardown(unlink(lnt_sample(verbose = FALSE)))
+teardown(unlink(dir, recursive = TRUE, force = TRUE))

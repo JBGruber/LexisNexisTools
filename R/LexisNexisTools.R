@@ -203,7 +203,7 @@ setMethod("+",
 #' @author Johannes B. Gruber
 #' @export
 #' @examples
-#' LNToutput <- lnt_read(lnt_sample())
+#' LNToutput <- lnt_read(lnt_sample(copy = FALSE))
 #' meta.df <- LNToutput@meta
 #' articles.df <- LNToutput@articles
 #' paragraphs.df <- LNToutput@paragraphs
@@ -1928,27 +1928,43 @@ lnt_add <- function(to,
 #' @param overwrite Should sample.TXT be overwritten if found in the current
 #'   working directory?
 #' @param verbose Display warning message if file exists in current wd.
+#' @param path The destination path for the sample file (current working
+#'   directory if \code{NULL})
+#' @param copy Logical. Should the file be copied to path/working directory? If
+#'   \code{FALSE}, the function only returns the location of the sample file.
 #'
 #' @examples
-#' lnt_sample()
+#' \dontrun{
+#'   lnt_sample()
+#' }
 #' @author Johannes Gruber
 #' @export
 lnt_sample <- function(overwrite = FALSE,
-                       verbose = TRUE) {
-  if (all(file.exists(paste0(getwd(), "/", "sample.TXT")), !overwrite)) {
-    if (verbose) {
-      warning(
-        "Sample file exists in wd. Use overwrite = TRUE to create fresh sample file."
+                       verbose = TRUE,
+                       path = NULL,
+                       copy = TRUE) {
+  if (is.null(path)) {
+    path <- getwd()
+  }
+  if (copy) {
+    to <- paste0(path, "/", "sample.TXT")
+    if (all(file.exists(paste0(path, "/", "sample.TXT")), !overwrite)) {
+      if (verbose) {
+        warning(
+          "Sample file exists in wd. Use overwrite = TRUE to create fresh sample file."
+        )
+      }
+    } else {
+      file.copy(
+        from = system.file("extdata", "sample.TXT", package = "LexisNexisTools"),
+        to = to,
+        overwrite = TRUE
       )
     }
   } else {
-    file.copy(
-      from = system.file("extdata", "sample.TXT", package = "LexisNexisTools"),
-      to = paste0(getwd(), "/", "sample.TXT"),
-      overwrite = TRUE
-    )
+    to <- system.file("extdata", "sample.TXT", package = "LexisNexisTools")
   }
-  return(paste0(getwd(), "/", "sample.TXT"))
+  return(to)
 }
 
 

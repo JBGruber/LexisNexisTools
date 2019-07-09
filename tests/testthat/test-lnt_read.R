@@ -1,8 +1,7 @@
 context("Read sample file")
 
-files <- system.file("extdata", "sample.TXT", package = "LexisNexisTools")
-file.copy(files, paste0(basename(files), "2.TXT"))
-files <- c(files, paste0(basename(files), "2.TXT"))
+files <- c(system.file("extdata", "sample.TXT", package = "LexisNexisTools"),
+           system.file("extdata", "sample.TXT", package = "LexisNexisTools"))
 
 test_that("Read in sample file", {
   expect_equal({
@@ -34,7 +33,7 @@ test_that("Read in folder", {
     lnt_read("../")
   }, "No .txt or .rtf or .doc or .pdf files found.", fixed = TRUE)
   expect_that({
-    test <- lnt_read("../../", 
+    test <- lnt_read(dirname(files), 
                      recursive = TRUE, 
                      extract_paragraphs = FALSE, 
                      file_pattern = ".txt$")
@@ -49,7 +48,6 @@ test_that("no articles found", {
   }, "No articles found in provided file(s)", fixed = TRUE)
 })
 
-teardown(unlink(c(
-  files[2],
+teardown(unlink(
   "../files/emtpy.txt"
-)))
+))

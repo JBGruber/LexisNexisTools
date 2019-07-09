@@ -82,7 +82,7 @@ The function can produce an \link{LNToutput} S4 object with two or
   * \code{end_keyword = "^LANGUAGE: |^SPRACHE: |^LANGUE: "}.
 }
 \examples{
-LNToutput <- lnt_read(lnt_sample())
+LNToutput <- lnt_read(lnt_sample(copy = FALSE))
 meta.df <- LNToutput@meta
 articles.df <- LNToutput@articles
 paragraphs.df <- LNToutput@paragraphs
