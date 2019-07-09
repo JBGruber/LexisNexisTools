@@ -31,7 +31,7 @@ test_that("Read in sample file", {
 test_that("Read in folder", {
   expect_error({
     lnt_read("../")
-  }, "No .txt or .rtf or .doc or .pdf files found.", fixed = TRUE)
+  }, "No .txt or .rtf or .doc or .pdf or .docx files found.", fixed = TRUE)
   expect_that({
     test <- lnt_read(dirname(files), 
                      recursive = TRUE, 

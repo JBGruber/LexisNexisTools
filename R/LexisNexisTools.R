@@ -217,24 +217,14 @@ lnt_read <- function(x,
                      start_keyword = "auto",
                      end_keyword = "auto",
                      length_keyword = "auto",
-                     author_keyword = "AUTOR: |VON |BYLINE: ",
+                     author_keyword = "auto",
                      exclude_lines = "^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIC: |^DATELINE: ",
                      recursive = FALSE,
-                     file_pattern = ".txt$|.rtf$|.doc$|.pdf$",
+                     file_pattern = ".txt$|.rtf$|.doc$|.pdf$|.docx$",
                      verbose = TRUE,
                      ...) {
 
   files <- get_files(x, recursive = recursive, pattern = file_pattern)
-
-  if (start_keyword == "auto") {
-    start_keyword <- "\\d+ of \\d+ DOCUMENTS$|\\d+ of \\d+ DOCUMENT$|Dokument \\d+ von \\d+$| Document \\d+ de \\d+$"
-  }
-  if (end_keyword == "auto") {
-    end_keyword <- "^LANGUAGE: |^SPRACHE: |^LANGUE: "
-  }
-  if (length_keyword == "auto") {
-    length_keyword <- "^LENGTH: |^L\u00c4NGE: |^LONGUEUR: "
-  }
 
   # Track the time
   if (verbose) {
@@ -249,6 +239,88 @@ lnt_read <- function(x,
   }
 
   lines <- lnt_read_lines(files, encoding)
+
+  if (length(lines$nexis) > 0) {
+    out_nexis <- lnt_parse_nexis(
+      lines = lines$nexis,
+      extract_paragraphs = extract_paragraphs,
+      convert_date = convert_date,
+      start_keyword = start_keyword,
+      end_keyword = end_keyword,
+      length_keyword = length_keyword,
+      author_keyword,
+      exclude_lines = exclude_lines,
+      verbose = verbose,
+      start_time = start_time,
+      ...
+    )
+  }
+
+  if (length(lines$uni) > 0) {
+    out_uni <- lnt_parse_uni(
+      lines = lines$uni,
+      extract_paragraphs = extract_paragraphs,
+      convert_date = convert_date,
+      start_keyword = start_keyword,
+      end_keyword = end_keyword,
+      length_keyword = length_keyword,
+      author_keyword,
+      exclude_lines = exclude_lines,
+      verbose = verbose,
+      start_time = start_time,
+      ...
+    )
+  }
+
+  if (exists("out_nexis") & exists("out_uni")) {
+    out <- out_nexis + out_uni
+  } else if (exists("out_nexis")) {
+    out <- out_nexis
+  } else if (exists("out_uni")) {
+    out <- out_uni
+  }
+
+  attributes(out)$created <- list(
+    time = Sys.time(),
+    Version = packageVersion("LexisNexisTools")
+  )
+  return(out)
+}
+
+
+#' lnt_parse_nexis
+#'
+#' Internal function to parse lines from nexis.com files.
+#'
+#' @param lines Input lines from \link{lnt_read_lines}.
+#' @param start_time Time the task was started (for status messages).
+#' @inheritParams lnt_read
+#'
+#' @noRd
+lnt_parse_nexis <- function(lines,
+                            extract_paragraphs,
+                            convert_date,
+                            start_keyword,
+                            end_keyword,
+                            length_keyword,
+                            author_keyword,
+                            exclude_lines,
+                            verbose,
+                            start_time,
+                            ...) {
+
+  if (start_keyword == "auto") {
+    start_keyword <- "\\d+ of \\d+ DOCUMENTS$|\\d+ of \\d+ DOCUMENT$|Dokument \\d+ von \\d+$| Document \\d+ de \\d+$"
+  }
+  if (end_keyword == "auto") {
+    end_keyword <- "^LANGUAGE: |^SPRACHE: |^LANGUE: "
+  }
+  if (length_keyword == "auto") {
+    length_keyword <- "^LENGTH: |^L\u00c4NGE: |^LONGUEUR: "
+  }
+  if (author_keyword == "auto") {
+    author_keyword = "AUTOR: |VON |BYLINE: "
+  }
 
   if (verbose) {
     message("\t...files loaded [", format(
@@ -408,9 +480,9 @@ lnt_read <- function(x,
       } else {
         # Alternatively, the edition is sometimes the first non-empty line in the article
         edition.v <- grep("edition",
-          df.l[[i]]$article[!stringi::stri_isempty(str = df.l[[i]]$article)][1],
-          value = TRUE,
-          ignore.case = TRUE
+                          df.l[[i]]$article[!stringi::stri_isempty(str = df.l[[i]]$article)][1],
+                          value = TRUE,
+                          ignore.case = TRUE
         )
         ifelse(length(edition.v) == 0,
                NA,
@@ -609,9 +681,337 @@ lnt_read <- function(x,
     articles = articles.df,
     paragraphs = tibble::as_tibble(paragraphs.df)
   )
-  attributes(out)$created <- list(
-    time = Sys.time(),
-    Version = packageVersion("LexisNexisTools")
+  return(out)
+}
+
+
+#' lnt_parse_uni
+#'
+#' Internal function to parse lines from Nexis Uni files.
+#'
+#' @param lines Input lines from \link{lnt_read_lines}.
+#' @param start_time Time the task was started (for status messages).
+#' @inheritParams lnt_read
+#' 
+#' @importFrom stats setNames
+#'
+#' @noRd
+lnt_parse_uni <- function(lines,
+                            extract_paragraphs,
+                            convert_date,
+                            start_keyword,
+                            end_keyword,
+                            length_keyword,
+                            author_keyword,
+                            exclude_lines,
+                            verbose,
+                            start_time,
+                            ...) {
+
+  if (end_keyword == "auto") {
+    end_keyword <- "^End of Document$"
+  }
+  if (length_keyword == "auto") {
+    length_keyword <- "^Length:\u00a0|^L\u00c4NGE:|^LONGUEUR:"
+  }
+  if (length_keyword == "auto") {
+    author_keyword <- "^Byline:\u00a0"
+  }
+
+  if (verbose) {
+    message("\t...files loaded [", format(
+      (Sys.time() - start_time),
+      digits = 2, nsmall = 2
+    ), "]")
+  }
+
+  # exclude some lines
+  if (length(exclude_lines) > 0) {
+    lines[grep("^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIC: |^DATELINE: ", lines)] <- ""
+  }
+
+  # remove cover page
+  lines <- rle(lines)
+  lines$article <- cumsum(lines$lengths > 2 & lines$values == "")
+  lines <- lines$values[lines$article == max(lines$article)]
+
+  articles.l <- split(
+    lines, cumsum(stringi::stri_detect_regex(lines, end_keyword))
+  )
+  articles.l[[length(articles.l)]] <- NULL
+  names(articles.l) <- NULL
+  rm(lines)
+
+  if (length(articles.l) == 0) {
+    stop("No articles found in provided file(s)")
+  }
+
+  # split meta from body
+  df.l <- lapply(articles.l, function(a) {
+    split <- grep("^Body$", a)[1]
+    if (!is.na(split)) {
+      list(
+        source = names(a)[1],
+        meta = unname(a[2:split]),
+        article = unname(a[(split + 1):(length(a) - 1)]),
+        graphic = FALSE
+      )
+    } else {
+      list(
+        source = names(a)[1],
+        meta = NULL,
+        article = a,
+        graphic = TRUE
+      )
+    }
+  })
+
+  if (verbose) {
+    message(
+      "\t...articles split [",
+      format(
+        (Sys.time() - start_time),
+        digits = 2,
+        nsmall = 2
+      ), "]"
+    )
+  }
+
+  # make data.frame
+  ### length
+  . <- vapply(df.l, FUN.VALUE = character(1), function(i) {
+    grep(pattern = length_keyword, x = i$meta,
+         value = TRUE, ignore.case = TRUE)[1]
+  })
+  length.v <- trimws(stri_replace_all_regex(., length_keyword, ""))
+  if (verbose) {
+    message("\t...lengths extracted [", format(
+      (Sys.time() - start_time),
+      digits = 2, nsmall = 2
+    ), "]")
+  }
+
+  ### Newspaper. First non emtpy line
+  headline.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
+    grep(
+      pattern = "^$",
+      x = i$meta,
+      value = TRUE,
+      fixed = FALSE,
+      invert = TRUE
+    )[1]
+  })
+
+  if (verbose) {
+    message(
+      "\t...headlines extracted [",
+      format(
+        (Sys.time() - start_time),
+        digits = 2,
+        nsmall = 2
+      ),
+      "]"
+    )
+  }
+
+  ### Newspaper. Second non emtpy line
+  newspaper.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
+    grep(
+      pattern = "^$",
+      x = i$meta,
+      value = TRUE,
+      fixed = FALSE,
+      invert = TRUE
+    )[2]
+  })
+
+  if (verbose) {
+    message(
+      "\t...newspapers extracted [",
+      format(
+        (Sys.time() - start_time),
+        digits = 2,
+        nsmall = 2
+      ),
+      "]"
+    )
+  }
+
+  ### Date
+  date.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
+    . <- stringi::stri_extract_last_regex(
+      str = i$meta[seq_len(10)],
+      pattern = "\\w+ \\d+, \\d+|\\d+ \\w+ \\d+|\\d+. \\w+ \\d+"
+    )
+    na.omit(.)[1]
+  })
+
+  if (verbose) {
+    message("\t...dates extracted [", format(
+      (Sys.time() - start_time),
+      digits = 2, nsmall = 2
+    ), "]")
+  }
+
+  ### Author (where available)
+  author.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
+    a <- head(
+      which(stri_detect_regex(i$meta, pattern = author_keyword)),
+      n = 1
+    )
+    if (length(a) > 0) {
+      if (!i$meta[a + 1] == "") {
+        a <- c(a:(a + 1))
+      }
+      stringi::stri_join(i$meta[a], collapse = " ")
+    } else {
+      ""
+    }
+  })
+  author.v <- stri_replace_all_regex(author.v, author_keyword, "")
+  author.v[author.v == ""] <- NA
+
+  if (verbose) {
+    message("\t...authors extracted [", format(
+      (Sys.time() - start_time),
+      digits = 2, nsmall = 2
+    ), "]")
+  }
+
+
+  ### section (where available)
+  section_keyword <- "^Section:\u00a0"
+  section.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
+    grep(pattern = section_keyword, x = i$meta, value = TRUE)[1]
+  })
+  section.v <- stri_replace_all_regex(section.v, section_keyword, "")
+
+  if (verbose) {
+    message("\t...sections extracted [", format(
+      (Sys.time() - start_time),
+      digits = 2, nsmall = 2
+    ), "]")
+  }
+
+
+  ### edition (not yet implemented)
+  edition.v <- NA
+
+  if (verbose) {
+    message("\t...editions extracted [", format(
+      (Sys.time() - start_time),
+      digits = 2, nsmall = 2
+    ), "]")
+  }
+
+  if (convert_date) {
+    date.v <- lnt_asDate(date.v, ...)
+    if (verbose) {
+      message("\t...dates converted [", format(
+        (Sys.time() - start_time),
+        digits = 2, nsmall = 2
+      ), "]")
+    }
+  }
+
+
+  ### make data.frame
+  meta.df <- tibble(
+    ID = seq_along(df.l),
+    Source_File = unlist(lapply(df.l, function(i) i[["source"]])),
+    Newspaper = trimws(newspaper.v, which = "both"),
+    Date = date.v,
+    Length = trimws(length.v, which = "both"),
+    Section = trimws(section.v, which = "both"),
+    Author = trimws(author.v, which = "both"),
+    Edition = edition.v,
+    Headline = trimws(headline.v, which = "both"),
+    Graphic = unlist(lapply(df.l, function(i) i[["graphic"]]))
+  )
+  if (verbose) {
+    message("\t...metadata extracted [", format(
+      (Sys.time() - start_time),
+      digits = 2, nsmall = 2
+    ), "]")
+  }
+
+
+  # Cut of after ends in article
+  df.l <- lapply(df.l, function(i) {
+    end <- tail(grep(end_keyword, i$article), n = 1)
+    if (length(end) > 0) {
+      i$article <- i$article[1:end - 1]
+    }
+    if (i$article[1] == "") {
+      i$article <- i$article[-1]
+    }
+    i$article
+  })
+  articles.df <- tibble(
+    ID = seq_along(df.l),
+    Article = vapply(df.l, FUN.VALUE = character(1), function(i) {
+      stringi::stri_join(i, collapse = " ")
+    })
+  )
+
+  if (verbose) {
+    message("\t...article texts extracted [", format(
+      (Sys.time() - start_time),
+      digits = 2, nsmall = 2
+    ), "]")
+  }
+
+  if (extract_paragraphs) {
+    names(df.l) <- seq_along(df.l)
+    par <- setNames(unlist(df.l, use.names = FALSE),
+                    rep(names(df.l), lengths(df.l)))
+    paragraphs.df <- tibble(
+      Art_ID = as.integer(names(par)),
+      Par_ID = seq_along(par),
+      Paragraph = par
+    )
+  } else {
+    paragraphs.df <- tibble(
+      Art_ID = NA,
+      Par_ID = NA,
+      Paragraph = NA
+    )
+  }
+
+  # remove unneccesary whitespace (removes \n as well)
+  articles.df$Article <- stringi::stri_replace_all_regex(
+    str = articles.df$Article,
+    pattern = c("\\s+", "^\\s|\\s$"),
+    replacement = c(" ", ""),
+    vectorize_all = FALSE
+  )
+  if (verbose) {
+    message("\t...superfluous whitespace removed from articles [", format(
+      (Sys.time() - start_time),
+      digits = 2, nsmall = 2
+    ), "]")
+  }
+  paragraphs.df$Paragraph <- stringi::stri_replace_all_regex(
+    str = paragraphs.df$Paragraph,
+    pattern = c("\\s+", "^\\s|\\s$"),
+    replacement = c(" ", ""),
+    vectorize_all = FALSE
+  )
+  if (verbose) {
+    message("\t...superfluous whitespace removed from paragraphs [", format(
+      (Sys.time() - start_time),
+      digits = 2, nsmall = 2
+    ), "]")
+    message("Elapsed time: ", format(
+      (Sys.time() - start_time),
+      digits = 2, nsmall = 2
+    ))
+  }
+  out <- new(
+    "LNToutput",
+    meta = meta.df,
+    articles = articles.df,
+    paragraphs = tibble::as_tibble(paragraphs.df)
   )
   return(out)
 }
@@ -2008,7 +2408,7 @@ trim <- function(object, n, e = "...") {
 #'
 #' @noRd
 get_files <- function(x,
-                      pattern = ".txt$|.rtf$|.doc$|.pdf$",
+                      pattern = ".txt$|.rtf$|.doc$|.pdf$|.docx$",
                       recursive = TRUE,
                       ignore_case = TRUE) {
   # Check how files are provided
@@ -2027,7 +2427,7 @@ get_files <- function(x,
   if (all(grepl(pattern, x, ignore.case = ignore_case))) {
     files <- x
   } else if (any(grepl(pattern, x, ignore.case = ignore_case))) {
-    warning("Not all provided files were TXT, DOC, RTF or PDF files. Other formats are ignored.")
+    warning("Not all provided files were TXT, DOC, RTF, PDF or DOCX files. Other formats are ignored.")
     files <- grep(pattern, x, ignore.case = ignore_case, value = TRUE)
   } else if (any(dir.exists(x))) {
     if (length(x) > 1) {
@@ -2052,9 +2452,9 @@ get_files <- function(x,
   } else {
     stop("Provide either file name(s) ending on ",
          stri_replace_all_fixed(
-           pattern,
+           toupper(pattern),
            c("$", "|"),
-           c("", "or"),
+           c("", " or "),
            vectorize_all = FALSE
          ),
          " or folder name(s) to x or leave black to search wd.")
@@ -2168,5 +2568,36 @@ lnt_read_lines <- function(files,
   } else {
     lines_pdf <- character()
   }
-  return(c(lines_txt, lines_doc, lines_rtf, lines_pdf))
+
+  ### read in docx (nexis uni)
+  if (length(files$docx) > 0) {
+    check_install("xml2")
+    if (length(files$docx) > 1) {
+      lines_docx <- unlist(lapply(files$docx, function(f) {
+        con <- unz(description = f, filename = "word/document.xml")
+        out <- xml2::read_xml(con)
+        rm(con)
+        out <- xml2::xml_find_all(out, "//w:p")
+        out <- xml2::xml_text(out)
+        names(out) <- rep(f, times = length(out))
+        out
+      }))
+    } else {
+      con <- unz(description = files$docx, filename = "word/document.xml")
+      lines_docx <- xml2::read_xml(con)
+      rm(con)
+      lines_docx <- xml2::xml_find_all(lines_docx, "//w:p")
+      lines_docx <- xml2::xml_text(lines_docx)
+      names(lines_docx) <- rep(files$docx, times = length(lines_docx))
+    }
+    message("Reading DOCX files from Nexis Uni is experimental. Please ",
+            "report any problems in this issue: ",
+            "https://github.com/JBGruber/LexisNexisTools/issues/7")
+  } else {
+    lines_docx <- character()
+  }
+
+
+  return(list(nexis = c(lines_txt, lines_doc, lines_rtf, lines_pdf),
+              uni = lines_docx))
 }

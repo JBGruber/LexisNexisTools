@@ -23,7 +23,7 @@ test_that("Rename Sample", {
   }, TRUE)
   expect_warning({
     x <- lnt_rename(smpl, simulate = TRUE, verbose = FALSE)
-  }, "Not all provided files were TXT, DOC, RTF or PDF files. Other formats are ignored.")
+  }, "Not all provided files were TXT, DOC, RTF, PDF or DOCX files. Other formats are ignored.")
 })
 
 teardown(unlink(dir, recursive = TRUE, force = TRUE))
