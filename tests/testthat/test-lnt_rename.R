@@ -6,11 +6,10 @@ smpl <- paste0(dir, "/", paste0("sample", c(".TXT", ".xlsx")))
 file.copy(
   from = system.file("extdata", "sample.TXT", package = "LexisNexisTools"),
   to = smpl,
-  overwrite = TRUE    
+  overwrite = TRUE
 )
 
 test_that("Rename Sample", {
-  skip_on_cran()
   expect_equal({
     file <- lnt_rename(smpl[1], simulate = TRUE,
                        verbose = FALSE)

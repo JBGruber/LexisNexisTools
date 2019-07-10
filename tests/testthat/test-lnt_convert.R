@@ -120,7 +120,7 @@ test_that("Test error messages", {
   expect_error ({
     lnt_convert(x = readRDS("../files/LNToutput.RDS"),
                 to = "rDNA", what = "Article")
-  },"Choose either \"Articles\" or \"Paragraphs\" as what argument.", fixed = TRUE)
+  }, "Choose either \"Articles\" or \"Paragraphs\" as what argument.", fixed = TRUE)
   expect_error ({
     lnt_convert(x = readRDS("../files/LNToutput.RDS"),
                 to = "quanteda", what = "Paragraph")

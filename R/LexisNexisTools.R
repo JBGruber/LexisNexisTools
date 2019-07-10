@@ -99,6 +99,7 @@ setMethod("[",
         select <- x@articles$ID[x@articles[[j]] %in% i]
       } else if (j %in% colnames(x@paragraphs)) {
         select <- x@paragraphs$Art_ID[x@paragraphs[[j]] %in% i]
+        select_par <- x@paragraphs$Par_ID[x@paragraphs[[j]] %in% i]
       } else {
         stop("'j' was not found to be a valid column name.")
       }
@@ -107,7 +108,11 @@ setMethod("[",
       }
       x@meta <- x@meta[x@meta$ID %in% select, ]
       x@articles <- x@articles[x@articles$ID %in% select, ]
-      x@paragraphs <- x@paragraphs[x@paragraphs$Art_ID %in% select, ]
+      if (exists("select_par")) {
+        x@paragraphs <- x@paragraphs[x@paragraphs$Par_ID %in% select_par, ]
+      } else {
+        x@paragraphs <- x@paragraphs[x@paragraphs$Art_ID %in% select, ]
+      }
     }
     return(x)
   }
@@ -131,7 +136,7 @@ setMethod("+",
     e1@articles <- rbind(e1@articles, e2@articles)
     e1@paragraphs <- rbind(e1@paragraphs, e2@paragraphs)
     if (any(duplicated(e1@meta$ID)) |
-      any(duplicated(e1@paragraphs$Par_ID))) {
+        any(duplicated(e1@paragraphs$Par_ID))) {
       warning("After objects were merged, there were duplicated IDs. This was fixed.")
       e1@meta$ID <- IDs
       e1@articles$ID <- IDs
@@ -319,7 +324,7 @@ lnt_parse_nexis <- function(lines,
     length_keyword <- "^LENGTH: |^L\u00c4NGE: |^LONGUEUR: "
   }
   if (author_keyword == "auto") {
-    author_keyword = "AUTOR: |VON |BYLINE: "
+    author_keyword <- "AUTOR: |VON |BYLINE: "
   }
 
   if (verbose) {

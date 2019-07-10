@@ -6,10 +6,11 @@ LNToutput <- lnt_read(
 )
 LNToutput@meta$Source_File <- basename(LNToutput@meta$Source_File)
 
-# test_that("Show method", {
-#   expect_known_output(object = show(LNToutput),
-#                       file = "../files/show")
-# })
+test_that("Show method", {
+  expect_equal(nchar(capture_output(show(LNToutput))),
+               2151,
+               tolerance = 10) # different OS = slightly different printing
+})
 
 test_that("Plus operator", {
   expect_warning({
@@ -26,13 +27,17 @@ test_that("Subset method", {
     test@meta$ID
   }, n = 2)
   expect_equal({
-    test <- LNToutput[c(2:3, 7), "ID"]
+    test <- LNToutput[c(2:3, 7),  j = "ID"]
     test@meta$ID
   }, c(2:3, 7))
   expect_equal({
-    test <- LNToutput[LNToutput@articles$Article[1], "Article"]
+    test <- LNToutput[LNToutput@articles$Article[1], j = "Article"]
     test@articles$Article
   }, LNToutput@articles$Article[1])
+  expect_equal({
+    test <- LNToutput[i = c(2:3, 7), j = "Par_ID"]
+    test@paragraphs$Par_ID
+  }, c(2:3, 7))
   expect_equal({
     test <- LNToutput["Guardian", "Newspaper"]
     test@meta$Newspaper
@@ -49,6 +54,17 @@ test_that("Subset method", {
        "MAIL ON SUNDAY (London)", "Sunday Mirror", "DAILY MAIL (London)"))
 })
 
+
+test_that("+", {
+  expect_equal({
+    suppressWarnings(dim(LNToutput + LNToutput))
+  }, c(Articles = 20, Meta_variable = 10, data.frames = 3))
+  expect_warning(
+    LNToutput + LNToutput,
+    "After objects were merged, there were duplicated IDs. This was fixed."
+  )
+})
+
 test_that("add", {
   expect_equal({
     test <- readRDS("../files/LNToutput.RDS")
@@ -58,7 +74,6 @@ test_that("add", {
     ncol(test@meta)
   }, 9)
 })
-
 
 test_that("dim", {
   expect_equal({
