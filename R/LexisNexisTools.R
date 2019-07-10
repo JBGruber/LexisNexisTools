@@ -599,12 +599,15 @@ lnt_parse_nexis <- function(lines,
     }
     i$article
   })
-  articles.df <- tibble(
+  articles.df <- data.frame(
     ID = seq_along(df.l),
-    Article = vapply(df.l, FUN.VALUE = character(1), function(i) {
+    Article = sapply(df.l, function(i) {
       stringi::stri_join(i, collapse = "\n")
-    })
+    }),
+    stringsAsFactors = FALSE
   )
+  # solves weird covr behaviour
+  articles.df <- tibble::as_tibble(articles.df)
 
   if (verbose) {
     message("\t...article texts extracted [", format(

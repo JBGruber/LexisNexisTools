@@ -1,8 +1,6 @@
 context("Lookup keyword")
 
-LNToutput <- lnt_read(system.file("extdata", "sample.TXT",
-                                  package = "LexisNexisTools"),
-                      verbose = FALSE)
+LNToutput <- readRDS("../files/LNToutput.RDS")
 
 test_that("Test similarity", {
   expect_equal(lnt_similarity(LNToutput = LNToutput),

@@ -1,10 +1,6 @@
 context("LNToutput methods")
 
-LNToutput <- lnt_read(
-  system.file("extdata", "sample.TXT", package = "LexisNexisTools"),
-  verbose = FALSE
-)
-LNToutput@meta$Source_File <- basename(LNToutput@meta$Source_File)
+LNToutput <- readRDS("../files/LNToutput.RDS")
 
 test_that("Show method", {
   expect_equal(nchar(capture_output(show(LNToutput))),

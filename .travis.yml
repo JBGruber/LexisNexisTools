@@ -1,7 +1,7 @@
 language: r
 dist: xenial
 cache: packages
-  
+
 matrix:
     include:
       - os: linux
@@ -20,13 +20,14 @@ matrix:
         brew_packages: poppler
         before_install:
           - brew install libgit2
-      - os: windows
-        r: release 
+# not supported yet
+#      - os: windows
+#        r: release
 
 r_packages:
   - covr
-  
-addons:
+
+-addons:
   apt:
     packages:
       - libpoppler-cpp-dev
@@ -34,5 +35,6 @@ addons:
 script:
     - R CMD build .
     - R CMD check *tar.gz
-    - Rscript -e 'covr::codecov()'
     
+after_success:
+    - Rscript -e 'covr::codecov(type = "tests")'

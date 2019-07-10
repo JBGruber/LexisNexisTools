@@ -60,6 +60,10 @@ system("R CMD Rd2pdf ../LexisNexisTools")
 ## build vignette
 knitr::knit("README.Rmd")
 
+## test covr
+covr::package_coverage(quiet = FALSE, clean = FALSE)
+
+
 # For release on CRAN
 ## test on winbuilder
 devtools::check_win_devel()

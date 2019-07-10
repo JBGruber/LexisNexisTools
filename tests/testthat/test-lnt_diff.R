@@ -1,12 +1,12 @@
 context("Display diff")
 
-duplicates.df <- lnt_similarity(
-  LNToutput = lnt_read(system.file("extdata", "sample.TXT",
-                                   package = "LexisNexisTools"),
-                       verbose = FALSE),
-  threshold = 0.95,
-  verbose = FALSE
-)
+duplicates.df <- readRDS("../files/duplicates.df.RDS")
+
+# writeLines(capture.output(lnt_diff(duplicates.df,
+#                                    min = 0.18,
+#                                    max = 0.30,
+#                                    output_html = TRUE)), 
+#            "../files/diff")
 
 test_that("Show method", {
   expect_known_output(object = lnt_diff(duplicates.df,
