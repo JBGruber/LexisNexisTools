@@ -36,7 +36,7 @@ Or get the development version by installing directly from GitHub (if
 you do not have `remotes` yet install it via
 `install.packages("remotes")` first):
 
-**Note: the GitHub Version now supports .docx files from NexisUni (see
+**Note: the GitHub Version now supports .docx files from Nexis Uni (see
 [this
 issue](https://github.com/JBGruber/LexisNexisTools/issues/7#issuecomment-509000414))**
 
