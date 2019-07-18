@@ -48,6 +48,8 @@ test_that("Subset method", {
   }, c("Guardian.com", "The Sun (England)", "The Times (London)",
        "The Times (London)", "The Times (London)",
        "MAIL ON SUNDAY (London)", "Sunday Mirror", "DAILY MAIL (London)"))
+  expect_error(LNToutput["Guardian", "not_valid"],
+               "'j' was not found to be a valid column name.")
 })
 
 

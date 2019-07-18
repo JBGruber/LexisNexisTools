@@ -33,12 +33,15 @@ install.packages("LexisNexisTools")
 ```
 
 Or get the development version by installing directly from GitHub (if
-you do not have `devtools` yet install it via
-`install.packages("devtools")`
-first):
+you do not have `remotes` yet install it via
+`install.packages("remotes")` first):
+
+**Note: the GitHub Version now supports .docx files from NexisUni (see
+[this
+issue](https://github.com/JBGruber/LexisNexisTools/issues/7#issuecomment-509000414))**
 
 ``` r
-devtools::install_github("JBGruber/LexisNexisTools")
+remotes::install_github("JBGruber/LexisNexisTools")
 ```
 
 ## Demo

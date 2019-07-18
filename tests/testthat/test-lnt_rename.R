@@ -23,6 +23,15 @@ test_that("Rename Sample", {
   expect_warning({
     x <- lnt_rename(smpl, simulate = TRUE, verbose = FALSE)
   }, "Not all provided files were TXT, DOC, RTF, PDF or DOCX files. Other formats are ignored.")
+  expect_equal({
+    capture_messages(
+      test <- lnt_rename(smpl[1], simulate = TRUE, verbose = TRUE)
+    )[-6]
+  }, c("Checking LN files...\n", "1 files found to process...\n",
+       "\r\t...renaming files 100.00%\n",
+       "0 files renamed, ",
+       "1 not renamed (file already exists), ",
+       " [changes were only simulated]\n"))
 })
 
 teardown(unlink(dir, recursive = TRUE, force = TRUE))
