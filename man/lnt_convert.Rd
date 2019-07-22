@@ -18,7 +18,7 @@ lnt2quanteda(x, what = "Articles", collapse = NULL, ...)
 
 lnt2tm(x, what = "Articles", collapse = NULL, ...)
 
-lnt2cptools(x, what = "Articles", collapse = NULL, ...)
+lnt2cptools(x, what = "Articles", ...)
 
 lnt2SQLite(x, file = "LNT.sqlite", ...)
 }

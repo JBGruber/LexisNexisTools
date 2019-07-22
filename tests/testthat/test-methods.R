@@ -71,6 +71,38 @@ test_that("add", {
     test <- lnt_add(test, meta, where = "meta")
     ncol(test@meta)
   }, 9)
+  expect_equal({
+    test <- readRDS("../files/LNToutput.RDS")
+    meta <- test@meta
+    meta$Graphic <- NULL
+    test <- lnt_add(test, meta, where = "meta", replace = FALSE)
+    ncol(test@meta)
+  }, 10)
+  expect_equal({
+    test <- readRDS("../files/LNToutput.RDS")
+    meta <- test@meta
+    meta$ID <- 11:20
+    test <- lnt_add(test, meta, where = "meta")
+    nrow(test@meta)
+  }, 20)
+  expect_warning({
+    test <- readRDS("../files/LNToutput.RDS")
+    meta <- test@meta
+    meta[11, ] <- meta[10, ]
+    meta[11, "ID"] <- 11
+    test <- lnt_add(test, meta, where = "meta")
+  }, "Some or all entries you added have no equivalent in other slots of \"to.\"")
+  expect_equal({
+    test <- readRDS("../files/LNToutput.RDS")
+    paragraphs <- test@paragraphs
+    test <- lnt_add(test, paragraphs, where = "paragraphs")
+    nrow(test@paragraphs)
+  }, 122)
+  expect_error({
+    test <- readRDS("../files/LNToutput.RDS")
+    paragraphs <- test@paragraphs
+    test <- lnt_add(test, paragraphs, where = "test")
+  }, "Choose either 'meta', 'articles' or 'paragraphs' as 'to' argument.")
 })
 
 test_that("dim", {

@@ -3,8 +3,23 @@ context("LNToutput Conversion")
 test_that("Convert LNToutput to rDNA", {
   expect_equal({
     lnt_convert(x = readRDS("../files/LNToutput.RDS"),
-                to = "rDNA", what = "Articles", collapse = TRUE)
+                to = "rDNA",
+                what = "Articles",
+                collapse = TRUE)
   }, readRDS("../files/rDNA.RDS"))
+  expect_equal({
+    test <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
+                        to = "rDNA",
+                        what = "Paragraphs")
+    test$notes
+  }, readLines("../files/rDNA_ids"))
+  expect_warning({
+    test <- readRDS("../files/LNToutput.RDS")
+    test@meta$Date[1] <- NA
+    test <- lnt_convert(x = test,
+                        to = "rDNA")
+  }, "One or more (or all) dates could not be converted to POSIXct. NA entries in 'date' were filled with the system's time and date instead.",
+  fixed = TRUE)
 })
 
 # saveRDS(lnt_convert(x = readRDS("../files/LNToutput.RDS"),
@@ -57,6 +72,20 @@ test_that("Convert LNToutput to quanteda", {
                           metacorpus = list(notes = "test"))
     unname(unlist(quanteda::metacorpus(corpus, "notes")))
   }, "test")
+  expect_equal({
+    corpus <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
+                          to = "quanteda", what = "Articles",
+                          collapse = TRUE)
+    quanteda::texts(corpus)
+    length(gregexpr("\n\n", quanteda::texts(corpus))[[1]])
+  }, 4L)
+  expect_equal({
+    corpus <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
+                          to = "quanteda", what = "Articles",
+                          collapse = "%%")
+    quanteda::texts(corpus)
+    length(gregexpr("%%", quanteda::texts(corpus))[[1]])
+  }, 4L)
 })
 
 # corpus <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
@@ -74,6 +103,11 @@ test_that("Convert LNToutput to corpustools", {
     out[[2]] <- cptools$get()
     out[[3]] <- cptools$get_meta()
   }, readRDS("../files/corpustools.RDS"))
+  expect_equal({
+    cptools <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
+                           to = "corpustools", what = "Paragraphs")
+    c(nrow(cptools$get()), class(cptools), length(unique(cptools$get()$doc_id)))
+  }, c("9992", "tCorpus", "R6", "122"))
 })
 
 # saveRDS({
@@ -90,6 +124,11 @@ test_that("Convert LNToutput to tidytext", {
     lnt_convert(x = readRDS("../files/LNToutput.RDS"),
                            to = "tidytext", what = "Articles")
   }, readRDS("../files/tidytext.RDS"))
+  expect_equal({
+    test <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
+                        to = "tidytext", what = "Paragraphs")
+    nrow(test)
+  }, 8587)
 })
 
 # saveRDS(lnt_convert(x = readRDS("../files/LNToutput.RDS"),
@@ -100,6 +139,26 @@ test_that("Convert LNToutput to tm", {
     lnt_convert(x = readRDS("../files/LNToutput.RDS"),
                 to = "tm", what = "Articles")
   }, readRDS("../files/tm.RDS"))
+  expect_equal({
+    test <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
+                         to = "tm",
+                         what = "Articles",
+                         collapse = TRUE)
+    length(gregexpr("\n\n", test[["1"]][["content"]])[[1]])
+  }, 4L)
+  expect_equal({
+    test <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
+                        to = "tm",
+                        what = "Articles",
+                        collapse = "%%")
+    length(gregexpr("%%", test[["1"]][["content"]])[[1]])
+  }, 4L)
+  expect_equal({
+    test <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
+                        to = "tm",
+                        what = "Paragraphs")
+    length(test)
+  }, 122L)
 })
 
 # saveRDS(lnt_convert(x = readRDS("../files/LNToutput.RDS"),

@@ -5,7 +5,7 @@ duplicates.df <- readRDS("../files/duplicates.df.RDS")
 # writeLines(capture.output(lnt_diff(duplicates.df,
 #                                    min = 0.18,
 #                                    max = 0.30,
-#                                    output_html = TRUE)), 
+#                                    output_html = TRUE)),
 #            "../files/diff")
 
 test_that("Show method", {
@@ -18,11 +18,13 @@ test_that("Show method", {
 
 
 test_that("lnt_diff warnings and errors", {
-  expect_error(lnt_diff(duplicates.df[, -"rel_dist"],
-                        min = 0.18,
-                        max = 0.30,
-                        output_html = TRUE))#,
-  #"'x' must contain a column with rel_dist information (see ?lnt_similarity)")
+  expect_error({
+    test <- data.frame()
+    class(test) <- c("data.table", "data.frame", "lnt_sim")
+    lnt_diff(test)
+  },
+  "'x' must contain a column with rel_dist information (see ?lnt_similarity)",
+  fixed = TRUE)
   expect_warning({
     class(duplicates.df) <- "data.frame"
     diff <- capture_output(

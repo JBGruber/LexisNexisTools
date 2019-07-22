@@ -700,7 +700,7 @@ lnt_parse_nexis <- function(lines,
 #' @param lines Input lines from \link{lnt_read_lines}.
 #' @param start_time Time the task was started (for status messages).
 #' @inheritParams lnt_read
-#' 
+#'
 #' @importFrom stats setNames
 #'
 #' @noRd
@@ -1058,12 +1058,12 @@ lnt_parse_uni <- function(lines,
 #' lnt_sample()
 #'
 #' # Rename files in current wd and report back if successful
-#' 
+#'
 #' report.df <- lnt_rename(
 #'   recursive = FALSE,
 #'   report = TRUE
 #' )
-#' 
+#'
 #'
 #' # Or provide file name(s)
 #' my_files <- list.files(
@@ -1844,7 +1844,7 @@ lnt_convert <- function(x,
   } else if (to == "tm") {
     return(lnt2tm(x, what = what, collapse = collapse, ...))
   } else if (to == "tidytext") {
-    return(lnt2tidy(x, what = what, collapse = collapse, ...))
+    return(lnt2tidy(x, what = what, ...))
   }
 }
 
@@ -1900,15 +1900,15 @@ lnt2rDNA <- function(x, what = "Articles", collapse = TRUE) {
     dta$date <- as.POSIXct.Date(dta$date)
   }
   if (any(is.na(dta$date), !any(grepl("POSIXct", class(dta$date))))) {
-    warning(paste0(
+    warning(paste(
       "One or more (or all) dates could not be converted to POSIXct.",
-      "Na entries in 'date' were filled with the system's time and date instead."
+      "NA entries in 'date' were filled with the system's time and date instead."
     ))
     dta$date <- tryCatch(as.POSIXct(dta$date),
       error = function(e) NA
     )
     dta$date[is.na(dta$date)] <- Sys.time()
-    if (class(dta$date) == "numeric") {
+    if (isTRUE(class(dta$date) == "numeric")) {
       dta$date <- as.POSIXct.numeric(dta$date, origin = "1970-01-01")
     }
   }
@@ -2033,28 +2033,13 @@ lnt2tm <- function(x, what = "Articles", collapse = NULL, ...) {
 #' @rdname lnt_convert
 #' @export
 #' @importFrom methods slot slotNames
-lnt2cptools <- function(x, what = "Articles", collapse = NULL, ...) {
+lnt2cptools <- function(x, what = "Articles", ...) {
   if (!what %in% c("Articles", "Paragraphs")) {
     stop("Choose either \"Articles\" or \"Paragraphs\" as what argument.")
   }
   check_install("corpustools")
-  if (isTRUE(collapse)) {
-    collapse <- "\n\n"
-  } else if (is.logical(collapse) && length(collapse) == 1L && !is.na(collapse) && !collapse) {
-    collapse <- NULL
-  }
   if (what == "Articles") {
-    if (is.null(collapse)) {
-      text <- x@articles$Article
-    } else if (!is.null(collapse)) {
-      text <- vapply(x@meta$ID, FUN.VALUE = character(1), function(id) {
-        stringi::stri_join(x@paragraphs$Paragraph[x@paragraphs$Art_ID == id],
-          sep = "",
-          collapse = collapse,
-          ignore_null = FALSE
-        )
-      })
-    }
+    text <- x@articles$Article
     ID <- x@meta$ID
     meta <- x@meta
   } else if (what == "Paragraphs") {
@@ -2079,26 +2064,12 @@ lnt2cptools <- function(x, what = "Articles", collapse = NULL, ...) {
 }
 
 
-lnt2tidy <- function(x, what = "Articles", collapse = NULL, ...) {
+lnt2tidy <- function(x, what = "Articles", ...) {
   if (!what %in% c("Articles", "Paragraphs")) {
     stop("Choose either \"Articles\" or \"Paragraphs\" as what argument.")
   }
   check_install("tidytext")
-  if (isTRUE(collapse)) {
-    collapse <- "\n\n"
-  } else if (is.logical(collapse) && length(collapse) == 1L && !is.na(collapse) && !collapse) {
-    collapse <- NULL
-  }
   if (what == "Articles") {
-    if (!is.null(collapse)) {
-      x@articles$Article <- vapply(x@meta$ID, FUN.VALUE = character(1), function(id) {
-        stringi::stri_join(x@paragraphs$Paragraph[x@paragraphs$Art_ID == id],
-          sep = "",
-          collapse = collapse,
-          ignore_null = FALSE
-        )
-      })
-    }
     df <- merge.data.frame(x@meta,
       x@articles,
       by = "ID"
@@ -2275,6 +2246,15 @@ lnt_add <- function(to,
           temp,
           what[update, ]
         )
+        if (length(which(!update)) > 0) {
+          if (!what$ID[!update] %in% slot(to, c("meta", "articles")[!c("meta", "articles") %in% where])) {
+            warning("Some or all entries you added have no equivalent in other slots of \"to.\"")
+          }
+          temp <- rbind(
+            temp,
+            what[!update, ]
+          )
+        }
         temp <- temp[order(temp$ID), ]
         message(sum(update), " entries in ", where, " replaced, ", sum(!update), " newly added.")
       } else {
@@ -2284,7 +2264,7 @@ lnt_add <- function(to,
         message(sum(update), " entries added to ", where, ", ", sum(!update), " already present.")
       }
     } else {
-      temp <- rbind(temp, what[update, ])
+      temp <- rbind(temp, what)
       temp <- temp[order(temp$ID), ]
       message(nrow(what), " entries added to ", where, ".")
     }
@@ -2426,10 +2406,14 @@ get_files <- function(x,
   if (missing(x)) {
     message("No path was given. Should files",
             "in working directory be renamed? [y/n]")
-    if (menu(c("yes", "no")) == 1) {
-      x <- getwd()
-    } else {
-      stop("Aborted by user")
+    if (interactive()) {
+      if (menu(c("yes", "no")) == 1) {
+        x <- getwd()
+      } else {
+        stop("Aborted by user")
+      }
+    }  else {
+      stop("No path was given as x.")
     }
   }
   if (all(grepl(pattern, x, ignore.case = ignore_case))) {

@@ -28,8 +28,10 @@ r_packages:
   - covr
 
 -addons:
-  apt:
-    packages:
+    apt:
+      sources:
+      - sourceline: 'ppa:opencpu/poppler'
+      packages:
       - libpoppler-cpp-dev
 
 script:
