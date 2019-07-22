@@ -4,9 +4,10 @@ cache: packages
 
 matrix:
     include:
-      - os: linux
-        sudo: required
-        r: release
+# has problems with libpoppler atm
+#      - os: linux
+#        sudo: required
+#        r: release
       - os: linux
         sudo: required
         r: oldrel
@@ -27,12 +28,14 @@ matrix:
 r_packages:
   - covr
 
--addons:
-    apt:
-      sources:
-      - sourceline: 'ppa:opencpu/poppler'
-      packages:
+addons:
+  apt:
+    sources:
+      - sourceline: 'ppa:cran/poppler'
+    packages:
+      - libwebp-dev
       - libpoppler-cpp-dev
+      - poppler-data
 
 script:
     - R CMD build .
