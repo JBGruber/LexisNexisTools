@@ -14,4 +14,3 @@ test_that("check_install", {
                "Package \"test\" is needed for this function to work. Please install it.",
                fixed = TRUE)
 })
-

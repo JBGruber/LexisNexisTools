@@ -705,16 +705,16 @@ lnt_parse_nexis <- function(lines,
 #'
 #' @noRd
 lnt_parse_uni <- function(lines,
-                            extract_paragraphs,
-                            convert_date,
-                            start_keyword,
-                            end_keyword,
-                            length_keyword,
-                            author_keyword,
-                            exclude_lines,
-                            verbose,
-                            start_time,
-                            ...) {
+                          extract_paragraphs,
+                          convert_date,
+                          start_keyword,
+                          end_keyword,
+                          length_keyword,
+                          author_keyword,
+                          exclude_lines,
+                          verbose,
+                          start_time,
+                          ...) {
 
   if (end_keyword == "auto") {
     end_keyword <- "^End of Document$"
@@ -722,7 +722,7 @@ lnt_parse_uni <- function(lines,
   if (length_keyword == "auto") {
     length_keyword <- "^Length:\u00a0|^L\u00c4NGE:|^LONGUEUR:"
   }
-  if (length_keyword == "auto") {
+  if (author_keyword == "auto") {
     author_keyword <- "^Byline:\u00a0"
   }
 
@@ -738,10 +738,16 @@ lnt_parse_uni <- function(lines,
     lines[grep("^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIC: |^DATELINE: ", lines)] <- ""
   }
 
-  # remove cover page
-  lines <- rle(lines)
-  lines$article <- cumsum(lines$lengths > 2 & lines$values == "")
-  lines <- lines$values[lines$article == max(lines$article)]
+  # remove cover page(s)
+  lines <- lapply(split(lines, names(lines)), function(l) {
+    l <- rle(l)
+    l$article <- cumsum(l$lengths > 2 & l$values == "")
+    l <- l$values[l$article == max(l$article)]
+    l <- l[!l == ""]
+    return(l)
+  })
+
+  lines <- unlist(lines)
 
   articles.l <- split(
     lines, cumsum(stringi::stri_detect_regex(lines, end_keyword))
@@ -863,18 +869,7 @@ lnt_parse_uni <- function(lines,
 
   ### Author (where available)
   author.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
-    a <- head(
-      which(stri_detect_regex(i$meta, pattern = author_keyword)),
-      n = 1
-    )
-    if (length(a) > 0) {
-      if (!i$meta[a + 1] == "") {
-        a <- c(a:(a + 1))
-      }
-      stringi::stri_join(i$meta[a], collapse = " ")
-    } else {
-      ""
-    }
+    grep(pattern = author_keyword, x = i$meta, value = TRUE)[1]
   })
   author.v <- stri_replace_all_regex(author.v, author_keyword, "")
   author.v[author.v == ""] <- NA
@@ -944,21 +939,10 @@ lnt_parse_uni <- function(lines,
   }
 
 
-  # Cut of after ends in article
-  df.l <- lapply(df.l, function(i) {
-    end <- tail(grep(end_keyword, i$article), n = 1)
-    if (length(end) > 0) {
-      i$article <- i$article[1:end - 1]
-    }
-    if (i$article[1] == "") {
-      i$article <- i$article[-1]
-    }
-    i$article
-  })
   articles.df <- tibble(
     ID = seq_along(df.l),
     Article = vapply(df.l, FUN.VALUE = character(1), function(i) {
-      stringi::stri_join(i, collapse = " ")
+      stringi::stri_join(i$article, collapse = " ")
     })
   )
 
@@ -970,11 +954,11 @@ lnt_parse_uni <- function(lines,
   }
 
   if (extract_paragraphs) {
-    names(df.l) <- seq_along(df.l)
-    par <- setNames(unlist(df.l, use.names = FALSE),
-                    rep(names(df.l), lengths(df.l)))
+    Art_ID <- seq_along(df.l)
+    Art_ID <- rep(Art_ID, lapply(df.l, function(i) length(i$article)))
+    par <- unlist(lapply(df.l, "[[", "article"), use.names = FALSE)
     paragraphs.df <- tibble(
-      Art_ID = as.integer(names(par)),
+      Art_ID = Art_ID,
       Par_ID = seq_along(par),
       Paragraph = par
     )
@@ -1556,7 +1540,7 @@ lnt_asDate <- function(x,
     } else {
       langchoice <- 2
     }
-    if (langchoice > 0) {
+    if (langchoice > 1) {
       format <- formats[names(formats) == names(most)[langchoice - 1]]
       locale <- locales[names(locales) == names(most)[langchoice - 1]]
     } else {
@@ -1566,6 +1550,7 @@ lnt_asDate <- function(x,
   if (!format[1] %in% formats) {
     message("A non-standard format was provided. Conversion is tried but might fail.")
   }
+  
   dat <- stringi::stri_datetime_parse(
     str = dat,
     format = format,
@@ -1574,6 +1559,7 @@ lnt_asDate <- function(x,
   )
   dat <- as.Date(dat)
   return(dat)
+  
 }
 
 
@@ -1862,7 +1848,7 @@ lnt2rDNA <- function(x, what = "Articles", collapse = TRUE) {
   if (what == "Articles") {
     if (is.null(collapse)) {
       text <- x@articles$Article
-    } else if (!is.null(collapse)) {
+    } else {
       text <- vapply(x@meta$ID, FUN.VALUE = character(1), function(id) {
         stringi::stri_join(x@paragraphs$Paragraph[x@paragraphs$Art_ID == id],
           sep = "",
@@ -1882,10 +1868,9 @@ lnt2rDNA <- function(x, what = "Articles", collapse = TRUE) {
     id = seq_along(order),
     title = vapply(x@meta$Headline[order],
                    FUN.VALUE = character(1),
-                   trim,
+                   FUN = trim,
                    n = 197,
-                   USE.NAMES = FALSE
-    ),
+                   USE.NAMES = FALSE),
     text = text,
     coder = 1,
     author = x@meta$Author[order],
@@ -2064,6 +2049,8 @@ lnt2cptools <- function(x, what = "Articles", ...) {
 }
 
 
+#' @rdname lnt_convert
+#' @export
 lnt2tidy <- function(x, what = "Articles", ...) {
   if (!what %in% c("Articles", "Paragraphs")) {
     stop("Choose either \"Articles\" or \"Paragraphs\" as what argument.")
@@ -2371,16 +2358,20 @@ lnt_sample <- function(overwrite = FALSE,
 #' @noRd
 #' @author Johannes B. Gruber
 trim <- function(object, n, e = "...") {
-  ifelse(nchar(object) > n,
-    paste0(
-      gsub(
-        "\\s+$", "",
-        strtrim(object, width = n)
-      ),
-      e
-    ),
-    object
-  )
+  if (!is.na(object) & !is.null(object)) {
+    ifelse(nchar(object) > n,
+           paste0(
+             gsub(
+               "\\s+$", "",
+               strtrim(object, width = n)
+             ),
+             e
+           ),
+           object
+    )
+  } else {
+    return(character(1))
+  }
 }
 
 #' Get files

@@ -4,10 +4,9 @@ cache: packages
 
 matrix:
     include:
-# has problems with libpoppler atm
-#      - os: linux
-#        sudo: required
-#        r: release
+      - os: linux
+        sudo: required
+        r: release
       - os: linux
         sudo: required
         r: oldrel

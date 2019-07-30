@@ -6,6 +6,7 @@
 \alias{lnt2quanteda}
 \alias{lnt2tm}
 \alias{lnt2cptools}
+\alias{lnt2tidy}
 \alias{lnt2SQLite}
 \title{Convert LNToutput to other formats}
 \usage{
@@ -19,6 +20,8 @@ lnt2quanteda(x, what = "Articles", collapse = NULL, ...)
 lnt2tm(x, what = "Articles", collapse = NULL, ...)
 
 lnt2cptools(x, what = "Articles", ...)
+
+lnt2tidy(x, what = "Articles", ...)
 
 lnt2SQLite(x, file = "LNT.sqlite", ...)
 }
