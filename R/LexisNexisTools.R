@@ -213,6 +213,7 @@ setMethod("+",
 #' articles.df <- LNToutput@articles
 #' paragraphs.df <- LNToutput@paragraphs
 #' @import stringi
+#' @import data.table
 #' @importFrom utils tail
 #' @importFrom tibble tibble as_tibble
 lnt_read <- function(x,
@@ -726,12 +727,7 @@ lnt_parse_uni <- function(lines,
     author_keyword <- "^Byline:\u00a0"
   }
 
-  if (verbose) {
-    message("\t...files loaded [", format(
-      (Sys.time() - start_time),
-      digits = 2, nsmall = 2
-    ), "]")
-  }
+  status("\t...files loaded", verbose, start_time)
 
   # exclude some lines
   if (length(exclude_lines) > 0) {
@@ -780,16 +776,7 @@ lnt_parse_uni <- function(lines,
     }
   })
 
-  if (verbose) {
-    message(
-      "\t...articles split [",
-      format(
-        (Sys.time() - start_time),
-        digits = 2,
-        nsmall = 2
-      ), "]"
-    )
-  }
+  status("\t...articles split", verbose, start_time)
 
   # make data.frame
   ### length
@@ -816,17 +803,7 @@ lnt_parse_uni <- function(lines,
     )[1]
   })
 
-  if (verbose) {
-    message(
-      "\t...headlines extracted [",
-      format(
-        (Sys.time() - start_time),
-        digits = 2,
-        nsmall = 2
-      ),
-      "]"
-    )
-  }
+  status("\t...headlines extracted", verbose, start_time)
 
   ### Newspaper. Second non emtpy line
   newspaper.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
@@ -839,17 +816,7 @@ lnt_parse_uni <- function(lines,
     )[2]
   })
 
-  if (verbose) {
-    message(
-      "\t...newspapers extracted [",
-      format(
-        (Sys.time() - start_time),
-        digits = 2,
-        nsmall = 2
-      ),
-      "]"
-    )
-  }
+  status("\t...newspapers extracted", verbose, start_time)
 
   ### Date
   date.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
@@ -860,12 +827,7 @@ lnt_parse_uni <- function(lines,
     na.omit(.)[1]
   })
 
-  if (verbose) {
-    message("\t...dates extracted [", format(
-      (Sys.time() - start_time),
-      digits = 2, nsmall = 2
-    ), "]")
-  }
+  status("\t...dates extracted", verbose, start_time)
 
   ### Author (where available)
   author.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
@@ -874,13 +836,7 @@ lnt_parse_uni <- function(lines,
   author.v <- stri_replace_all_regex(author.v, author_keyword, "")
   author.v[author.v == ""] <- NA
 
-  if (verbose) {
-    message("\t...authors extracted [", format(
-      (Sys.time() - start_time),
-      digits = 2, nsmall = 2
-    ), "]")
-  }
-
+  status("\t...authors extracted", verbose, start_time)
 
   ### section (where available)
   section_keyword <- "^Section:\u00a0"
@@ -889,32 +845,17 @@ lnt_parse_uni <- function(lines,
   })
   section.v <- stri_replace_all_regex(section.v, section_keyword, "")
 
-  if (verbose) {
-    message("\t...sections extracted [", format(
-      (Sys.time() - start_time),
-      digits = 2, nsmall = 2
-    ), "]")
-  }
+  status("\t...sections extracted", verbose, start_time)
 
-
+  
   ### edition (not yet implemented)
   edition.v <- NA
 
-  if (verbose) {
-    message("\t...editions extracted [", format(
-      (Sys.time() - start_time),
-      digits = 2, nsmall = 2
-    ), "]")
-  }
+  status("\t...editions extracted", verbose, start_time)
 
   if (convert_date) {
     date.v <- lnt_asDate(date.v, ...)
-    if (verbose) {
-      message("\t...dates converted [", format(
-        (Sys.time() - start_time),
-        digits = 2, nsmall = 2
-      ), "]")
-    }
+    status("\t...dates converted", verbose, start_time)
   }
 
 
@@ -931,66 +872,27 @@ lnt_parse_uni <- function(lines,
     Headline = trimws(headline.v, which = "both"),
     Graphic = unlist(lapply(df.l, function(i) i[["graphic"]]))
   )
-  if (verbose) {
-    message("\t...metadata extracted [", format(
-      (Sys.time() - start_time),
-      digits = 2, nsmall = 2
-    ), "]")
-  }
+  
+  status("\t...metadata extracted", verbose, start_time)
 
-
-  articles.df <- tibble(
-    ID = seq_along(df.l),
-    Article = vapply(df.l, FUN.VALUE = character(1), function(i) {
-      stringi::stri_join(i$article, collapse = " ")
-    })
+  par <- unlist(lapply(df.l, "[[", "article"), use.names = FALSE)
+  paragraphs.df <- data.table::data.table(
+    Art_ID = rep(seq_along(df.l), lapply(df.l, function(i) length(i$article))),
+    Par_ID = seq_along(par),
+    Paragraph = par
   )
-
-  if (verbose) {
-    message("\t...article texts extracted [", format(
-      (Sys.time() - start_time),
-      digits = 2, nsmall = 2
-    ), "]")
-  }
-
-  if (extract_paragraphs) {
-    Art_ID <- seq_along(df.l)
-    Art_ID <- rep(Art_ID, lapply(df.l, function(i) length(i$article)))
-    par <- unlist(lapply(df.l, "[[", "article"), use.names = FALSE)
-    paragraphs.df <- tibble(
-      Art_ID = Art_ID,
-      Par_ID = seq_along(par),
-      Paragraph = par
-    )
-  } else {
-    paragraphs.df <- tibble(
-      Art_ID = NA,
-      Par_ID = NA,
-      Paragraph = NA
-    )
-  }
-
-  # remove unneccesary whitespace (removes \n as well)
-  articles.df$Article <- stringi::stri_replace_all_regex(
-    str = articles.df$Article,
-    pattern = c("\\s+", "^\\s|\\s$"),
-    replacement = c(" ", ""),
-    vectorize_all = FALSE
-  )
-  if (verbose) {
-    message("\t...superfluous whitespace removed from articles [", format(
-      (Sys.time() - start_time),
-      digits = 2, nsmall = 2
-    ), "]")
-  }
+  
+  status("\t...article texts extracted", verbose, start_time)
+  
   paragraphs.df$Paragraph <- stringi::stri_replace_all_regex(
     str = paragraphs.df$Paragraph,
-    pattern = c("\\s+", "^\\s|\\s$"),
-    replacement = c(" ", ""),
+    pattern = c("\\s+|^\\s|\\s$"),
+    replacement = c(" "),
     vectorize_all = FALSE
   )
+  
   if (verbose) {
-    message("\t...superfluous whitespace removed from paragraphs [", format(
+    message("\t...superfluous whitespace removed [", format(
       (Sys.time() - start_time),
       digits = 2, nsmall = 2
     ), "]")
@@ -999,11 +901,24 @@ lnt_parse_uni <- function(lines,
       digits = 2, nsmall = 2
     ))
   }
+  
+  Paragraph <- NULL
+  Art_ID <- NULL
+  articles.df <- paragraphs.df[, 
+                               (Article = stri_join(Paragraph, collapse = " ")),
+                               by = list(ID = Art_ID)]
+
+  articles.df <- tibble::as_tibble(articles.df)
+  paragraphs.df <- tibble::as_tibble(paragraphs.df)
+  
+  attr(articles.df, ".internal.selfref") <- NULL
+  attr(paragraphs.df, ".internal.selfref") <- NULL
+  
   out <- new(
     "LNToutput",
     meta = meta.df,
     articles = articles.df,
-    paragraphs = tibble::as_tibble(paragraphs.df)
+    paragraphs = paragraphs.df
   )
   return(out)
 }
@@ -2346,6 +2261,25 @@ lnt_sample <- function(overwrite = FALSE,
 }
 
 
+#' Status message
+#'
+#' Internal function to print status messages
+#'
+#' @param m Message to be included in the status.
+#' @param v Verbise argument passed on from other functions.
+#' @param start_time Start time, to calculate time elapsed since start.
+#'
+#' @noRd
+status <- function(m, v, start_time) {
+  if (v) {
+    message(m, " [", format(
+      (Sys.time() - start_time),
+      digits = 2, nsmall = 2
+    ), "]")
+  }
+}
+
+
 #' Truncate
 #'
 #' Internal function, used to truncate text
@@ -2558,7 +2492,7 @@ lnt_read_lines <- function(files,
     if (length(files$docx) > 1) {
       lines_docx <- unlist(lapply(files$docx, function(f) {
         con <- unz(description = f, filename = "word/document.xml")
-        out <- xml2::read_xml(con)
+        out <- xml2::read_xml(con, encoding = "utf-8")
         rm(con)
         out <- xml2::xml_find_all(out, "//w:p")
         out <- xml2::xml_text(out)
