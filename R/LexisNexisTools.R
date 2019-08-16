@@ -328,12 +328,7 @@ lnt_parse_nexis <- function(lines,
     author_keyword <- "AUTOR: |VON |BYLINE: "
   }
 
-  if (verbose) {
-    message("\t...files loaded [", format(
-      (Sys.time() - start_time),
-      digits = 2, nsmall = 2
-    ), "]")
-  }
+  status("\t...files loaded", verbose, start_time)
 
   # exclude some lines
   if (length(exclude_lines) > 0) {
@@ -369,16 +364,8 @@ lnt_parse_nexis <- function(lines,
       )
     }
   })
-  if (verbose) {
-    message(
-      "\t...articles split [",
-      format(
-        (Sys.time() - start_time),
-        digits = 2,
-        nsmall = 2
-      ), "]"
-    )
-  }
+  
+  status("\t...articles split", verbose, start_time)
 
   # make data.frame
   ### length
@@ -386,12 +373,7 @@ lnt_parse_nexis <- function(lines,
     grep(pattern = length_keyword, x = i$meta, value = TRUE)[1]
   })
   length.v <- stri_replace_all_regex(., length_keyword, "")
-  if (verbose) {
-    message("\t...lengths extracted [", format(
-      (Sys.time() - start_time),
-      digits = 2, nsmall = 2
-    ), "]")
-  }
+  status("\t...lengths extracted", verbose, start_time)
 
   ### Newspaper. First non emtpy line
   newspaper.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
@@ -408,18 +390,9 @@ lnt_parse_nexis <- function(lines,
     "January|February|March|April|May|June|July|August|September|October|November|December",
     newspaper.v
   )] <- ""
-  if (verbose) {
-    message(
-      "\t...newspapers extracted [",
-      format(
-        (Sys.time() - start_time),
-        digits = 2,
-        nsmall = 2
-      ),
-      "]"
-    )
-  }
-
+  
+  status("\t...newspapers extracted", verbose, start_time)
+  
   ### Date
   date.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
     . <- stringi::stri_extract_last_regex(
@@ -428,12 +401,8 @@ lnt_parse_nexis <- function(lines,
     )
     na.omit(.)[1]
   })
-  if (verbose) {
-    message("\t...dates extracted [", format(
-      (Sys.time() - start_time),
-      digits = 2, nsmall = 2
-    ), "]")
-  }
+  
+  status("\t...dates extracted", verbose, start_time)
 
   ### Author (where available)
   author.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
@@ -452,24 +421,14 @@ lnt_parse_nexis <- function(lines,
   })
   author.v[author.v == ""] <- NA
 
-  if (verbose) {
-    message("\t...authors extracted [", format(
-      (Sys.time() - start_time),
-      digits = 2, nsmall = 2
-    ), "]")
-  }
-
-
+  status("\t...authors extracted", verbose, start_time)
+  
   ### section (where available)
   section.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
     grep(pattern = "SECTION: |RUBRIK: ", x = i$meta, value = TRUE)[1]
   })
-  if (verbose) {
-    message("\t...sections extracted [", format(
-      (Sys.time() - start_time),
-      digits = 2, nsmall = 2
-    ), "]")
-  }
+
+  status("\t...sections extracted", verbose, start_time)
 
 
   ### edition (where available)
@@ -500,12 +459,7 @@ lnt_parse_nexis <- function(lines,
     }
   })
 
-  if (verbose) {
-    message("\t...editions extracted [", format(
-      (Sys.time() - start_time),
-      digits = 2, nsmall = 2
-    ), "]")
-  }
+  status("\t...editions extracted", verbose, start_time)
 
   ### Headline
   headline.v <- vapply(seq_along(df.l), FUN.VALUE = character(1), function(i) {
@@ -535,21 +489,12 @@ lnt_parse_nexis <- function(lines,
       ""
     }
   })
-  if (verbose) {
-    message("\t...headlines extracted [", format(
-      (Sys.time() - start_time),
-      digits = 2, nsmall = 2
-    ), "]")
-  }
+  
+  status("\t...headlines extracted", verbose, start_time)
 
   if (convert_date) {
     date.v <- lnt_asDate(date.v, ...)
-    if (verbose) {
-      message("\t...dates converted [", format(
-        (Sys.time() - start_time),
-        digits = 2, nsmall = 2
-      ), "]")
-    }
+    status("\t...dates converted", verbose, start_time)
   }
 
   # Clean the clutter from objects
@@ -584,13 +529,8 @@ lnt_parse_nexis <- function(lines,
     Headline = trimws(headline.v, which = "both"),
     Graphic = unlist(lapply(df.l, function(i) i[["graphic"]]))
   )
-  if (verbose) {
-    message("\t...metadata extracted [", format(
-      (Sys.time() - start_time),
-      digits = 2, nsmall = 2
-    ), "]")
-  }
-
+  
+  status("\t...metadata extracted", verbose, start_time)
 
   # Cut of after ends in article
   df.l <- lapply(df.l, function(i) {
@@ -610,12 +550,7 @@ lnt_parse_nexis <- function(lines,
   # solves weird covr behaviour
   articles.df <- tibble::as_tibble(articles.df)
 
-  if (verbose) {
-    message("\t...article texts extracted [", format(
-      (Sys.time() - start_time),
-      digits = 2, nsmall = 2
-    ), "]")
-  }
+  status("\t...article texts extracted", verbose, start_time)
 
   if (extract_paragraphs) {
     # split paragraphs
@@ -662,12 +597,7 @@ lnt_parse_nexis <- function(lines,
     replacement = c(" ", ""),
     vectorize_all = FALSE
   )
-  if (verbose) {
-    message("\t...superfluous whitespace removed from articles [", format(
-      (Sys.time() - start_time),
-      digits = 2, nsmall = 2
-    ), "]")
-  }
+  
   paragraphs.df$Paragraph <- stringi::stri_replace_all_regex(
     str = paragraphs.df$Paragraph,
     pattern = c("\\s+", "^\\s|\\s$"),
@@ -675,10 +605,7 @@ lnt_parse_nexis <- function(lines,
     vectorize_all = FALSE
   )
   if (verbose) {
-    message("\t...superfluous whitespace removed from paragraphs [", format(
-      (Sys.time() - start_time),
-      digits = 2, nsmall = 2
-    ), "]")
+    status("\t...superfluous whitespace removed", verbose, start_time)
     message("Elapsed time: ", format(
       (Sys.time() - start_time),
       digits = 2, nsmall = 2
@@ -758,20 +685,16 @@ lnt_parse_uni <- function(lines,
 
   # split meta from body
   df.l <- lapply(articles.l, function(a) {
-    split <- grep("^Body$", a)[1]
+    split <- which(stri_detect_regex("^Body$", a))[1]
     if (!is.na(split)) {
       list(
-        source = names(a)[1],
-        meta = unname(a[2:split]),
-        article = unname(a[(split + 1):(length(a) - 1)]),
-        graphic = FALSE
+        meta = tibble(source = names(a)[1], lines = unname(a[2:split]), graphic = FALSE),
+        article = tibble(source = names(a)[1], lines = unname(a[(split + 1):(length(a) - 1)]))
       )
     } else {
       list(
-        source = names(a)[1],
-        meta = NULL,
-        article = a,
-        graphic = TRUE
+        meta = tibble(source = names(a)[1], lines = "", graphic = TRUE),
+        article = tibble(source = names(a)[1], lines = unname(a))
       )
     }
   })
@@ -847,9 +770,10 @@ lnt_parse_uni <- function(lines,
 
   status("\t...sections extracted", verbose, start_time)
 
-  
+
   ### edition (not yet implemented)
   edition.v <- NA
+    
 
   status("\t...editions extracted", verbose, start_time)
 
@@ -872,7 +796,7 @@ lnt_parse_uni <- function(lines,
     Headline = trimws(headline.v, which = "both"),
     Graphic = unlist(lapply(df.l, function(i) i[["graphic"]]))
   )
-  
+
   status("\t...metadata extracted", verbose, start_time)
 
   par <- unlist(lapply(df.l, "[[", "article"), use.names = FALSE)
@@ -881,39 +805,36 @@ lnt_parse_uni <- function(lines,
     Par_ID = seq_along(par),
     Paragraph = par
   )
-  
+
   status("\t...article texts extracted", verbose, start_time)
-  
+
   paragraphs.df$Paragraph <- stringi::stri_replace_all_regex(
     str = paragraphs.df$Paragraph,
     pattern = c("\\s+|^\\s|\\s$"),
     replacement = c(" "),
     vectorize_all = FALSE
   )
-  
+
   if (verbose) {
-    message("\t...superfluous whitespace removed [", format(
-      (Sys.time() - start_time),
-      digits = 2, nsmall = 2
-    ), "]")
+    status("\t...superfluous whitespace removed", verbose, start_time)
     message("Elapsed time: ", format(
       (Sys.time() - start_time),
       digits = 2, nsmall = 2
     ))
   }
-  
+
   Paragraph <- NULL
   Art_ID <- NULL
-  articles.df <- paragraphs.df[, 
+  articles.df <- paragraphs.df[,
                                (Article = stri_join(Paragraph, collapse = " ")),
                                by = list(ID = Art_ID)]
 
   articles.df <- tibble::as_tibble(articles.df)
   paragraphs.df <- tibble::as_tibble(paragraphs.df)
-  
+
   attr(articles.df, ".internal.selfref") <- NULL
   attr(paragraphs.df, ".internal.selfref") <- NULL
-  
+
   out <- new(
     "LNToutput",
     meta = meta.df,
@@ -1465,7 +1386,7 @@ lnt_asDate <- function(x,
   if (!format[1] %in% formats) {
     message("A non-standard format was provided. Conversion is tried but might fail.")
   }
-  
+
   dat <- stringi::stri_datetime_parse(
     str = dat,
     format = format,
@@ -1474,7 +1395,7 @@ lnt_asDate <- function(x,
   )
   dat <- as.Date(dat)
   return(dat)
-  
+
 }
 
 
@@ -2291,21 +2212,19 @@ status <- function(m, v, start_time) {
 #'
 #' @noRd
 #' @author Johannes B. Gruber
-trim <- function(object, n, e = "...") {
-  if (!is.na(object) & !is.null(object)) {
-    ifelse(nchar(object) > n,
-           paste0(
-             gsub(
-               "\\s+$", "",
-               strtrim(object, width = n)
-             ),
-             e
-           ),
-           object
-    )
-  } else {
-    return(character(1))
-  }
+trim <- function(x, n, e = "...") {
+  x <- ifelse(nchar(x) > n,
+              paste0(
+                gsub(
+                  "\\s+$", "",
+                  strtrim(x, width = n)
+                ),
+                e
+              ),
+              x
+  )
+  x[is.na(x)] <- ""
+  return(x)
 }
 
 #' Get files
