@@ -473,6 +473,7 @@ lnt_parse_nexis <- function(lines,
         section.v[i],
         edition.v[[i]]
       ))
+      pattern <- pattern[pattern != ""]
 
       remove.m <- vapply(pattern, FUN.VALUE = matrix(nrow = length(headline)), function(p) {
         out <- stringi::stri_detect_fixed(headline, p[1])
