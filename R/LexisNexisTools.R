@@ -686,16 +686,20 @@ lnt_parse_uni <- function(lines,
 
   # split meta from body
   df.l <- lapply(articles.l, function(a) {
-    split <- which(stri_detect_regex("^Body$", a))[1]
-    if (!is.na(split)) {
+    split <- which(stri_detect_regex(a, "^Body$"))[1]
+    if (!is.na(len)) {
       list(
-        meta = tibble(source = names(a)[1], lines = unname(a[2:split]), graphic = FALSE),
-        article = tibble(source = names(a)[1], lines = unname(a[(split + 1):(length(a) - 1)]))
+        source = names(a)[1],
+        meta = unname(a[2:len]),
+        article = unname(a[(len + 1):(length(a) - 1)]),
+        graphic = FALSE
       )
     } else {
       list(
-        meta = tibble(source = names(a)[1], lines = "", graphic = TRUE),
-        article = tibble(source = names(a)[1], lines = unname(a))
+        source = names(a)[1],
+        meta = NULL,
+        article = a,
+        graphic = TRUE
       )
     }
   })
