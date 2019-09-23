@@ -364,7 +364,7 @@ lnt_parse_nexis <- function(lines,
       )
     }
   })
-  
+
   status("\t...articles split", verbose, start_time)
 
   # make data.frame
@@ -390,9 +390,9 @@ lnt_parse_nexis <- function(lines,
     "January|February|March|April|May|June|July|August|September|October|November|December",
     newspaper.v
   )] <- ""
-  
+
   status("\t...newspapers extracted", verbose, start_time)
-  
+
   ### Date
   date.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
     . <- stringi::stri_extract_last_regex(
@@ -401,7 +401,7 @@ lnt_parse_nexis <- function(lines,
     )
     na.omit(.)[1]
   })
-  
+
   status("\t...dates extracted", verbose, start_time)
 
   ### Author (where available)
@@ -422,7 +422,7 @@ lnt_parse_nexis <- function(lines,
   author.v[author.v == ""] <- NA
 
   status("\t...authors extracted", verbose, start_time)
-  
+
   ### section (where available)
   section.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
     grep(pattern = "SECTION: |RUBRIK: ", x = i$meta, value = TRUE)[1]
@@ -490,7 +490,7 @@ lnt_parse_nexis <- function(lines,
       ""
     }
   })
-  
+
   status("\t...headlines extracted", verbose, start_time)
 
   if (convert_date) {
@@ -530,7 +530,7 @@ lnt_parse_nexis <- function(lines,
     Headline = trimws(headline.v, which = "both"),
     Graphic = unlist(lapply(df.l, function(i) i[["graphic"]]))
   )
-  
+
   status("\t...metadata extracted", verbose, start_time)
 
   # Cut of after ends in article
@@ -598,7 +598,7 @@ lnt_parse_nexis <- function(lines,
     replacement = c(" ", ""),
     vectorize_all = FALSE
   )
-  
+
   paragraphs.df$Paragraph <- stringi::stri_replace_all_regex(
     str = paragraphs.df$Paragraph,
     pattern = c("\\s+", "^\\s|\\s$"),
@@ -647,6 +647,9 @@ lnt_parse_uni <- function(lines,
 
   if (end_keyword == "auto") {
     end_keyword <- "^End of Document$"
+    if (!any(stringi::stri_detect_regex(lines, end_keyword))) {
+      end_keyword <- "End of Document$"
+    }
   }
   if (length_keyword == "auto") {
     length_keyword <- "^Length:\u00a0|^L\u00c4NGE:|^LONGUEUR:"
@@ -687,11 +690,11 @@ lnt_parse_uni <- function(lines,
   # split meta from body
   df.l <- lapply(articles.l, function(a) {
     split <- which(stri_detect_regex(a, "^Body$"))[1]
-    if (!is.na(len)) {
+    if (!is.na(split)) {
       list(
         source = names(a)[1],
-        meta = unname(a[2:len]),
-        article = unname(a[(len + 1):(length(a) - 1)]),
+        meta = unname(a[2:split]),
+        article = unname(a[(split + 1):(length(a) - 1)]),
         graphic = FALSE
       )
     } else {
@@ -778,7 +781,6 @@ lnt_parse_uni <- function(lines,
 
   ### edition (not yet implemented)
   edition.v <- NA
-    
 
   status("\t...editions extracted", verbose, start_time)
 
