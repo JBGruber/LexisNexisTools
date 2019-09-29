@@ -662,18 +662,17 @@ lnt_parse_uni <- function(lines,
 
   # exclude some lines
   if (length(exclude_lines) > 0) {
-    lines[grep("^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIC: |^DATELINE: ", lines)] <- ""
+    lines[grep(exclude_lines, lines)] <- ""
   }
 
   # remove cover page(s)
-  lines <- lapply(split(lines, names(lines)), function(l) {
+  lines <- lapply(unname(split(lines, names(lines))), function(l) {
     l <- rle(l)
     l$article <- cumsum(l$lengths > 2 & l$values == "")
     l <- l$values[l$article == max(l$article)]
     l <- l[!l == ""]
     return(l)
   })
-
   lines <- unlist(lines)
 
   articles.l <- split(
@@ -681,7 +680,11 @@ lnt_parse_uni <- function(lines,
   )
   articles.l[[length(articles.l)]] <- NULL
   names(articles.l) <- NULL
-  rm(lines)
+  
+  #  first article does not contain keyword
+  if (!stringi::stri_detect_regex(articles.l[[1]][1], end_keyword)) {
+    articles.l[[1]] <- c(articles.l[[1]][1], articles.l[[1]])
+  }
 
   if (length(articles.l) == 0) {
     stop("No articles found in provided file(s)")
@@ -716,14 +719,9 @@ lnt_parse_uni <- function(lines,
          value = TRUE, ignore.case = TRUE)[1]
   })
   length.v <- trimws(stri_replace_all_regex(., length_keyword, ""))
-  if (verbose) {
-    message("\t...lengths extracted [", format(
-      (Sys.time() - start_time),
-      digits = 2, nsmall = 2
-    ), "]")
-  }
+  status("\t...lengths extracted", verbose, start_time)
 
-  ### Newspaper. First non emtpy line
+  ### headline First non emtpy line
   headline.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
     grep(
       pattern = "^$",
@@ -833,7 +831,7 @@ lnt_parse_uni <- function(lines,
   Paragraph <- NULL
   Art_ID <- NULL
   articles.df <- paragraphs.df[,
-                               (Article = stri_join(Paragraph, collapse = " ")),
+                               list(Article = stri_join(Paragraph, collapse = " ")),
                                by = list(ID = Art_ID)]
 
   articles.df <- tibble::as_tibble(articles.df)
