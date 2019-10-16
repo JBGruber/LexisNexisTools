@@ -680,7 +680,7 @@ lnt_parse_uni <- function(lines,
   )
   articles.l[[length(articles.l)]] <- NULL
   names(articles.l) <- NULL
-  
+
   #  first article does not contain keyword
   if (!stringi::stri_detect_regex(articles.l[[1]][1], end_keyword)) {
     articles.l[[1]] <- c(articles.l[[1]][1], articles.l[[1]])
@@ -1221,33 +1221,39 @@ lnt_similarity <- function(texts,
             }
           })
         }
-        message(
-          "\r\t...processing date ",
-          as.character(x),
-          ": ",
-          length(unique(duplicates.df$ID_duplicate)),
-          " duplicates found [",
-          format(
-            (Sys.time() - start_time), digits = 2, nsmall = 2
-          ), "]. \t\t",
-          appendLF = FALSE
-        )
+        if (verbose) {
+          message(
+            "\r\t...processing date ",
+            as.character(x),
+            ": ",
+            length(unique(duplicates.df$ID_duplicate)),
+            " duplicates found [",
+            format(
+              (Sys.time() - start_time), digits = 2, nsmall = 2
+            ), "]. \t\t",
+            appendLF = FALSE
+          )
+        }
         return(duplicates.df)
       } else {
-        message("\r\t...processing date ", as.character(x), ": 0 duplicates found [",
-          format(
-            (Sys.time() - start_time), digits = 2, nsmall = 2
-          ), "]. \t\t",
-          appendLF = FALSE
-        )
+        if (verbose) {
+          message("\r\t...processing date ", as.character(x), ": 0 duplicates found [",
+                  format(
+                    (Sys.time() - start_time), digits = 2, nsmall = 2
+                  ), "]. \t\t",
+                  appendLF = FALSE
+          )
+        }
       }
     } else {
-      message("\r\t...processing date ", as.character(x), ": 0 duplicates found [",
-        format(
-          (Sys.time() - start_time), digits = 2, nsmall = 2
-        ), "]. \t\t",
-        appendLF = FALSE
-      )
+      if (verbose) {
+        message("\r\t...processing date ", as.character(x), ": 0 duplicates found [",
+                format(
+                  (Sys.time() - start_time), digits = 2, nsmall = 2
+                ), "]. \t\t",
+                appendLF = FALSE
+        )
+      }
     }
   })
   duplicates.df <- data.table::rbindlist(duplicates.df)
