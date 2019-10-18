@@ -665,11 +665,11 @@ lnt_parse_uni <- function(lines,
     lines[grep(exclude_lines, lines)] <- ""
   }
 
-  # remove cover page(s)
+  # remove cover page(s) (which are separated by 2 empty lines)
   lines <- lapply(unname(split(lines, names(lines))), function(l) {
     l <- rle(l)
     l$article <- cumsum(l$lengths > 2 & l$values == "")
-    l <- l$values[l$article == max(l$article)]
+    l <- l$values[l$article > min(l$article)] #remove after 1st double blank
     l <- l[!l == ""]
     return(l)
   })
