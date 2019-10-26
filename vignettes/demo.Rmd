@@ -188,7 +188,7 @@ meta_paragraphs_df <- meta_df %>%
 
 Alternatively, you can convert LNToutput objects to formats common in other packages using the function `lnt_convert`:
 
-```{r}
+```{r eval=FALSE}
 rDNA_docs <- lnt_convert(LNToutput, to = "rDNA")
 
 quanteda_corpus <- lnt_convert(LNToutput, to = "quanteda")
@@ -199,7 +199,7 @@ tidy <- lnt_convert(LNToutput, to = "tidytext")
 
 Corpus <- lnt_convert(LNToutput, to = "tm")
 
-dbloc <- lnt_convert(LNToutput, to = "lnt2SQLite")
+dbloc <- lnt_convert(LNToutput, to = "SQLite")
 ```
 
 See `?lnt_convert` for details and comment in [this issue](https://github.com/JBGruber/LexisNexisTools/issues/2) if you want a format added to the convert function.

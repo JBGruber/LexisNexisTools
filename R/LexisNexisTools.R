@@ -1650,11 +1650,13 @@ lnt_diff <- function(x,
 #' @examples
 #' LNToutput <- lnt_read(lnt_sample(copy = FALSE))
 #'
+#' df <- lnt_convert(LNToutput, to = "data.frame")
+#'
 #' docs <- lnt_convert(LNToutput, to = "rDNA")
 #'
 #' corpus <- lnt_convert(LNToutput, to = "quanteda")
 #'
-#' dbloc <- lnt_convert(LNToutput, to = "lnt2SQLite")
+#' dbloc <- lnt_convert(LNToutput, to = "SQLite")
 #'
 #' tCorpus <- lnt_convert(LNToutput, to = "corpustools")
 #'
@@ -1670,20 +1672,56 @@ lnt_convert <- function(x,
                         collapse = FALSE,
                         file = "LNT.sqlite",
                         ...) {
-  if (to == "rDNA") {
-    return(lnt2rDNA(x, what = what, collapse = collapse))
-  } else if (to == "quanteda") {
-    return(lnt2quanteda(x, what = what, collapse = collapse, ...))
-  } else if (to == "SQLite") {
-    return(lnt2SQLite(x, file = file, collapse = collapse, ...))
-  } else if (to == "corpustools") {
-    return(lnt2cptools(x, what = what, collapse = collapse, ...))
-  } else if (to == "tm") {
-    return(lnt2tm(x, what = what, collapse = collapse, ...))
-  } else if (to == "tidytext") {
-    return(lnt2tidy(x, what = what, ...))
+
+  valid_to <- c("data.frame",
+                "rDNA",
+                "quanteda",
+                "SQLite",
+                "corpustools",
+                "tm",
+                "tidytext")
+
+  if (!to %in% valid_to) {
+    stop(to, " is not a valid selection. Choose one of: ",
+         paste(valid_to, collapse = ", "))
   }
+
+  switch(
+    to,
+    "data.frame"  = return(lnt2df(x, what = what, collapse = collapse)),
+    "rDNA"        = return(lnt2rDNA(x, what = what, collapse = collapse)),
+    "quanteda"    = return(lnt2quanteda(x, what = what, collapse = collapse, ...)),
+    "SQLite"      = return(lnt2SQLite(x, file = file, collapse = collapse, ...)),
+    "corpustools" = return(lnt2cptools(x, what = what, collapse = collapse, ...)),
+    "tm"          = return(lnt2tm(x, what = what, collapse = collapse, ...)),
+    "tidytext"    = return(lnt2tidy(x, what = what, ...))
+  )
 }
+
+
+#' @rdname lnt_convert
+#' @importFrom tibble as_tibble
+#' @export
+lnt2df <- function(x, what = "Articles", ...) {
+  if (!what %in% c("Articles", "Paragraphs")) {
+    stop("Choose either \"Articles\" or \"Paragraphs\" as what argument.")
+  }
+  if (what == "Articles") {
+    df <- merge.data.frame(x@meta,
+                           x@articles,
+                           by = "ID"
+    )
+  } else if (what == "Paragraphs") {
+    df <- merge.data.frame(
+      x@paragraphs,
+      x@meta,
+      by.x = "Art_ID",
+      by.y = "ID"
+    )
+  }
+  return(as_tibble(df))
+}
+
 
 #' @rdname lnt_convert
 #' @export

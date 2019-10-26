@@ -13,7 +13,7 @@ Thanks\!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://sayth
 ## Motivation
 
 My PhD supervisor once told me that everyone doing newspaper analysis
-starts by writing code to read in files from the ’LexisNexis’ newspaper
+starts by writing code to read in files from the ‘LexisNexis’ newspaper
 archive. However, while I do recommend this exercise, not everyone has
 the time. This package provides functions to read in TXT files
 downloaded from ‘LexisNexis’ and comes with a few other features I think
@@ -120,6 +120,8 @@ report <- lnt_rename(x = my_files, report = TRUE)
 
 report
 ```
+
+    ## [1] TRUE
 
 | name\_orig | name\_new                               | status  |
 | :--------- | :-------------------------------------- | :------ |
@@ -257,7 +259,7 @@ tidy <- lnt_convert(LNToutput, to = "tidytext")
 
 Corpus <- lnt_convert(LNToutput, to = "tm")
 
-dbloc <- lnt_convert(LNToutput, to = "lnt2SQLite")
+dbloc <- lnt_convert(LNToutput, to = "SQLite")
 ```
 
 See `?lnt_convert` for details and comment in [this
@@ -348,7 +350,7 @@ LNToutput[1, ]
     ## # A tibble: 1 x 10
     ##      ID Source_File Newspaper Date       Length Section Author Edition
     ##   <int> <chr>       <chr>     <date>     <chr>  <chr>   <chr>  <chr>  
-    ## 1     1 /home/joha… Guardian… 2010-01-11 355 w… <NA>    Andre… <NA>   
+    ## 1     1 /tmp/RtmpB… Guardian… 2010-01-11 355 w… <NA>    Andre… <NA>   
     ## # … with 2 more variables: Headline <chr>, Graphic <lgl>
     ## # A tibble: 1 x 2
     ##      ID Article                                                            
@@ -380,11 +382,11 @@ paragraphs_df <- LNToutput@paragraphs
 head(meta_df, n = 3)
 ```
 
-| ID | Source\_File                                                                            | Newspaper         | Date       | Length    | Section         | Author          | Edition             | Headline                   | Graphic |
-| -: | :-------------------------------------------------------------------------------------- | :---------------- | :--------- | :-------- | :-------------- | :-------------- | :------------------ | :------------------------- | :------ |
-|  1 | /home/johannes/Documents/GitHub/LexisNexisTools/SampleFile\_20091201-20100511\_1-10.txt | Guardian.com      | 2010-01-11 | 355 words | NA              | Andrew Sparrow  | NA                  | Lorem ipsum dolor sit amet | FALSE   |
-|  2 | /home/johannes/Documents/GitHub/LexisNexisTools/SampleFile\_20091201-20100511\_1-10.txt | Guardian          | 2010-01-11 | 927 words | NA              | Simon Tisdall   | NA                  | Lorem ipsum dolor sit amet | FALSE   |
-|  3 | /home/johannes/Documents/GitHub/LexisNexisTools/SampleFile\_20091201-20100511\_1-10.txt | The Sun (England) | 2010-01-11 | 677 words | FEATURES; Pg. 6 | TREVOR Kavanagh | Edition 1; Scotland | Lorem ipsum dolor sit amet | FALSE   |
+| ID | Source\_File                                            | Newspaper         | Date       | Length    | Section         | Author          | Edition             | Headline                   | Graphic |
+| -: | :------------------------------------------------------ | :---------------- | :--------- | :-------- | :-------------- | :-------------- | :------------------ | :------------------------- | :------ |
+|  1 | /tmp/RtmpBzT1UG/SampleFile\_20091201-20100511\_1-10.txt | Guardian.com      | 2010-01-11 | 355 words | NA              | Andrew Sparrow  | NA                  | Lorem ipsum dolor sit amet | FALSE   |
+|  2 | /tmp/RtmpBzT1UG/SampleFile\_20091201-20100511\_1-10.txt | Guardian          | 2010-01-11 | 927 words | NA              | Simon Tisdall   | NA                  | Lorem ipsum dolor sit amet | FALSE   |
+|  3 | /tmp/RtmpBzT1UG/SampleFile\_20091201-20100511\_1-10.txt | The Sun (England) | 2010-01-11 | 677 words | FEATURES; Pg. 6 | TREVOR Kavanagh | Edition 1; Scotland | Lorem ipsum dolor sit amet | FALSE   |
 
 ### Lookup Keywords
 
@@ -439,7 +441,7 @@ LNToutput
     ## # A tibble: 1 x 11
     ##      ID Source_File Newspaper Date       Length Section Author Edition
     ##   <int> <chr>       <chr>     <date>     <chr>  <chr>   <chr>  <chr>  
-    ## 1     9 /home/joha… Sunday M… 2010-01-10 446 w… NEWS; … Ross … 3 Star…
+    ## 1     9 /tmp/RtmpB… Sunday M… 2010-01-10 446 w… NEWS; … Ross … 3 Star…
     ## # … with 3 more variables: Headline <chr>, Graphic <lgl>, stats <named
     ## #   list>
     ## # A tibble: 1 x 2

@@ -2,6 +2,8 @@
 ## set for spelling package
 Sys.setenv(NOT_CRAN = TRUE)
 
+setwd(here::here())
+
 ## Update date and version
 update_description <- function() {
   desc <- readLines("DESCRIPTION")
@@ -61,7 +63,7 @@ system("R CMD Rd2pdf ../LexisNexisTools")
 knitr::knit("README.Rmd")
 
 ## test covr
-covr::package_coverage(quiet = FALSE, clean = FALSE)
+devtools::test_coverage()
 
 
 # For release on CRAN

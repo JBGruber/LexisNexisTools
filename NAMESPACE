@@ -3,6 +3,7 @@
 export(lnt2SQLite)
 export(lnt2bibtex)
 export(lnt2cptools)
+export(lnt2df)
 export(lnt2quanteda)
 export(lnt2rDNA)
 export(lnt2tidy)

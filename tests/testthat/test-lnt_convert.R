@@ -1,5 +1,17 @@
 context("LNToutput Conversion")
 
+test_that("Convert LNToutput to data.frame", {
+  expect_equal({
+    lnt_convert(x = readRDS("../files/LNToutput.RDS"),
+                to = "data.frame",
+                what = "Articles",
+                collapse = TRUE)
+  }, readRDS("../files/df.RDS"))
+})
+
+# saveRDS(lnt_convert(x = readRDS("../files/LNToutput.RDS"),
+#                     to = "data.frame", what = "Articles", collapse = TRUE), "../files/df.RDS")
+
 test_that("Convert LNToutput to rDNA", {
   expect_equal({
     lnt_convert(x = readRDS("../files/LNToutput.RDS"),

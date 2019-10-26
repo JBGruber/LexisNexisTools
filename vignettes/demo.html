@@ -7,12 +7,13 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <meta name="author" content="Johannes B. Gruber" />
 
-<meta name="date" content="2019-07-09" />
+<meta name="date" content="2019-10-26" />
 
 <title>Basic Usage</title>
 
@@ -96,7 +97,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -303,7 +304,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">Basic Usage</h1>
 <h4 class="author">Johannes B. Gruber</h4>
-<h4 class="date">2019-07-09</h4>
+<h4 class="date">2019-10-26</h4>
 
 
 
@@ -355,7 +356,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <tbody>
 <tr class="odd">
 <td align="left">sample.TXT</td>
-<td align="left">file2edb116d94e9.TXT</td>
+<td align="left">file640613d3dc4a.TXT</td>
 <td align="left">not renamed (file exists)</td>
 </tr>
 </tbody>
@@ -431,7 +432,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <tbody>
 <tr class="odd">
 <td align="right">1</td>
-<td align="left">file2edb116d94e9.TXT</td>
+<td align="left">file640613d3dc4a.TXT</td>
 <td align="left">Guardian.com</td>
 <td align="left">2010-01-11</td>
 <td align="left">355 words</td>
@@ -443,7 +444,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 </tr>
 <tr class="even">
 <td align="right">2</td>
-<td align="left">file2edb116d94e9.TXT</td>
+<td align="left">file640613d3dc4a.TXT</td>
 <td align="left">Guardian</td>
 <td align="left">2010-01-11</td>
 <td align="left">927 words</td>
@@ -455,7 +456,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 </tr>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">file2edb116d94e9.TXT</td>
+<td align="left">file640613d3dc4a.TXT</td>
 <td align="left">The Sun (England)</td>
 <td align="left">2010-01-11</td>
 <td align="left">677 words</td>
@@ -486,7 +487,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <a class="sourceLine" id="cb12-8" data-line-number="8"></a>
 <a class="sourceLine" id="cb12-9" data-line-number="9">Corpus &lt;-<span class="st"> </span><span class="kw">lnt_convert</span>(LNToutput, <span class="dt">to =</span> <span class="st">&quot;tm&quot;</span>)</a>
 <a class="sourceLine" id="cb12-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb12-11" data-line-number="11">dbloc &lt;-<span class="st"> </span><span class="kw">lnt_convert</span>(LNToutput, <span class="dt">to =</span> <span class="st">&quot;lnt2SQLite&quot;</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb12-11" data-line-number="11">dbloc &lt;-<span class="st"> </span><span class="kw">lnt_convert</span>(LNToutput, <span class="dt">to =</span> <span class="st">&quot;SQLite&quot;</span>)</a></code></pre></div>
 <p>See <code>?lnt_convert</code> for details and comment in <a href="https://github.com/JBGruber/LexisNexisTools/issues/2">this issue</a> if you want a format added to the convert function.</p>
 </div>
 <div id="identify-highly-similar-articles" class="section level3">
@@ -525,7 +526,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <a class="sourceLine" id="cb18-5" data-line-number="5"><span class="co">#&gt; # A tibble: 1 x 10</span></a>
 <a class="sourceLine" id="cb18-6" data-line-number="6"><span class="co">#&gt;      ID Source_File Newspaper Date       Length Section Author Edition</span></a>
 <a class="sourceLine" id="cb18-7" data-line-number="7"><span class="co">#&gt;   &lt;int&gt; &lt;chr&gt;       &lt;chr&gt;     &lt;date&gt;     &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;  </span></a>
-<a class="sourceLine" id="cb18-8" data-line-number="8"><span class="co">#&gt; 1     1 /tmp/Rtmpo… Guardian… 2010-01-11 355 w… &lt;NA&gt;    Andre… &lt;NA&gt;   </span></a>
+<a class="sourceLine" id="cb18-8" data-line-number="8"><span class="co">#&gt; 1     1 /tmp/RtmpB… Guardian… 2010-01-11 355 w… &lt;NA&gt;    Andre… &lt;NA&gt;   </span></a>
 <a class="sourceLine" id="cb18-9" data-line-number="9"><span class="co">#&gt; # … with 2 more variables: Headline &lt;chr&gt;, Graphic &lt;lgl&gt;</span></a>
 <a class="sourceLine" id="cb18-10" data-line-number="10"><span class="co">#&gt; # A tibble: 1 x 2</span></a>
 <a class="sourceLine" id="cb18-11" data-line-number="11"><span class="co">#&gt;      ID Article                                                            </span></a>
@@ -578,7 +579,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <tbody>
 <tr class="odd">
 <td align="right">1</td>
-<td align="left">/tmp/Rtmpo9CkIC/file2edb116d94e9.TXT</td>
+<td align="left">/tmp/RtmpBzT1UG/file640613d3dc4a.TXT</td>
 <td align="left">Guardian.com</td>
 <td align="left">2010-01-11</td>
 <td align="left">355 words</td>
@@ -590,7 +591,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 </tr>
 <tr class="even">
 <td align="right">2</td>
-<td align="left">/tmp/Rtmpo9CkIC/file2edb116d94e9.TXT</td>
+<td align="left">/tmp/RtmpBzT1UG/file640613d3dc4a.TXT</td>
 <td align="left">Guardian</td>
 <td align="left">2010-01-11</td>
 <td align="left">927 words</td>
@@ -602,7 +603,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 </tr>
 <tr class="odd">
 <td align="right">3</td>
-<td align="left">/tmp/Rtmpo9CkIC/file2edb116d94e9.TXT</td>
+<td align="left">/tmp/RtmpBzT1UG/file640613d3dc4a.TXT</td>
 <td align="left">The Sun (England)</td>
 <td align="left">2010-01-11</td>
 <td align="left">677 words</td>
@@ -649,7 +650,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <a class="sourceLine" id="cb21-7" data-line-number="7"><span class="co">#&gt; # A tibble: 1 x 11</span></a>
 <a class="sourceLine" id="cb21-8" data-line-number="8"><span class="co">#&gt;      ID Source_File Newspaper Date       Length Section Author Edition</span></a>
 <a class="sourceLine" id="cb21-9" data-line-number="9"><span class="co">#&gt;   &lt;int&gt; &lt;chr&gt;       &lt;chr&gt;     &lt;date&gt;     &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;  </span></a>
-<a class="sourceLine" id="cb21-10" data-line-number="10"><span class="co">#&gt; 1     9 /tmp/Rtmpo… Sunday M… 2010-01-10 446 w… NEWS; … Ross … 3 Star…</span></a>
+<a class="sourceLine" id="cb21-10" data-line-number="10"><span class="co">#&gt; 1     9 /tmp/RtmpB… Sunday M… 2010-01-10 446 w… NEWS; … Ross … 3 Star…</span></a>
 <a class="sourceLine" id="cb21-11" data-line-number="11"><span class="co">#&gt; # … with 3 more variables: Headline &lt;chr&gt;, Graphic &lt;lgl&gt;, stats &lt;named</span></a>
 <a class="sourceLine" id="cb21-12" data-line-number="12"><span class="co">#&gt; #   list&gt;</span></a>
 <a class="sourceLine" id="cb21-13" data-line-number="13"><span class="co">#&gt; # A tibble: 1 x 2</span></a>
@@ -679,6 +680,9 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 </div>
 </div>
 
+
+
+<!-- code folding -->
 
 
 <!-- dynamically load mathjax for compatibility with self-contained -->

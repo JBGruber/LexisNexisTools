@@ -2,6 +2,7 @@
 % Please edit documentation in R/LexisNexisTools.R
 \name{lnt_convert}
 \alias{lnt_convert}
+\alias{lnt2df}
 \alias{lnt2rDNA}
 \alias{lnt2quanteda}
 \alias{lnt2tm}
@@ -12,6 +13,8 @@
 \usage{
 lnt_convert(x, to = "rDNA", what = "Articles", collapse = FALSE,
   file = "LNT.sqlite", ...)
+
+lnt2df(x, what = "Articles", ...)
 
 lnt2rDNA(x, what = "Articles", collapse = TRUE)
 
@@ -65,11 +68,13 @@ for tuning the outcome:
 \examples{
 LNToutput <- lnt_read(lnt_sample(copy = FALSE))
 
+df <- lnt_convert(LNToutput, to = "data.frame")
+
 docs <- lnt_convert(LNToutput, to = "rDNA")
 
 corpus <- lnt_convert(LNToutput, to = "quanteda")
 
-dbloc <- lnt_convert(LNToutput, to = "lnt2SQLite")
+dbloc <- lnt_convert(LNToutput, to = "SQLite")
 
 tCorpus <- lnt_convert(LNToutput, to = "corpustools")
 
