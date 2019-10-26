@@ -1945,11 +1945,8 @@ lnt2tidy <- function(x, what = "Articles", ...) {
     stop("Choose either \"Articles\" or \"Paragraphs\" as what argument.")
   }
   check_install("tidytext")
+  df <- lnt2df(x, what = what)
   if (what == "Articles") {
-    df <- merge.data.frame(x@meta,
-      x@articles,
-      by = "ID"
-    )
     tidy <- tidytext::unnest_tokens(
       tbl = df,
       input = "Article",
@@ -1957,12 +1954,6 @@ lnt2tidy <- function(x, what = "Articles", ...) {
       ...
     )
   } else if (what == "Paragraphs") {
-    df <- merge.data.frame(
-      x@paragraphs,
-      x@meta,
-      by.x = "Art_ID",
-      by.y = "ID"
-    )
     tidy <- tidytext::unnest_tokens(
       tbl = df,
       input = "Paragraph",
