@@ -19,7 +19,11 @@ matrix:
         r: release
         brew_packages: poppler
         before_install:
-          - brew install libgit2
+          - brew install cmake gcc libgit2 llvm &&
+            export PATH="/usr/local/opt/llvm/bin:$PATH" &&
+            export LDFLAGS="-L/usr/local/opt/llvm/lib" &&
+            export CFLAGS="-I/usr/local/opt/llvm/include"; fi
+            
 # not supported yet
 #      - os: windows
 #        r: release
