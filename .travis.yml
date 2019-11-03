@@ -15,8 +15,10 @@ matrix:
       - os: linux
         sudo: required
         r: devel
-      - os: osx
-        r: release
+        
+# simply causes too much headache
+#      - os: osx
+#        r: release
             
 # not supported yet
 #      - os: windows
