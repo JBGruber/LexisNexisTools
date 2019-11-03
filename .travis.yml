@@ -17,12 +17,7 @@ matrix:
         r: devel
       - os: osx
         r: release
-        brew_packages: poppler
-        before_install:
-          - brew install cmake gcc libgit2 llvm
-          - export PATH="/usr/local/opt/llvm/bin:$PATH" # for compiling data.table
-          - export LDFLAGS="-L/usr/local/opt/llvm/lib"
-          - export CFLAGS="-I/usr/local/opt/llvm/include"
+        brew_packages: poppler cmake gcc libgit2
             
 # not supported yet
 #      - os: windows
