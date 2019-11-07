@@ -685,6 +685,10 @@ lnt_parse_uni <- function(lines,
   articles.l[[length(articles.l)]] <- NULL
   names(articles.l) <- NULL
 
+  if (!length(articles.l)) {
+    stop("No articles found to parse.")
+  }
+  
   #  first article does not contain keyword
   if (!stringi::stri_detect_regex(articles.l[[1]][1], end_keyword)) {
     articles.l[[1]] <- c(articles.l[[1]][1], articles.l[[1]])
