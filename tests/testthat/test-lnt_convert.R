@@ -37,53 +37,20 @@ test_that("Convert LNToutput to rDNA", {
 # saveRDS(lnt_convert(x = readRDS("../files/LNToutput.RDS"),
 #                     to = "rDNA", what = "Articles", collapse = TRUE), "../files/rDNA.RDS")
 
+
 test_that("Convert LNToutput to quanteda", {
-  skip_if(packageVersion("quanteda") > "1.4.89")
   expect_equal({
     corpus <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
                           to = "quanteda", what = "Articles",
                           collapse = FALSE)
-    quanteda::metacorpus(corpus, "created") <- "Wed Jul 25 19:33:20 2018"
-    quanteda::metacorpus(corpus, "source") <-
-      "/home/johannes/Documents/Github/LexisNexisTools/tests/testthat/* on x86_64 by johannes"
-    corpus
-  }, readRDS("../files/quanteda.RDS"))
+    list(class(corpus)[1], quanteda::ndoc(corpus))
+  }, list("corpus", 10L))
   expect_equal({
     corpus <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
-                          to = "quanteda",
-                          what = "Paragraphs",
-                          collapse = FALSE,
-                          metacorpus = list(notes = "test"))
-    unname(unlist(quanteda::metacorpus(corpus, "notes")))
-  }, "test")
-})
-
-# corpus <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
-#                       to = "quanteda", what = "Articles")
-# corpus$metadata$created <- "Wed Jul 25 19:33:20 2018"
-# corpus
-# saveRDS(corpus, "../files/quanteda.RDS")
-
-
-test_that("Convert LNToutput to quanteda", {
-  skip_if(packageVersion("quanteda") < "1.5.0")
-  expect_equal({
-    corpus <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
-                          to = "quanteda", what = "Articles",
+                          to = "quanteda", what = "Paragraphs",
                           collapse = FALSE)
-    quanteda::metacorpus(corpus, "created") <- "Mon Jul  8 10:34:12 2019"
-    quanteda::metacorpus(corpus, "source") <-
-      "/home/johannes/Documents/Github/LexisNexisTools/tests/testthat/* on x86_64 by johannes"
-    corpus
-  }, readRDS("../files/quanteda_1.5.RDS"))
-  expect_equal({
-    corpus <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
-                          to = "quanteda",
-                          what = "Paragraphs",
-                          collapse = FALSE,
-                          metacorpus = list(notes = "test"))
-    unname(unlist(quanteda::metacorpus(corpus, "notes")))
-  }, "test")
+    list(class(corpus)[1], quanteda::ndoc(corpus))
+  }, list("corpus", 122L))
   expect_equal({
     corpus <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
                           to = "quanteda", what = "Articles",
