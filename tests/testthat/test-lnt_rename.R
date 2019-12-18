@@ -27,11 +27,12 @@ test_that("Rename Sample", {
     capture_messages(
       test <- lnt_rename(smpl[1], simulate = TRUE, verbose = TRUE)
     )[-6]
-  }, c("Checking LN files...\n", "1 files found to process...\n",
+  }, c("Checking LN files...\n",
+       "1 files found to process...\n",
        "\r\t...renaming files 100.00%\n",
        "0 files renamed, ",
        "1 not renamed (file already exists), ",
-       " [changes were only simulated]\n"))
+       " [changes were only simulated]\n" ))
 })
 
 teardown(unlink(dir, recursive = TRUE, force = TRUE))

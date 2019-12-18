@@ -930,9 +930,49 @@ lnt_rename <- function(x,
     name_orig = files,
     name_new = character(length = length(files)),
     status = character(length = length(files)),
+    type = tolower(tools::file_ext(files)),
     stringsAsFactors = FALSE
   )
   # start renaming files
+  tbl <- renamed[renamed$type == "txt",]
+  if (nrow(tbl) > 0) {
+    renamed[renamed$type == "txt",] <- lnt_rename_txt(
+      tbl, encoding, simulate, verbose
+    )
+  }
+  if (verbose) {
+    message(sum(grepl("^renamed$", renamed$status)),
+            " files renamed, ",
+            appendLF = FALSE
+    )
+
+    if (sum(grepl("exists", renamed$status, fixed = TRUE)) > 0) {
+      message(sum(grepl("exists", renamed$status, fixed = TRUE)),
+              " not renamed (file already exists), ",
+              appendLF = FALSE
+      )
+    }
+    if (sum(grepl("empty", renamed$status, fixed = TRUE)) > 0) {
+      message(sum(grepl("empty", renamed$status, fixed = TRUE)),
+              " not renamed (no search term or time range found), ",
+              appendLF = FALSE
+      )
+    }
+  }
+  renamed$status <- as.factor(renamed$status)
+  elapsed <- Sys.time() - start_time
+  if (verbose) {
+    message(
+      "in ", format(elapsed, digits = 2, nsmall = 2), appendLF = FALSE
+    )
+  }
+  if (simulate) message(" [changes were only simulated]")
+  if (report) return(renamed)
+}
+
+
+lnt_rename_txt <- function(tbl, encoding, simulate, verbose) {
+  files <- tbl$name_orig
   for (i in seq_along(files)) {
     # read in the articles
     content.v <- readLines(files[i], encoding = encoding, n = 50)
@@ -941,14 +981,14 @@ lnt_rename <- function(x,
     # extract the actual range infromation from line
     range.v <- stringi::stri_extract_all_regex(range.v, pattern = "[[:digit:]]|-", simplify = TRUE)
     range.v <- stringi::stri_join(range.v, sep = "", collapse = "")
-
+    
     # look for search term
     term.v <- content.v[grep("^Terms: |^Begriffe: ", content.v)]
     # erase everything in the line exept the actual range
     term.v <- gsub("^Terms: |^Begriffe: ", "", term.v)
     # split term into elemets seprated by and or OR
     term.v <- unlist(strsplit(term.v, split = " AND | and | OR ", fixed = FALSE))
-
+    
     date.v <- term.v[grepl("\\d+-\\d+-\\d+", term.v)]
     if (length(date.v) > 1) {
       date.v <- paste0(
@@ -979,17 +1019,17 @@ lnt_rename <- function(x,
     file.name <- sub("[^/]+$", "", files[i]) # take old filepath
     file.name <- paste0(file.name, term.v, "_", date.v, "_", range.v, ".txt")
     # rename file
-
+    
     if (file.exists(file.name)) {
-      renamed$name_new[i] <- renamed$name_orig[i]
-      renamed$status[i] <- "not renamed (file exists)"
+      tbl$name_new[i] <- tbl$name_orig[i]
+      tbl$status[i] <- "not renamed (file exists)"
     } else {
       if (file.name == "__.txt") {
-        renamed$name_new[i] <- file.name
-        renamed$status[i] <- "not renamed (file is empty)"
+        tbl$name_new[i] <- file.name
+        tbl$status[i] <- "not renamed (file is empty)"
       } else {
-        renamed$name_new[i] <- file.name
-        renamed$status[i] <- "renamed"
+        tbl$name_new[i] <- file.name
+        tbl$status[i] <- "renamed"
         if (!simulate) {
           file.rename(files[i], file.name)
         }
@@ -1002,34 +1042,7 @@ lnt_rename <- function(x,
       ), "%")
     }
   }
-  if (verbose) {
-    message(sum(grepl("^renamed$", renamed$status)),
-            " files renamed, ",
-            appendLF = FALSE
-    )
-
-    if (sum(grepl("exists", renamed$status, fixed = TRUE)) > 0) {
-      message(sum(grepl("exists", renamed$status, fixed = TRUE)),
-              " not renamed (file already exists), ",
-              appendLF = FALSE
-      )
-    }
-    if (sum(grepl("empty", renamed$status, fixed = TRUE)) > 0) {
-      message(sum(grepl("empty", renamed$status, fixed = TRUE)),
-              " not renamed (no search term or time range found), ",
-              appendLF = FALSE
-      )
-    }
-  }
-  renamed$status <- as.factor(renamed$status)
-  elapsed <- Sys.time() - start_time
-  if (verbose) {
-    message(
-      " in ", format(elapsed, digits = 2, nsmall = 2), appendLF = FALSE
-    )
-  }
-  if (simulate) message(" [changes were only simulated]")
-  if (report) return(renamed)
+  return(tbl)
 }
 
 
