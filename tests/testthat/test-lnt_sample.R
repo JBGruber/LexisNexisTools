@@ -4,6 +4,12 @@ dir <- paste0(tempdir(check = TRUE), "/test")
 dir.create(dir)
 
 test_that("sample exists", {
+  expect_equal(lnt_sample(copy = FALSE),
+               system.file("extdata", "sample.TXT", 
+                           package = "LexisNexisTools"))
+})
+
+test_that("sample exists", {
   skip_on_cran()
   expect_equal({
     file <- lnt_sample(verbose = FALSE)

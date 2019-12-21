@@ -1,7 +1,7 @@
 context("Read sample file")
 
-files <- c(system.file("extdata", "sample.TXT", package = "LexisNexisTools"),
-           system.file("extdata", "sample.TXT", package = "LexisNexisTools"))
+files <- c(lnt_sample(copy = FALSE),
+           lnt_sample(copy = FALSE))
 
 test_that("Read in sample file", {
   expect_equal({

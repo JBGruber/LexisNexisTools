@@ -1,18 +1,27 @@
 context("Read sample file")
 
+files <- c(system.file("extdata", "sample.DOCX", package = "LexisNexisTools"),
+           system.file("extdata", "sample.DOCX", package = "LexisNexisTools"))
+
 test_that("Read in sample file", {
   expect_error(lnt_read("../files/test.DOCX"),
                "No articles found to parse.")
-  skip_on_cran()
-  skip_on_travis()
   expect_equal({
-    test <- lnt_read("/home/johannes/Dropbox/LexisNexis_sample_files/should_work/Files(30).DOCX",
-                     verbose = TRUE)
-    test@meta$Source_File <- basename(test@meta$Source_File)
-    attributes(test)$created$time <- "2018-12-15 01:00:38 GMT"
-    attributes(test)$created$Version <- "0.2.1.9000"
-    test
-  }, readRDS("../files/LNToutput_uni.RDS"))
+    test <- lnt_read(files[1], verbose = TRUE)
+    dim(test)
+  }, c(Articles = 10, Meta_variable = 10, data.frames = 3))
+  expect_equal({
+    test <- lnt_read(files, verbose = TRUE, convert_date = FALSE)
+    dim(test)
+  }, c(Articles = 20, Meta_variable = 10, data.frames = 3))
+  expect_equal({
+    test <- lnt_read(files[1], verbose = TRUE)
+    dim(test@paragraphs)
+  }, c(83L, 3L))
+})
+
+test_that("Test local collection", {
+  skip_if(!dir.exists("/home/johannes/Dropbox/LexisNexis_sample_files/"))
   expect_gt({
     test <- lnt_read("/home/johannes/Dropbox/LexisNexis_sample_files/should_work/",
                      convert_date = FALSE,
