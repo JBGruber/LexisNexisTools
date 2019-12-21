@@ -144,6 +144,7 @@ test_that("Convert LNToutput to tm", {
 #                     to = "tm", what = "Articles"), "../files/tm.RDS")
 
 test_that("Convert LNToutput to SQLite", {
+  skip_on_cran()
   expect_equal({
     unlink("../files/LNT.sqlite")
     conn <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),

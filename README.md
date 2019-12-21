@@ -7,8 +7,6 @@ Status](https://travis-ci.org/JBGruber/LexisNexisTools.svg?branch=master)](https
 [![CRAN\_Download\_Badge](http://cranlogs.r-pkg.org/badges/grand-total/LexisNexisTools)](https://cran.r-project.org/package=LexisNexisTools)
 [![Coverage
 Status](https://codecov.io/gh/JBGruber/LexisNexisTools/branch/master/graph/badge.svg)](https://codecov.io/github/JBGruber/LexisNexisTools)
-[![Say
-Thanks\!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/JBGruber)
 
 ## Motivation
 
@@ -327,8 +325,8 @@ LNToutput[1, ]
 ```
 
     ## Object of class 'LNToutput':
-    ## 1 Articles
-    ## 5 Paragraphs
+    ## 1 articles
+    ## 5 paragraphs
     ## # A tibble: 1 x 10
     ##      ID Source_File Newspaper Date       Length Section Author Edition Headline
     ##   <int> <chr>       <chr>     <date>     <chr>  <chr>   <chr>  <chr>   <chr>   
@@ -418,8 +416,8 @@ LNToutput
 ```
 
     ## Object of class 'LNToutput':
-    ## 1 Articles
-    ## 7 Paragraphs
+    ## 1 articles
+    ## 7 paragraphs
     ## # A tibble: 1 x 11
     ##      ID Source_File Newspaper Date       Length Section Author Edition Headline
     ##   <int> <chr>       <chr>     <date>     <chr>  <chr>   <chr>  <chr>   <chr>   
