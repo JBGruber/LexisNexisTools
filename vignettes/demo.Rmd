@@ -68,7 +68,7 @@ report
 ```{r, echo=FALSE}
 library(kableExtra)
 temp <- paste0(tempfile(), ".TXT")
-file.copy(
+silent <- file.copy(
   from = system.file("extdata", "sample.TXT", package = "LexisNexisTools"),
   to = temp,
   overwrite = TRUE
@@ -118,6 +118,7 @@ LNToutput <- lnt_read(x = getwd())
 ```
 ```{r echo=FALSE, message=FALSE}
 LNToutput <- lnt_read(x = newfile)
+LNToutput@meta$Source_File <- basename(LNToutput@meta$Source_File)
 ```
 
     ## Creating LNToutput from 1 file...
@@ -272,7 +273,6 @@ head(meta_df, n = 3)
 meta_df <- LNToutput@meta
 articles_df <- LNToutput@articles
 paragraphs_df <- LNToutput@paragraphs
-
 kable(head(meta_df, n = 3), format = "markdown")
 ```
 

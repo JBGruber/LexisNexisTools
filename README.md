@@ -109,8 +109,6 @@ report <- lnt_rename(x = my_files, report = TRUE)
 report
 ```
 
-    ## [1] TRUE
-
 | name\_orig | name\_new                               | status  | type |
 | :--------- | :-------------------------------------- | :------ | :--- |
 | sample.TXT | SampleFile\_20091201-20100511\_1-10.txt | renamed | txt  |
@@ -334,7 +332,7 @@ LNToutput[1, ]
     ## # A tibble: 1 x 10
     ##      ID Source_File Newspaper Date       Length Section Author Edition Headline
     ##   <int> <chr>       <chr>     <date>     <chr>  <chr>   <chr>  <chr>   <chr>   
-    ## 1     1 /tmp/Rtmpb… Guardian… 2010-01-11 355 w… <NA>    Andre… <NA>    Lorem i…
+    ## 1     1 SampleFile… Guardian… 2010-01-11 355 w… <NA>    Andre… <NA>    Lorem i…
     ## # … with 1 more variable: Graphic <lgl>
     ## # A tibble: 1 x 2
     ##      ID Article                                                                 
@@ -366,11 +364,11 @@ paragraphs_df <- LNToutput@paragraphs
 head(meta_df, n = 3)
 ```
 
-| ID | Source\_File                                            | Newspaper         | Date       | Length    | Section         | Author          | Edition             | Headline                   | Graphic |
-| -: | :------------------------------------------------------ | :---------------- | :--------- | :-------- | :-------------- | :-------------- | :------------------ | :------------------------- | :------ |
-|  1 | /tmp/RtmpbOUJOd/SampleFile\_20091201-20100511\_1-10.txt | Guardian.com      | 2010-01-11 | 355 words | NA              | Andrew Sparrow  | NA                  | Lorem ipsum dolor sit amet | FALSE   |
-|  2 | /tmp/RtmpbOUJOd/SampleFile\_20091201-20100511\_1-10.txt | Guardian          | 2010-01-11 | 927 words | NA              | Simon Tisdall   | NA                  | Lorem ipsum dolor sit amet | FALSE   |
-|  3 | /tmp/RtmpbOUJOd/SampleFile\_20091201-20100511\_1-10.txt | The Sun (England) | 2010-01-11 | 677 words | FEATURES; Pg. 6 | TREVOR Kavanagh | Edition 1; Scotland | Lorem ipsum dolor sit amet | FALSE   |
+| ID | Source\_File                            | Newspaper         | Date       | Length    | Section         | Author          | Edition             | Headline                   | Graphic |
+| -: | :-------------------------------------- | :---------------- | :--------- | :-------- | :-------------- | :-------------- | :------------------ | :------------------------- | :------ |
+|  1 | SampleFile\_20091201-20100511\_1-10.txt | Guardian.com      | 2010-01-11 | 355 words | NA              | Andrew Sparrow  | NA                  | Lorem ipsum dolor sit amet | FALSE   |
+|  2 | SampleFile\_20091201-20100511\_1-10.txt | Guardian          | 2010-01-11 | 927 words | NA              | Simon Tisdall   | NA                  | Lorem ipsum dolor sit amet | FALSE   |
+|  3 | SampleFile\_20091201-20100511\_1-10.txt | The Sun (England) | 2010-01-11 | 677 words | FEATURES; Pg. 6 | TREVOR Kavanagh | Edition 1; Scotland | Lorem ipsum dolor sit amet | FALSE   |
 
 ### Lookup Keywords
 
@@ -425,7 +423,7 @@ LNToutput
     ## # A tibble: 1 x 11
     ##      ID Source_File Newspaper Date       Length Section Author Edition Headline
     ##   <int> <chr>       <chr>     <date>     <chr>  <chr>   <chr>  <chr>   <chr>   
-    ## 1     9 /tmp/Rtmpb… Sunday M… 2010-01-10 446 w… NEWS; … Ross … 3 Star… R (prog…
+    ## 1     9 SampleFile… Sunday M… 2010-01-10 446 w… NEWS; … Ross … 3 Star… R (prog…
     ## # … with 2 more variables: Graphic <lgl>, stats <named list>
     ## # A tibble: 1 x 2
     ##      ID Article                                                                 
