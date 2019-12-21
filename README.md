@@ -15,10 +15,11 @@ Thanks\!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://sayth
 My PhD supervisor once told me that everyone doing newspaper analysis
 starts by writing code to read in files from the ‘LexisNexis’ newspaper
 archive. However, while I do recommend this exercise, not everyone has
-the time. This package provides functions to read in TXT files
-downloaded from ‘LexisNexis’ and comes with a few other features I think
-come in handy while working with data from the popular newspaper
-archive.
+the time. This package provides functions to read in TXT, RTF, DOC and
+PDF files downloaded from the old ‘LexisNexis’ or DOCX from the new
+Nexis Uni, Lexis Advance and similar services. The package also comes
+with a few other features that should be useful while working with data
+from the popular newspaper archive.
 
 **Did you experience any problems, have questions or an idea about a
 great new feature?** Then please don’t hesitate to file an [**issue
@@ -36,10 +37,6 @@ Or get the development version by installing directly from GitHub (if
 you do not have `remotes` yet install it via
 `install.packages("remotes")` first):
 
-**Note: the GitHub Version now supports .docx files from Nexis Uni (see
-[this
-issue](https://github.com/JBGruber/LexisNexisTools/issues/7#issuecomment-509000414))**
-
 ``` r
 remotes::install_github("JBGruber/LexisNexisTools")
 ```
@@ -52,19 +49,9 @@ remotes::install_github("JBGruber/LexisNexisTools")
 library("LexisNexisTools")
 ```
 
-### Set Working Directory to a location containing raw files from ‘LexisNexis’.
-
-``` r
-# For example
-setwd("C:/Test/LNTools_test")
-
-# Or
-setwd("~/Test/LNTools_test")
-```
-
-If you do not have files from ‘LexisNexis’, you can use `lnt_sample()`
-to copy a sample file with mock data into your current working
-directory:
+If you do not yet have files from ‘LexisNexis’ but want to test the
+package, you can use `lnt_sample()` to copy a sample file with mock data
+into your current working directory:
 
 ``` r
 lnt_sample()
@@ -72,15 +59,16 @@ lnt_sample()
 
 ### Rename Files
 
-‘LexisNexis’ does not give the TXT files proper names. The function
-`lnt_rename()` renames files to a standard format:
-“searchTerm\_startDate-endDate\_documentRange.txt” (e.g.,
-“Obama\_20091201-20100511\_1-500.txt”). Note, that this will not work
-if your TXT files lack a cover page with this information. Currently, it
-seems, like ‘LexisNexis’ only delivers those cover pages when you first
-create a link to your search (“link to this search” on the results
-page), follow this link, and then download the TXT files from there (see
-here for a [visual
+‘LexisNexis’ does not give its files proper names. The function
+`lnt_rename()` renames files to a standard format: For TXT files this
+format is “searchTerm\_startDate-endDate\_documentRange.txt” (e.g.,
+“Obama\_20091201-20100511\_1-500.txt”) (for other file types the
+format is similar but depends on what information is available). Note,
+that this will not work if your files lack a cover page with this
+information. Currently, it seems, like ‘LexisNexis’ only delivers those
+cover pages when you first create a link to your search (“link to this
+search” on the results page), follow this link, and then download the
+TXT files from there (see here for a [visual
 explanation](https://github.com/JBGruber/LexisNexisTools/wiki/Downloading-TXT-Files-From-Nexis)).
 If you do not want to rename files, you can skip to the next section.
 The rest of the package’s functionality stays untouched by whether you
@@ -123,9 +111,9 @@ report
 
     ## [1] TRUE
 
-| name\_orig | name\_new                               | status  |
-| :--------- | :-------------------------------------- | :------ |
-| sample.TXT | SampleFile\_20091201-20100511\_1-10.txt | renamed |
+| name\_orig | name\_new                               | status  | type |
+| :--------- | :-------------------------------------- | :------ | :--- |
+| sample.TXT | SampleFile\_20091201-20100511\_1-10.txt | renamed | txt  |
 
 Using `list.files()` instead of the built-in mechanism allows you to
 specify a file pattern. This might be a preferred option if you have a
@@ -140,10 +128,9 @@ your drive and how.
 ### Read in ‘LexisNexis’ Files to Get Meta, Articles and Paragraphs
 
 The main function of this package is `lnt_read()`. It converts the raw
-text files into three different `data.frames` nested in a special S4
-object of class `LNToutput`. The three data.frames contain (1.) the
-metadata of the articles, (2.) the articles themselves, and (3.) the
-paragraphs (when `extract_paragraphs = TRUE`).
+files into three different `data.frames` nested in a special S4 object
+of class `LNToutput`. The three data.frames contain (1.) the metadata of
+the articles, (2.) the articles themselves, and (3.) the paragraphs.
 
 There are several important keywords that are used to split up the raw
 articles into article text and metadata. Those need to be provided in
@@ -182,7 +169,7 @@ viewer.)
 </p>
 
 To use the function, you can again provide either file name(s), folder
-name(s) or nothing—to search the current working directory for TXT
+name(s) or nothing—to search the current working directory for relevant
 files—as `x` argument:
 
 ``` r
@@ -236,13 +223,10 @@ If you want to keep only one data.frame including metadata and text data
 you can easily do so:
 
 ``` r
-library("dplyr")
-meta_articles_df <- meta_df %>%
-  right_join(articles_df, by = "ID")
+meta_articles_df <- lnt_convert(LNToutput, to = "data.frame")
 
 # Or keep the paragraphs
-meta_paragraphs_df <- meta_df %>%
-  right_join(paragraphs_df, by = c("ID" = "Art_ID"))
+meta_paragraphs_df <- lnt_convert(LNToutput, to = "data.frame", what = "Paragraphs")
 ```
 
 Alternatively, you can convert LNToutput objects to formats common in
@@ -348,22 +332,22 @@ LNToutput[1, ]
     ## 1 Articles
     ## 5 Paragraphs
     ## # A tibble: 1 x 10
-    ##      ID Source_File Newspaper Date       Length Section Author Edition
-    ##   <int> <chr>       <chr>     <date>     <chr>  <chr>   <chr>  <chr>  
-    ## 1     1 /tmp/RtmpB… Guardian… 2010-01-11 355 w… <NA>    Andre… <NA>   
-    ## # … with 2 more variables: Headline <chr>, Graphic <lgl>
+    ##      ID Source_File Newspaper Date       Length Section Author Edition Headline
+    ##   <int> <chr>       <chr>     <date>     <chr>  <chr>   <chr>  <chr>   <chr>   
+    ## 1     1 /tmp/Rtmpb… Guardian… 2010-01-11 355 w… <NA>    Andre… <NA>    Lorem i…
+    ## # … with 1 more variable: Graphic <lgl>
     ## # A tibble: 1 x 2
-    ##      ID Article                                                            
-    ##   <int> <chr>                                                              
-    ## 1     1 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam lac…
+    ##      ID Article                                                                 
+    ##   <int> <chr>                                                                   
+    ## 1     1 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam lacinia …
     ## # A tibble: 5 x 3
-    ##   Art_ID Par_ID Paragraph                                                  
-    ##    <int>  <int> <chr>                                                      
-    ## 1      1      1 Lorem ipsum dolor sit amet, consectetur adipiscing elit. E…
-    ## 2      1      2 Duis eleifend ipsum vehicula nunc luctus vestibulum. Donec…
-    ## 3      1      3 Sed ut ex quis nisi interdum ornare quis quis velit. Ut el…
-    ## 4      1      4 Aliquam ut consectetur urna, et dignissim turpis. Ut matti…
-    ## 5      1      5 Fusce sit amet aliquet lorem, id faucibus nisl. Nulla susc…
+    ##   Art_ID Par_ID Paragraph                                                       
+    ##    <int>  <int> <chr>                                                           
+    ## 1      1      1 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam …
+    ## 2      1      2 Duis eleifend ipsum vehicula nunc luctus vestibulum. Donec non …
+    ## 3      1      3 Sed ut ex quis nisi interdum ornare quis quis velit. Ut element…
+    ## 4      1      4 Aliquam ut consectetur urna, et dignissim turpis. Ut mattis ele…
+    ## 5      1      5 Fusce sit amet aliquet lorem, id faucibus nisl. Nulla suscipit …
 
 In this case, writing `[1, ]` delivers an LNToutput object which
 includes only the first article and the metadata and paragraphs
@@ -384,9 +368,9 @@ head(meta_df, n = 3)
 
 | ID | Source\_File                                            | Newspaper         | Date       | Length    | Section         | Author          | Edition             | Headline                   | Graphic |
 | -: | :------------------------------------------------------ | :---------------- | :--------- | :-------- | :-------------- | :-------------- | :------------------ | :------------------------- | :------ |
-|  1 | /tmp/RtmpBzT1UG/SampleFile\_20091201-20100511\_1-10.txt | Guardian.com      | 2010-01-11 | 355 words | NA              | Andrew Sparrow  | NA                  | Lorem ipsum dolor sit amet | FALSE   |
-|  2 | /tmp/RtmpBzT1UG/SampleFile\_20091201-20100511\_1-10.txt | Guardian          | 2010-01-11 | 927 words | NA              | Simon Tisdall   | NA                  | Lorem ipsum dolor sit amet | FALSE   |
-|  3 | /tmp/RtmpBzT1UG/SampleFile\_20091201-20100511\_1-10.txt | The Sun (England) | 2010-01-11 | 677 words | FEATURES; Pg. 6 | TREVOR Kavanagh | Edition 1; Scotland | Lorem ipsum dolor sit amet | FALSE   |
+|  1 | /tmp/RtmpbOUJOd/SampleFile\_20091201-20100511\_1-10.txt | Guardian.com      | 2010-01-11 | 355 words | NA              | Andrew Sparrow  | NA                  | Lorem ipsum dolor sit amet | FALSE   |
+|  2 | /tmp/RtmpbOUJOd/SampleFile\_20091201-20100511\_1-10.txt | Guardian          | 2010-01-11 | 927 words | NA              | Simon Tisdall   | NA                  | Lorem ipsum dolor sit amet | FALSE   |
+|  3 | /tmp/RtmpbOUJOd/SampleFile\_20091201-20100511\_1-10.txt | The Sun (England) | 2010-01-11 | 677 words | FEATURES; Pg. 6 | TREVOR Kavanagh | Edition 1; Scotland | Lorem ipsum dolor sit amet | FALSE   |
 
 ### Lookup Keywords
 
@@ -439,24 +423,23 @@ LNToutput
     ## 1 Articles
     ## 7 Paragraphs
     ## # A tibble: 1 x 11
-    ##      ID Source_File Newspaper Date       Length Section Author Edition
-    ##   <int> <chr>       <chr>     <date>     <chr>  <chr>   <chr>  <chr>  
-    ## 1     9 /tmp/RtmpB… Sunday M… 2010-01-10 446 w… NEWS; … Ross … 3 Star…
-    ## # … with 3 more variables: Headline <chr>, Graphic <lgl>, stats <named
-    ## #   list>
+    ##      ID Source_File Newspaper Date       Length Section Author Edition Headline
+    ##   <int> <chr>       <chr>     <date>     <chr>  <chr>   <chr>  <chr>   <chr>   
+    ## 1     9 /tmp/Rtmpb… Sunday M… 2010-01-10 446 w… NEWS; … Ross … 3 Star… R (prog…
+    ## # … with 2 more variables: Graphic <lgl>, stats <named list>
     ## # A tibble: 1 x 2
-    ##      ID Article                                                            
-    ##   <int> <chr>                                                              
-    ## 1     9 R is a programming language and free software environment for stat…
+    ##      ID Article                                                                 
+    ##   <int> <chr>                                                                   
+    ## 1     9 R is a programming language and free software environment for statistic…
     ## # A tibble: 7 x 3
-    ##   Art_ID Par_ID Paragraph                                                  
-    ##    <int>  <int> <chr>                                                      
-    ## 1      9     67 R is a programming language and free software environment …
-    ## 2      9     68 R is a GNU package. The source code for the R software env…
-    ## 3      9     69 R is an implementation of the S programming language combi…
-    ## 4      9     70 R was created by Ross Ihaka and Robert Gentleman at the Un…
-    ## 5      9     71 R and its libraries implement a wide variety of statistica…
-    ## 6      9     72 Another strength of R is static graphics, which can produc…
+    ##   Art_ID Par_ID Paragraph                                                       
+    ##    <int>  <int> <chr>                                                           
+    ## 1      9     67 R is a programming language and free software environment for s…
+    ## 2      9     68 R is a GNU package. The source code for the R software environm…
+    ## 3      9     69 R is an implementation of the S programming language combined w…
+    ## 4      9     70 R was created by Ross Ihaka and Robert Gentleman at the Univers…
+    ## 5      9     71 R and its libraries implement a wide variety of statistical and…
+    ## 6      9     72 Another strength of R is static graphics, which can produce pub…
     ## # … with 1 more row
 
 Another use of the function is to find out which versions of your

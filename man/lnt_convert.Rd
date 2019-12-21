@@ -13,7 +13,7 @@
 \usage{
 lnt_convert(
   x,
-  to = "rDNA",
+  to = "data.frame",
   what = "Articles",
   collapse = FALSE,
   file = "LNT.sqlite",

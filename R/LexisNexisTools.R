@@ -1770,7 +1770,7 @@ lnt_diff <- function(x,
 #' @md
 
 lnt_convert <- function(x,
-                        to = "rDNA",
+                        to = "data.frame",
                         what = "Articles",
                         collapse = FALSE,
                         file = "LNT.sqlite",
@@ -2573,9 +2573,6 @@ lnt_read_lines <- function(files,
       lines_docx <- xml2::xml_text(lines_docx)
       names(lines_docx) <- rep(files$docx, times = length(lines_docx))
     }
-    message("Reading DOCX files from Nexis Uni is experimental. Please ",
-            "report any problems in this issue: ",
-            "https://github.com/JBGruber/LexisNexisTools/issues/7")
   } else {
     lines_docx <- character()
   }

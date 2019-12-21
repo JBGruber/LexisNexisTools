@@ -12,7 +12,8 @@ output: github_document
 
 My PhD supervisor once told me that everyone doing newspaper analysis starts by writing code to read in files from the 'LexisNexis' newspaper archive.
 However, while I do recommend this exercise, not everyone has the time.
-This package provides functions to read in TXT files downloaded from 'LexisNexis' and comes with a few other features I think come in handy while working with data from the popular newspaper archive.
+This package provides functions to read in TXT, RTF, DOC and PDF files downloaded from the old 'LexisNexis' or DOCX from the new Nexis Uni, Lexis Advance and similar services.
+The package also comes with a few other features that should be useful while working with data from the popular newspaper archive.
 
 **Did you experience any problems, have questions or an idea about a great new feature?** Then please don't hesitate to file an [**issue report**](https://github.com/JBGruber/LexisNexisTools/issues).
 
@@ -25,8 +26,6 @@ install.packages("LexisNexisTools")
 
 Or get the development version by installing directly from GitHub (if you do not have `remotes` yet install it via `install.packages("remotes")` first):
 
-**Note: the GitHub Version now supports .docx files from Nexis Uni (see [this issue](https://github.com/JBGruber/LexisNexisTools/issues/7#issuecomment-509000414))**
-
 ```{r, eval=FALSE}
 remotes::install_github("JBGruber/LexisNexisTools")
 ```
@@ -38,17 +37,7 @@ remotes::install_github("JBGruber/LexisNexisTools")
 library("LexisNexisTools")
 ```
 
-### Set Working Directory to a location containing raw files from 'LexisNexis'.
-
-```{r, eval=FALSE}
-# For example
-setwd("C:/Test/LNTools_test")
-
-# Or
-setwd("~/Test/LNTools_test")
-```
-
-If you do not have files from 'LexisNexis', you can use `lnt_sample()` to copy a sample file with mock data into your current working directory:
+If you do not yet have files from 'LexisNexis' but want to test the package, you can use `lnt_sample()` to copy a sample file with mock data into your current working directory:
 
 ```{r, eval=FALSE}
 lnt_sample()
@@ -56,9 +45,10 @@ lnt_sample()
 
 ### Rename Files
 
-'LexisNexis' does not give the TXT files proper names.
-The function `lnt_rename()` renames files to a standard format: "searchTerm_startDate-endDate_documentRange.txt" (e.g., "Obama_20091201-20100511_1-500.txt").
-Note, that this will not work if your TXT files lack a cover page with this information.
+'LexisNexis' does not give its files proper names.
+The function `lnt_rename()` renames files to a standard format:
+For TXT files this format is "searchTerm_startDate-endDate_documentRange.txt" (e.g., "Obama_20091201-20100511_1-500.txt") (for other file types the format is similar but depends on what information is available).
+Note, that this will not work if your files lack a cover page with this information.
 Currently, it seems, like 'LexisNexis' only delivers those cover pages when you first create a link to your search ("link to this search" on the results page), follow this link, and then download the TXT files from there (see here for a [visual explanation](https://github.com/JBGruber/LexisNexisTools/wiki/Downloading-TXT-Files-From-Nexis)).
 If you do not want to rename files, you can skip to the next section.
 The rest of the package's functionality stays untouched by whether you rename your files or not.
@@ -113,8 +103,8 @@ The argument `report = TRUE` indicates that the output of the function in `R` wi
 ### Read in 'LexisNexis' Files to Get Meta, Articles and Paragraphs
 
 The main function of this package is `lnt_read()`.
-It converts the raw text files into three different `data.frames` nested in a special S4 object of class `LNToutput`.
-The three data.frames contain (1.) the metadata of the articles, (2.) the articles themselves, and (3.) the paragraphs (when `extract_paragraphs = TRUE`).
+It converts the raw files into three different `data.frames` nested in a special S4 object of class `LNToutput`.
+The three data.frames contain (1.) the metadata of the articles, (2.) the articles themselves, and (3.) the paragraphs.
 
 There are several important keywords that are used to split up the raw articles into article text and metadata.
 Those need to be provided in some form but can be left to 'auto' to use 'LexisNexis' defaults in several languages.
@@ -135,7 +125,7 @@ In these cases, you should remove the whole article after inspecting it.
    <a href="https://ibb.co/fj5YjG"><img src="https://preview.ibb.co/fOfNdb/LN.png" alt="LN" border="1"></a>
 </p>
 
-To use the function, you can again provide either file name(s), folder name(s) or nothing---to search the current working directory for TXT files---as `x` argument:
+To use the function, you can again provide either file name(s), folder name(s) or nothing---to search the current working directory for relevant files---as `x` argument:
 
 ```{r eval=FALSE}
 LNToutput <- lnt_read(x = getwd())
@@ -192,13 +182,10 @@ kable(head(meta_df, n = 3), format = "markdown")
 If you want to keep only one data.frame including metadata and text data you can easily do so:
 
 ```{r, message=FALSE}
-library("dplyr")
-meta_articles_df <- meta_df %>%
-  right_join(articles_df, by = "ID")
+meta_articles_df <- lnt_convert(LNToutput, to = "data.frame")
 
 # Or keep the paragraphs
-meta_paragraphs_df <- meta_df %>%
-  right_join(paragraphs_df, by = c("ID" = "Art_ID"))
+meta_paragraphs_df <- lnt_convert(LNToutput, to = "data.frame", what = "Paragraphs")
 ```
 
 Alternatively, you can convert LNToutput objects to formats common in other packages using the function `lnt_convert`:
