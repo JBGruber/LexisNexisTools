@@ -4,8 +4,7 @@
 \alias{lnt_sample}
 \title{Provides a small sample TXT file}
 \usage{
-lnt_sample(overwrite = FALSE, verbose = TRUE, path = NULL,
-  copy = TRUE)
+lnt_sample(overwrite = FALSE, verbose = TRUE, path = NULL, copy = TRUE)
 }
 \arguments{
 \item{overwrite}{Should sample.TXT be overwritten if found in the current

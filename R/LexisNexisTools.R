@@ -940,6 +940,20 @@ lnt_rename <- function(x,
       tbl, encoding, simulate, verbose
     )
   }
+  
+  tbl <- renamed[renamed$type == "docx",]
+  if (nrow(tbl) > 0) {
+    renamed[renamed$type == "docx",] <- lnt_rename_docx(
+      tbl, encoding, simulate, verbose
+    )
+  }
+  
+  other <- !renamed$type %in% c("txt", "docx")
+  renamed$name_new[other] <- renamed$name_orig[other]
+  renamed$status[other] <- paste0("not renamed (not implemented for ",
+                                  renamed$type[other],
+                                  ")")
+  
   if (verbose) {
     message(sum(grepl("^renamed$", renamed$status)),
             " files renamed, ",
@@ -967,7 +981,7 @@ lnt_rename <- function(x,
     )
   }
   if (simulate) message(" [changes were only simulated]")
-  if (report) return(renamed)
+  if (report) return(tibble::as_tibble(renamed))
 }
 
 
@@ -975,15 +989,15 @@ lnt_rename_txt <- function(tbl, encoding, simulate, verbose) {
   files <- tbl$name_orig
   for (i in seq_along(files)) {
     # read in the articles
-    content.v <- readLines(files[i], encoding = encoding, n = 50)
+    content_v <- readLines(files[i], encoding = encoding, n = 50)
     # look for the range of articles
-    range.v <- content.v[grep("^Download Request:|^Ausgabeauftrag: Dokument", content.v)]
+    range.v <- content_v[grep("^Download Request:|^Ausgabeauftrag: Dokument", content_v)]
     # extract the actual range infromation from line
     range.v <- stringi::stri_extract_all_regex(range.v, pattern = "[[:digit:]]|-", simplify = TRUE)
     range.v <- stringi::stri_join(range.v, sep = "", collapse = "")
     
     # look for search term
-    term.v <- content.v[grep("^Terms: |^Begriffe: ", content.v)]
+    term.v <- content_v[grep("^Terms: |^Begriffe: ", content_v)]
     # erase everything in the line exept the actual range
     term.v <- gsub("^Terms: |^Begriffe: ", "", term.v)
     # split term into elemets seprated by and or OR
@@ -1016,22 +1030,22 @@ lnt_rename_txt <- function(tbl, encoding, simulate, verbose) {
       date.v <- "NA"
       term.v <- gsub("[^[:alpha:]]", "", term.v)
     }
-    file.name <- sub("[^/]+$", "", files[i]) # take old filepath
-    file.name <- paste0(file.name, term.v, "_", date.v, "_", range.v, ".txt")
+    file_name <- sub("[^/]+$", "", files[i]) # take old filepath
+    file_name <- paste0(file_name, term.v, "_", date.v, "_", range.v, ".txt")
     # rename file
     
-    if (file.exists(file.name)) {
+    if (file.exists(file_name)) {
       tbl$name_new[i] <- tbl$name_orig[i]
       tbl$status[i] <- "not renamed (file exists)"
     } else {
-      if (file.name == "__.txt") {
-        tbl$name_new[i] <- file.name
+      if (file_name == "__.txt") {
+        tbl$name_new[i] <- file_name
         tbl$status[i] <- "not renamed (file is empty)"
       } else {
-        tbl$name_new[i] <- file.name
+        tbl$name_new[i] <- file_name
         tbl$status[i] <- "renamed"
         if (!simulate) {
-          file.rename(files[i], file.name)
+          file.rename(files[i], file_name)
         }
       }
     }
@@ -1042,6 +1056,78 @@ lnt_rename_txt <- function(tbl, encoding, simulate, verbose) {
       ), "%")
     }
   }
+  return(tbl)
+}
+
+
+lnt_rename_docx <- function(tbl, encoding, simulate, verbose) {
+  check_install("xml2")
+
+  for (i in seq_along(tbl$name_orig)) {
+    # read in file
+    con <- unz(description = tbl$name_orig[i], filename = "word/document.xml")
+    content_v <- xml2::read_xml(con, encoding = "utf-8")
+    rm(con)
+    content_v <- xml2::xml_find_all(content_v, "//w:p")
+    content_v <- xml2::xml_text(content_v)
+      
+    job <- grep("^Job Number:", content_v, value = TRUE)
+    
+    # extract the actual range infromation from line
+    if (length(job) > 0) {
+      job <- stringi::stri_extract_all_regex(
+        job, pattern = "[[:digit:]]+"
+      )[[1]]
+    }
+
+    # look for search term
+    terms <- grep("^Search Terms:", content_v, value = TRUE)[1]
+    # erase everything in the line exept the actual range
+    terms <- stringi::stri_replace_all_regex(
+      terms, "^Search Terms: \\({0,2}", ""
+    )
+    # trim long search strings
+    terms <- stringi::stri_extract_all_words(terms)[[1]][1:3]
+    terms <- paste(na.omit(terms), collapse = "_")
+    
+    date <- which(stringi::stri_detect_regex(content_v, "^Narrowed by"))[2]
+    if (!is.na(date)) {
+      date <- content_v[date:(date + 3)]
+      date <- na.omit(unlist(
+        stringi::stri_extract_all_regex(date, "\\w{3} \\d{2}, \\d{4}")
+      ))
+    }
+    date <- paste(na.omit(date), collapse = "-")
+    
+    file_name <- paste0(dirname(tbl$name_orig[i]),
+                        "/",
+                        paste(terms,
+                              date,
+                              job,
+                              sep = "_"),
+                        ".docx")
+                        
+    if (file.exists(file_name)) {
+      tbl$name_new[i] <- tbl$name_orig[i]
+      tbl$status[i] <- "not renamed (file exists)"
+    } else if (grepl("_{2,}.docx", basename(file_name))) {
+      tbl$name_new[i] <- tbl$name_orig[i]
+      tbl$status[i] <- "not renamed (file has no cover page)"
+    } else {
+      tbl$name_new[i] <- file_name
+      tbl$status[i] <- "renamed"
+      if (!simulate) {
+        file.rename(tbl$name_orig[i], file_name)
+      }
+    }
+    if (verbose) {
+      message("\r\t...renaming files ", format(
+        (100 * (i / nrow(tbl))),
+        digits = 2, nsmall = 2
+      ), "%")
+    }
+  }
+  
   return(tbl)
 }
 

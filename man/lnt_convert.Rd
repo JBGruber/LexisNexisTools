@@ -11,8 +11,14 @@
 \alias{lnt2SQLite}
 \title{Convert LNToutput to other formats}
 \usage{
-lnt_convert(x, to = "rDNA", what = "Articles", collapse = FALSE,
-  file = "LNT.sqlite", ...)
+lnt_convert(
+  x,
+  to = "rDNA",
+  what = "Articles",
+  collapse = FALSE,
+  file = "LNT.sqlite",
+  ...
+)
 
 lnt2df(x, what = "Articles", ...)
 
