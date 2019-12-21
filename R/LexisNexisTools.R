@@ -2277,17 +2277,20 @@ lnt_add <- function(to,
 }
 
 
-#' Provides a small sample TXT file
+#' Provides a small sample TXT/DOCX file
 #'
-#' Copies a small TXT sample file to the current working directory and returns
+#' Copies a small TXT sample file (as used by the old Nexis) or a DOCX (as used
+#' by Nexis Uni or Lexis Advance) to the current working directory and returns
 #' the location of this newly created file. The content of the file is made up
 #' or copied from Wikipedia since real articles from LexisNexis fall under
 #' copyright laws and can not be shared.
 #'
 #' A small sample database to test the functions of LexisNexisTools
 #'
-#' @param overwrite Should sample.TXT be overwritten if found in the current
-#'   working directory?
+#' @param format Either "txt" to get the sample.TXT file or "docx" to get the
+#'   format used by Nexis Uni.
+#' @param overwrite Should the sample file be overwritten if found in the
+#'   current working directory?
 #' @param verbose Display warning message if file exists in current wd.
 #' @param path The destination path for the sample file (current working
 #'   directory if \code{NULL})
@@ -2300,16 +2303,24 @@ lnt_add <- function(to,
 #' }
 #' @author Johannes Gruber
 #' @export
-lnt_sample <- function(overwrite = FALSE,
+lnt_sample <- function(format = "txt",
+                       overwrite = FALSE,
                        verbose = TRUE,
                        path = NULL,
                        copy = TRUE) {
   if (is.null(path)) {
     path <- getwd()
   }
+  if (tolower(format) == "txt") {
+    f <- "sample.TXT"
+  } else if (tolower(format) == "docx") {
+    f <- "sample.DOCX"
+  } else {
+    stop("Choose either \"txt\" or \"docx\" as format.")
+  }
   if (copy) {
-    to <- paste0(path, "/", "sample.TXT")
-    if (all(file.exists(paste0(path, "/", "sample.TXT")), !overwrite)) {
+    to <- paste0(path, "/", f)
+    if (all(file.exists(paste0(path, "/", f)), !overwrite)) {
       if (verbose) {
         warning(
           "Sample file exists in wd. Use overwrite = TRUE to create fresh sample file."
@@ -2317,13 +2328,13 @@ lnt_sample <- function(overwrite = FALSE,
       }
     } else {
       file.copy(
-        from = system.file("extdata", "sample.TXT", package = "LexisNexisTools"),
+        from = system.file("extdata", f, package = "LexisNexisTools"),
         to = to,
         overwrite = TRUE
       )
     }
   } else {
-    to <- system.file("extdata", "sample.TXT", package = "LexisNexisTools")
+    to <- system.file("extdata", f, package = "LexisNexisTools")
   }
   return(to)
 }

@@ -2,13 +2,22 @@
 % Please edit documentation in R/LexisNexisTools.R
 \name{lnt_sample}
 \alias{lnt_sample}
-\title{Provides a small sample TXT file}
+\title{Provides a small sample TXT/DOCX file}
 \usage{
-lnt_sample(overwrite = FALSE, verbose = TRUE, path = NULL, copy = TRUE)
+lnt_sample(
+  format = "txt",
+  overwrite = FALSE,
+  verbose = TRUE,
+  path = NULL,
+  copy = TRUE
+)
 }
 \arguments{
-\item{overwrite}{Should sample.TXT be overwritten if found in the current
-working directory?}
+\item{format}{Either "txt" to get the sample.TXT file or "docx" to get the
+format used by Nexis Uni.}
+
+\item{overwrite}{Should the sample file be overwritten if found in the
+current working directory?}
 
 \item{verbose}{Display warning message if file exists in current wd.}
 
@@ -19,7 +28,8 @@ directory if \code{NULL})}
 \code{FALSE}, the function only returns the location of the sample file.}
 }
 \description{
-Copies a small TXT sample file to the current working directory and returns
+Copies a small TXT sample file (as used by the old Nexis) or a DOCX (as used
+by Nexis Uni or Lexis Advance) to the current working directory and returns
 the location of this newly created file. The content of the file is made up
 or copied from Wikipedia since real articles from LexisNexis fall under
 copyright laws and can not be shared.
