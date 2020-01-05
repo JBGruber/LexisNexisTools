@@ -934,16 +934,16 @@ lnt_rename <- function(x,
     stringsAsFactors = FALSE
   )
   # start renaming files
-  tbl <- renamed[renamed$type == "txt",]
+  tbl <- renamed[renamed$type == "txt", ]
   if (nrow(tbl) > 0) {
-    renamed[renamed$type == "txt",] <- lnt_rename_txt(
+    renamed[renamed$type == "txt", ] <- lnt_rename_txt(
       tbl, encoding, simulate, verbose
     )
   }
 
-  tbl <- renamed[renamed$type == "docx",]
+  tbl <- renamed[renamed$type == "docx", ]
   if (nrow(tbl) > 0) {
-    renamed[renamed$type == "docx",] <- lnt_rename_docx(
+    renamed[renamed$type == "docx", ] <- lnt_rename_docx(
       tbl, encoding, simulate, verbose
     )
   }
@@ -1528,7 +1528,8 @@ lnt_asDate <- function(x,
 #'   actual value from the text.
 #' @param x An LNToutput object or a string or vector of strings.
 #' @param pattern A character vector of keywords. Word boundaries before and
-#'   after the keywords are honoured. Regular expression can be used.
+#'   after the keywords are honoured (see \code{word_boundaries}). Regular
+#'   expression can be used.
 #' @param cores The number of CPU cores to use. Use \code{NULL} or \code{1} to
 #'   turn off.
 #' @param case_insensitive If FALSE, the pattern matching is case sensitive and
@@ -1557,7 +1558,7 @@ lnt_asDate <- function(x,
 #' # Keep only articles which mention the keyword
 #' LNToutput_stat <- LNToutput[!sapply(LNToutput@meta$Keyword, is.null)]
 #'
-#' # Covert list of keywords to string
+#' # Convert list of keywords to string
 #' LNToutput@meta$Keyword <- sapply(LNToutput@meta$Keyword, toString)
 #' @author Johannes Gruber
 #' @export
@@ -1571,19 +1572,54 @@ lnt_lookup <- function(x,
                        word_boundaries = c("both", "before", "after"),
                        cores = NULL,
                        verbose = TRUE) {
-  if ("character" %in% class(x)) {
-  } else if ("LNToutput" %in% class(x)) {
-    IDs <- x@meta$ID
-    x <- stringi::stri_join(x@meta$Headline,
-      x@articles$Article,
-      sep = " \n "
-    )
-    names(x) <- IDs
-  } else {
-    (
-      stop("'x' must be either a character vector or LNToutput object.")
-    )
-  }
+
+  UseMethod("lnt_lookup")
+}
+
+#' @rdname lnt_lookup
+#' @noRd
+#' @export
+lnt_lookup.default <- function(x, ...) {
+  stop("'x' must be either a character vector or LNToutput object.")
+}
+
+#' @rdname lnt_lookup
+#' @noRd
+#' @export
+lnt_lookup.LNToutput <- function(x,
+                                 pattern,
+                                 case_insensitive = FALSE,
+                                 unique_pattern = FALSE,
+                                 word_boundaries = c("both", "before", "after"),
+                                 cores = NULL,
+                                 verbose = TRUE) {
+
+  IDs <- x@meta$ID
+  x <- stringi::stri_join(x@meta$Headline,
+                          x@articles$Article,
+                          sep = " \n "
+  )
+  names(x) <- IDs
+  lnt_lookup(x = x,
+             pattern = pattern,
+             case_insensitive = case_insensitive,
+             unique_pattern = unique_pattern,
+             word_boundaries = word_boundaries,
+             cores = cores,
+             verbose = verbose)
+}
+
+#' @rdname lnt_lookup
+#' @noRd
+#' @export
+lnt_lookup.character <- function(x,
+                                 pattern,
+                                 case_insensitive = FALSE,
+                                 unique_pattern = FALSE,
+                                 word_boundaries = c("both", "before", "after"),
+                                 cores = NULL,
+                                 verbose = TRUE) {
+
   if (!is.null(word_boundaries) | isFALSE(word_boundaries)) {
     if (word_boundaries[1] == "both" | isTRUE(word_boundaries)) {
       pattern <- paste0(

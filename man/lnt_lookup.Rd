@@ -18,7 +18,8 @@ lnt_lookup(
 \item{x}{An LNToutput object or a string or vector of strings.}
 
 \item{pattern}{A character vector of keywords. Word boundaries before and
-after the keywords are honoured. Regular expression can be used.}
+after the keywords are honoured (see \code{word_boundaries}). Regular
+expression can be used.}
 
 \item{case_insensitive}{If FALSE, the pattern matching is case sensitive and
 if TRUE, case is ignored during matching.}
@@ -65,7 +66,7 @@ LNToutput@meta$Keyword <- lnt_lookup(
 # Keep only articles which mention the keyword
 LNToutput_stat <- LNToutput[!sapply(LNToutput@meta$Keyword, is.null)]
 
-# Covert list of keywords to string
+# Convert list of keywords to string
 LNToutput@meta$Keyword <- sapply(LNToutput@meta$Keyword, toString)
 }
 \author{
