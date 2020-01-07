@@ -80,11 +80,14 @@ docs <- lnt_convert(LNToutput, to = "rDNA")
 
 corpus <- lnt_convert(LNToutput, to = "quanteda")
 
-dbloc <- lnt_convert(LNToutput, to = "SQLite")
-
 tCorpus <- lnt_convert(LNToutput, to = "corpustools")
 
 tidy <- lnt_convert(LNToutput, to = "tidytext")
 
 Corpus <- lnt_convert(LNToutput, to = "tm")
+
+\dontrun{
+dbloc <- lnt_convert(LNToutput, to = "SQLite") 
+}
+
 }

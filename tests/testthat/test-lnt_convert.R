@@ -146,10 +146,11 @@ test_that("Convert LNToutput to tm", {
 test_that("Convert LNToutput to SQLite", {
   skip_on_cran()
   expect_equal({
-    unlink("../files/LNT.sqlite")
+    tempf <- paste0(tempdir(), "/LNT.sqlite")
     conn <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
                         to = "SQLite", what = "Articles",
-                        file = "../files/LNT.sqlite")
+                        file = tempf)
+    unlink(tempf)
     conn@dbname <- basename(conn@dbname)
     conn
   }, readRDS("../files/SQLite.RDS"))
