@@ -1,3 +1,9 @@
+# LexisNexisTools 0.3.0
+
+* Added support for new formats introduced by Nexis Uni and Lexis Advance.
+* Improved lnt_convert and added option for data.frame.
+* Bug fixes and internal improvements.
+
 # LexisNexisTools 0.2.3
 
 * Added support for different download formats (.RTF, .DOC, .PDF[limited]).

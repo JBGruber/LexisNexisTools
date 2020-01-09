@@ -1,7 +1,7 @@
 Package: LexisNexisTools
 Title: Working with Files from 'LexisNexis'
-Version: 0.2.3.9000
-Date: 2019-11-26
+Version: 0.3.0
+Date: 2020-01-05
 Authors@R: person("Johannes", "Gruber", email = "j.gruber.1@research.gla.ac.uk", 
   role = c("aut", "cre"))
 Description: My PhD supervisor once told me that everyone doing newspaper
@@ -44,6 +44,6 @@ Encoding: UTF-8
 LazyData: true
 URL: https://github.com/JBGruber/LexisNexisTools
 BugReports: https://github.com/JBGruber/LexisNexisTools/issues
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
 VignetteBuilder: knitr
 Language: en-GB

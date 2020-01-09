@@ -4,8 +4,14 @@
 \alias{lnt_rename}
 \title{Assign proper names to LexisNexis files}
 \usage{
-lnt_rename(x, encoding = "UTF-8", recursive = FALSE, report = TRUE,
-  simulate = TRUE, verbose = FALSE)
+lnt_rename(
+  x,
+  encoding = "UTF-8",
+  recursive = FALSE,
+  report = TRUE,
+  simulate = TRUE,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{x}{Can be either a character vector of LexisNexis file name(s),

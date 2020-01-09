@@ -4,12 +4,21 @@
 \alias{lnt_read}
 \title{Read in a LexisNexis file}
 \usage{
-lnt_read(x, encoding = "UTF-8", extract_paragraphs = TRUE,
-  convert_date = TRUE, start_keyword = "auto", end_keyword = "auto",
-  length_keyword = "auto", author_keyword = "auto",
+lnt_read(
+  x,
+  encoding = "UTF-8",
+  extract_paragraphs = TRUE,
+  convert_date = TRUE,
+  start_keyword = "auto",
+  end_keyword = "auto",
+  length_keyword = "auto",
+  author_keyword = "auto",
   exclude_lines = "^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIC: |^DATELINE: ",
-  recursive = FALSE, file_pattern = ".txt$|.rtf$|.doc$|.pdf$|.docx$",
-  verbose = TRUE, ...)
+  recursive = FALSE,
+  file_pattern = ".txt$|.rtf$|.doc$|.pdf$|.docx$",
+  verbose = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{Name(s) of file(s) or one or multiple directories containing files

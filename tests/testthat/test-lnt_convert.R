@@ -144,6 +144,7 @@ test_that("Convert LNToutput to tm", {
 #                     to = "tm", what = "Articles"), "../files/tm.RDS")
 
 test_that("Convert LNToutput to SQLite", {
+  skip_on_cran()
   expect_equal({
     unlink("../files/LNT.sqlite")
     conn <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
@@ -158,11 +159,11 @@ test_that("Test error messages", {
   expect_error ({
     lnt_convert(x = readRDS("../files/LNToutput.RDS"),
                 to = "rDNA", what = "Article")
-  }, "Choose either \"Articles\" or \"Paragraphs\" as what argument.", fixed = TRUE)
+  }, "Choose either \"articles\" or \"paragraphs\" as what argument.", fixed = TRUE)
   expect_error ({
     lnt_convert(x = readRDS("../files/LNToutput.RDS"),
                 to = "quanteda", what = "Paragraph")
-  }, "Choose either \"Articles\" or \"Paragraphs\" as what argument.", fixed = TRUE)
+  }, "Choose either \"articles\" or \"paragraphs\" as what argument.", fixed = TRUE)
 })
 
 # saveRDS(conn, "../files/SQLite.RDS")
