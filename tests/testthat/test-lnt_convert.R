@@ -99,7 +99,7 @@ test_that("Convert LNToutput to corpustools", {
 # }, "../files/corpustools.RDS")
 
 test_that("Convert LNToutput to tidytext", {
-  expect_equal({
+  expect_equivalent({
     lnt_convert(x = readRDS("../files/LNToutput.RDS"),
                            to = "tidytext", what = "Articles")
   }, readRDS("../files/tidytext.RDS"))
