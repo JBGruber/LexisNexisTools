@@ -2256,16 +2256,15 @@ trim <- function(x, n, e = "...") {
 #' @param x character, name or names of file(s) or folder(s) to be searched.
 #' @param types file types/extensions to be searched.
 #' @param recursive logical. Should the listing recurse into directories?
-#' @param ignore_case logical. Should pattern-matching be case-insensitive?
 #'
 #' @importFrom stringi stri_replace_all_fixed
 #' @importFrom tools file_ext
+#' @importFrom utils unzip
 #'
 #' @noRd
 get_files <- function(x,
                       types = c("txt", "rtf", "doc", "pdf", "docx", "zip"),
-                      recursive = TRUE,
-                      ignore_case = TRUE) {
+                      recursive = TRUE) {
   # Check how files are provided
   # 1. nothing (search wd)
   # 2. file or files
@@ -2312,7 +2311,13 @@ get_files <- function(x,
          " or folder name(s) to x or leave blank to search wd.")
   }
   if (length(files) > 0) {
-    #zips <-
+    zips <- tolower(tools::file_ext(files)) == "zip"
+    if (any(zips)) {
+      temp <- paste0(tempdir(), "/zips")
+      unzip(files[zips], exdir = temp)
+      files <- c(files[!zips],
+                 get_files(temp))
+    }
     return(files)
   } else {
     stop("No ",
