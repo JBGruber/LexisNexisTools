@@ -32,7 +32,7 @@ test_that("Rename Sample", {
        "\r\t...renaming files 100.00%\n",
        "0 files renamed, ",
        "1 not renamed (file already exists), ",
-       " [changes were only simulated]\n" ))
+       " [changes were only simulated]\n"))
 })
 
 smpl_uni <- paste0(dir, "/", "sample.DOCX")
@@ -61,7 +61,7 @@ test_that("Rename Sample Nexis Uni", {
        "\r\t...renaming files 100.00%\n",
        "0 files renamed, ",
        "1 not renamed (file already exists), ",
-       " [changes were only simulated]\n" ))
+       " [changes were only simulated]\n"))
 })
 
 teardown(unlink(dir, recursive = TRUE, force = TRUE))

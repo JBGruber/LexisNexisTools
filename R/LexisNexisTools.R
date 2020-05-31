@@ -1,5 +1,4 @@
 # Startup ----------------------------------------------------------------------
-
 #' @importFrom utils packageVersion
 .onAttach <- function(...) {
   packageStartupMessage(
@@ -7,10 +6,7 @@
     packageVersion("LexisNexisTools")
   )
 }
-
-
 # Class and Methods ------------------------------------------------------------
-
 #' An S4 class to store the three data.frames created with \link{lnt_read}
 #'
 #' This S4 class stores the output from \link{lnt_read}. Just like a spreadsheet
@@ -38,8 +34,6 @@ setClass(
     paragraphs = "data.frame"
   )
 )
-
-
 #' Methods for LNToutput output objects
 #'
 #' @param x,object An LNToutput object.
@@ -51,8 +45,6 @@ setClass(
 #' @name LNToutput_methods
 #' @importFrom tibble tibble
 NULL
-
-
 #' @rdname LNToutput_methods
 setMethod("dim",
           signature = "LNToutput",
@@ -68,8 +60,6 @@ setMethod("dim",
             )
           }
 )
-
-
 #' @rdname LNToutput_methods
 setMethod("show",
   signature = "LNToutput",
@@ -82,8 +72,6 @@ setMethod("show",
     print(object@paragraphs, n = 6)
   }
 )
-
-
 #' @rdname LNToutput_methods
 setMethod("[",
   signature = "LNToutput",
@@ -117,8 +105,6 @@ setMethod("[",
     return(x)
   }
 )
-
-
 #' @rdname LNToutput_methods
 setMethod("+",
   signature = c("LNToutput", "LNToutput"),
@@ -146,11 +132,7 @@ setMethod("+",
     return(e1)
   }
 )
-
-
 # Main Functions ------------------------------------------------------------
-
-
 #' Read in a LexisNexis file
 #'
 #' Read a file from LexisNexis in a supported format and convert it to an object
@@ -184,7 +166,7 @@ setMethod("+",
 #'   Set to \code{character()} if you want to turn off this feature.
 #' @param recursive A logical flag indicating whether subdirectories are
 #'   searched for more files.
-#' @param file_pattern Pattern of file types to be included in search for files.
+#' @param file_type File types/extensions to be included in search for files.
 #' @param verbose A logical flag indicating whether information should be
 #'   printed to the screen.
 #' @param ... Additional arguments passed on to \link{lnt_asDate}.
@@ -226,12 +208,10 @@ lnt_read <- function(x,
                      author_keyword = "auto",
                      exclude_lines = "^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIC: |^DATELINE: ",
                      recursive = FALSE,
-                     file_pattern = ".txt$|.rtf$|.doc$|.pdf$|.docx$",
+                     file_type = c("txt", "rtf", "doc", "pdf", "docx", "zip"),
                      verbose = TRUE,
                      ...) {
-
-  files <- get_files(x, recursive = recursive, pattern = file_pattern)
-
+  files <- get_files(x, recursive = recursive, types = file_type)
   # Track the time
   if (verbose) {
     start_time <- Sys.time()
@@ -243,9 +223,7 @@ lnt_read <- function(x,
       )
     )
   }
-
   lines <- lnt_read_lines(files, encoding)
-
   if (length(lines$nexis) > 0) {
     out_nexis <- lnt_parse_nexis(
       lines = lines$nexis,
@@ -261,7 +239,6 @@ lnt_read <- function(x,
       ...
     )
   }
-
   if (length(lines$uni) > 0) {
     out_uni <- lnt_parse_uni(
       lines = lines$uni,
@@ -277,7 +254,6 @@ lnt_read <- function(x,
       ...
     )
   }
-
   if (exists("out_nexis") & exists("out_uni")) {
     out <- out_nexis + out_uni
   } else if (exists("out_nexis")) {
@@ -285,15 +261,12 @@ lnt_read <- function(x,
   } else if (exists("out_uni")) {
     out <- out_uni
   }
-
   attributes(out)$created <- list(
     time = Sys.time(),
     Version = packageVersion("LexisNexisTools")
   )
   return(out)
 }
-
-
 #' lnt_parse_nexis
 #'
 #' Internal function to parse lines from nexis.com files.
@@ -314,7 +287,6 @@ lnt_parse_nexis <- function(lines,
                             verbose,
                             start_time,
                             ...) {
-
   if (start_keyword == "auto") {
     start_keyword <- "\\d+ of \\d+ DOCUMENTS$|\\d+ of \\d+ DOCUMENT$|Dokument \\d+ von \\d+$| Document \\d+ de \\d+$"
   }
@@ -327,25 +299,20 @@ lnt_parse_nexis <- function(lines,
   if (author_keyword == "auto") {
     author_keyword <- "AUTOR: |VON |BYLINE: "
   }
-
   status("\t...files loaded", verbose, start_time)
-
   # exclude some lines
   if (length(exclude_lines) > 0) {
     lines[grep("^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIC: |^DATELINE: ", lines)] <- ""
   }
-
   articles.l <- split(
     lines, cumsum(stringi::stri_detect_regex(lines, start_keyword))
   )
   articles.l[["0"]] <- NULL
   names(articles.l) <- NULL
   rm(lines)
-
   if (length(articles.l) == 0) {
     stop("No articles found in provided file(s)")
   }
-
   df.l <- lapply(articles.l, function(a) {
     len <- grep(length_keyword, a)[1]
     if (!is.na(len)) {
@@ -364,9 +331,7 @@ lnt_parse_nexis <- function(lines,
       )
     }
   })
-
   status("\t...articles split", verbose, start_time)
-
   # make data.frame
   ### length
   . <- vapply(df.l, FUN.VALUE = character(1), function(i) {
@@ -374,7 +339,6 @@ lnt_parse_nexis <- function(lines,
   })
   length.v <- stri_replace_all_regex(., length_keyword, "")
   status("\t...lengths extracted", verbose, start_time)
-
   ### Newspaper. First non emtpy line
   newspaper.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
     grep(
@@ -390,9 +354,7 @@ lnt_parse_nexis <- function(lines,
     "January|February|March|April|May|June|July|August|September|October|November|December",
     newspaper.v
   )] <- ""
-
   status("\t...newspapers extracted", verbose, start_time)
-
   ### Date
   date.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
     . <- stringi::stri_extract_last_regex(
@@ -401,9 +363,7 @@ lnt_parse_nexis <- function(lines,
     )
     na.omit(.)[1]
   })
-
   status("\t...dates extracted", verbose, start_time)
-
   ### Author (where available)
   author.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
     a <- head(
@@ -420,17 +380,12 @@ lnt_parse_nexis <- function(lines,
     }
   })
   author.v[author.v == ""] <- NA
-
   status("\t...authors extracted", verbose, start_time)
-
   ### section (where available)
   section.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
     grep(pattern = "SECTION: |RUBRIK: ", x = i$meta, value = TRUE)[1]
   })
-
   status("\t...sections extracted", verbose, start_time)
-
-
   ### edition (where available)
   edition.v <- lapply(seq_along(df.l), function(i) {
     date <- grep(date.v[i], x = df.l[[i]]$meta, fixed = TRUE)
@@ -458,9 +413,7 @@ lnt_parse_nexis <- function(lines,
       NA
     }
   })
-
   status("\t...editions extracted", verbose, start_time)
-
   ### Headline
   headline.v <- vapply(seq_along(df.l), FUN.VALUE = character(1), function(i) {
     if (!df.l[[i]]$graphic) {
@@ -474,7 +427,6 @@ lnt_parse_nexis <- function(lines,
         edition.v[[i]]
       ))
       pattern <- pattern[pattern != ""]
-
       remove.m <- vapply(pattern, FUN.VALUE = matrix(nrow = length(headline)), function(p) {
         out <- stringi::stri_detect_fixed(headline, p[1])
         if (length(p) > 1) {
@@ -490,14 +442,11 @@ lnt_parse_nexis <- function(lines,
       ""
     }
   })
-
   status("\t...headlines extracted", verbose, start_time)
-
   if (convert_date) {
     date.v <- lnt_asDate(date.v, ...)
     status("\t...dates converted", verbose, start_time)
   }
-
   # Clean the clutter from objects
   author.v <- stri_replace_all_regex(
     str = author.v,
@@ -515,8 +464,6 @@ lnt_parse_nexis <- function(lines,
     out[out == ""] <- NA
     stri_trim_both(out)
   })
-
-
   ### make data.frame
   meta.df <- tibble(
     ID = seq_along(df.l),
@@ -530,9 +477,7 @@ lnt_parse_nexis <- function(lines,
     Headline = trimws(headline.v, which = "both"),
     Graphic = unlist(lapply(df.l, function(i) i[["graphic"]]))
   )
-
   status("\t...metadata extracted", verbose, start_time)
-
   # Cut of after ends in article
   df.l <- lapply(df.l, function(i) {
     end <- tail(grep(end_keyword, i$article), n = 1)
@@ -550,9 +495,7 @@ lnt_parse_nexis <- function(lines,
   )
   # solves weird covr behaviour
   articles.df <- tibble::as_tibble(articles.df)
-
   status("\t...article texts extracted", verbose, start_time)
-
   if (extract_paragraphs) {
     # split paragraphs
     . <- stringi::stri_split_fixed(
@@ -590,7 +533,6 @@ lnt_parse_nexis <- function(lines,
       Paragraph = NA
     )
   }
-
   # remove unneccesary whitespace (removes \n as well)
   articles.df$Article <- stringi::stri_replace_all_regex(
     str = articles.df$Article,
@@ -598,7 +540,6 @@ lnt_parse_nexis <- function(lines,
     replacement = c(" ", ""),
     vectorize_all = FALSE
   )
-
   paragraphs.df$Paragraph <- stringi::stri_replace_all_regex(
     str = paragraphs.df$Paragraph,
     pattern = c("\\s+", "^\\s|\\s$"),
@@ -620,8 +561,6 @@ lnt_parse_nexis <- function(lines,
   )
   return(out)
 }
-
-
 #' lnt_parse_uni
 #'
 #' Internal function to parse lines from Nexis Uni files.
@@ -644,7 +583,6 @@ lnt_parse_uni <- function(lines,
                           verbose,
                           start_time,
                           ...) {
-
   if (end_keyword == "auto") {
     end_keyword <- "^End of Document$"
     if (!any(stringi::stri_detect_regex(lines, end_keyword))) {
@@ -657,14 +595,11 @@ lnt_parse_uni <- function(lines,
   if (author_keyword == "auto") {
     author_keyword <- "^Byline:\u00a0"
   }
-
   status("\t...files loaded", verbose, start_time)
-
   # exclude some lines
   if (length(exclude_lines) > 0) {
     lines[grep(exclude_lines, lines)] <- ""
   }
-
   # remove cover page(s) (which are separated by 2 empty lines)
   lines <- lapply(unname(split(lines, names(lines))), function(l) {
     l <- rle(l)
@@ -678,26 +613,21 @@ lnt_parse_uni <- function(lines,
     return(l)
   })
   lines <- unlist(lines)
-
   articles.l <- split(
     lines, cumsum(stringi::stri_detect_regex(lines, end_keyword))
   )
   articles.l[[length(articles.l)]] <- NULL
   names(articles.l) <- NULL
-
   if (!length(articles.l)) {
     stop("No articles found to parse.")
   }
-
   #  first article does not contain keyword
   if (!stringi::stri_detect_regex(articles.l[[1]][1], end_keyword)) {
     articles.l[[1]] <- c(articles.l[[1]][1], articles.l[[1]])
   }
-
   if (length(articles.l) == 0) {
     stop("No articles found in provided file(s)")
   }
-
   # split meta from body
   df.l <- lapply(articles.l, function(a) {
     split <- which(stri_detect_regex(a, "^Body$"))[1]
@@ -717,9 +647,7 @@ lnt_parse_uni <- function(lines,
       )
     }
   })
-
   status("\t...articles split", verbose, start_time)
-
   # make data.frame
   ### length
   . <- vapply(df.l, FUN.VALUE = character(1), function(i) {
@@ -728,7 +656,6 @@ lnt_parse_uni <- function(lines,
   })
   length.v <- trimws(stri_replace_all_regex(., length_keyword, ""))
   status("\t...lengths extracted", verbose, start_time)
-
   ### headline First non emtpy line
   headline.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
     grep(
@@ -739,9 +666,7 @@ lnt_parse_uni <- function(lines,
       invert = TRUE
     )[1]
   })
-
   status("\t...headlines extracted", verbose, start_time)
-
   ### Newspaper. Second non emtpy line
   newspaper.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
     grep(
@@ -752,9 +677,7 @@ lnt_parse_uni <- function(lines,
       invert = TRUE
     )[2]
   })
-
   status("\t...newspapers extracted", verbose, start_time)
-
   ### Date
   date.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
     . <- stringi::stri_extract_last_regex(
@@ -763,39 +686,28 @@ lnt_parse_uni <- function(lines,
     )
     na.omit(.)[1]
   })
-
   status("\t...dates extracted", verbose, start_time)
-
   ### Author (where available)
   author.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
     grep(pattern = author_keyword, x = i$meta, value = TRUE)[1]
   })
   author.v <- stri_replace_all_regex(author.v, author_keyword, "")
   author.v[author.v == ""] <- NA
-
   status("\t...authors extracted", verbose, start_time)
-
   ### section (where available)
   section_keyword <- "^Section:\u00a0"
   section.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
     grep(pattern = section_keyword, x = i$meta, value = TRUE)[1]
   })
   section.v <- stri_replace_all_regex(section.v, section_keyword, "")
-
   status("\t...sections extracted", verbose, start_time)
-
-
   ### edition (not yet implemented)
   edition.v <- NA
-
   status("\t...editions extracted", verbose, start_time)
-
   if (convert_date) {
     date.v <- lnt_asDate(date.v, ...)
     status("\t...dates converted", verbose, start_time)
   }
-
-
   ### make data.frame
   meta.df <- tibble(
     ID = seq_along(df.l),
@@ -809,25 +721,20 @@ lnt_parse_uni <- function(lines,
     Headline = trimws(headline.v, which = "both"),
     Graphic = unlist(lapply(df.l, function(i) i[["graphic"]]))
   )
-
   status("\t...metadata extracted", verbose, start_time)
-
   par <- unlist(lapply(df.l, "[[", "article"), use.names = FALSE)
   paragraphs.df <- data.table::data.table(
     Art_ID = rep(seq_along(df.l), lapply(df.l, function(i) length(i$article))),
     Par_ID = seq_along(par),
     Paragraph = par
   )
-
   status("\t...article texts extracted", verbose, start_time)
-
   paragraphs.df$Paragraph <- stringi::stri_replace_all_regex(
     str = paragraphs.df$Paragraph,
     pattern = c("\\s+|^\\s|\\s$"),
     replacement = c(" "),
     vectorize_all = FALSE
   )
-
   if (verbose) {
     status("\t...superfluous whitespace removed", verbose, start_time)
     message("Elapsed time: ", format(
@@ -835,19 +742,15 @@ lnt_parse_uni <- function(lines,
       digits = 2, nsmall = 2
     ))
   }
-
   Paragraph <- NULL
   Art_ID <- NULL
   articles.df <- paragraphs.df[,
                                list(Article = stri_join(Paragraph, collapse = " ")),
                                by = list(ID = Art_ID)]
-
   articles.df <- tibble::as_tibble(articles.df)
   paragraphs.df <- tibble::as_tibble(paragraphs.df)
-
   attr(articles.df, ".internal.selfref") <- NULL
   attr(paragraphs.df, ".internal.selfref") <- NULL
-
   out <- new(
     "LNToutput",
     meta = meta.df,
@@ -856,8 +759,6 @@ lnt_parse_uni <- function(lines,
   )
   return(out)
 }
-
-
 #' Assign proper names to LexisNexis files
 #'
 #' Give proper names to files downloaded from 'LexisNexis' based on search
@@ -940,26 +841,22 @@ lnt_rename <- function(x,
       tbl, encoding, simulate, verbose
     )
   }
-
   tbl <- renamed[renamed$type == "docx", ]
   if (nrow(tbl) > 0) {
     renamed[renamed$type == "docx", ] <- lnt_rename_docx(
       tbl, encoding, simulate, verbose
     )
   }
-
   other <- !renamed$type %in% c("txt", "docx")
   renamed$name_new[other] <- renamed$name_orig[other]
   renamed$status[other] <- paste0("not renamed (not implemented for ",
                                   renamed$type[other],
                                   ")")
-
   if (verbose) {
     message(sum(grepl("^renamed$", renamed$status)),
             " files renamed, ",
             appendLF = FALSE
     )
-
     if (sum(grepl("exists", renamed$status, fixed = TRUE)) > 0) {
       message(sum(grepl("exists", renamed$status, fixed = TRUE)),
               " not renamed (file already exists), ",
@@ -983,8 +880,6 @@ lnt_rename <- function(x,
   if (simulate) message(" [changes were only simulated]")
   if (report) return(tibble::as_tibble(renamed))
 }
-
-
 lnt_rename_txt <- function(tbl, encoding, simulate, verbose) {
   files <- tbl$name_orig
   for (i in seq_along(files)) {
@@ -995,14 +890,12 @@ lnt_rename_txt <- function(tbl, encoding, simulate, verbose) {
     # extract the actual range infromation from line
     range.v <- stringi::stri_extract_all_regex(range.v, pattern = "[[:digit:]]|-", simplify = TRUE)
     range.v <- stringi::stri_join(range.v, sep = "", collapse = "")
-
     # look for search term
     term.v <- content_v[grep("^Terms: |^Begriffe: ", content_v)]
     # erase everything in the line exept the actual range
     term.v <- gsub("^Terms: |^Begriffe: ", "", term.v)
     # split term into elemets seprated by and or OR
     term.v <- unlist(strsplit(term.v, split = " AND | and | OR ", fixed = FALSE))
-
     date.v <- term.v[grepl("\\d+-\\d+-\\d+", term.v)]
     if (length(date.v) > 1) {
       date.v <- paste0(
@@ -1033,7 +926,6 @@ lnt_rename_txt <- function(tbl, encoding, simulate, verbose) {
     file_name <- sub("[^/]+$", "", files[i]) # take old filepath
     file_name <- paste0(file_name, term.v, "_", date.v, "_", range.v, ".txt")
     # rename file
-
     if (file.exists(file_name)) {
       tbl$name_new[i] <- tbl$name_orig[i]
       tbl$status[i] <- "not renamed (file exists)"
@@ -1058,11 +950,8 @@ lnt_rename_txt <- function(tbl, encoding, simulate, verbose) {
   }
   return(tbl)
 }
-
-
 lnt_rename_docx <- function(tbl, encoding, simulate, verbose) {
   check_install("xml2")
-
   for (i in seq_along(tbl$name_orig)) {
     # read in file
     con <- unz(description = tbl$name_orig[i], filename = "word/document.xml")
@@ -1070,16 +959,13 @@ lnt_rename_docx <- function(tbl, encoding, simulate, verbose) {
     rm(con)
     content_v <- xml2::xml_find_all(content_v, "//w:p")
     content_v <- xml2::xml_text(content_v)
-
     job <- grep("^Job Number:", content_v, value = TRUE)
-
     # extract the actual range infromation from line
     if (length(job) > 0) {
       job <- stringi::stri_extract_all_regex(
         job, pattern = "[[:digit:]]+"
       )[[1]]
     }
-
     # look for search term
     terms <- grep("^Search Terms:", content_v, value = TRUE)[1]
     # erase everything in the line exept the actual range
@@ -1089,7 +975,6 @@ lnt_rename_docx <- function(tbl, encoding, simulate, verbose) {
     # trim long search strings
     terms <- stringi::stri_extract_all_words(terms)[[1]][1:3]
     terms <- paste(na.omit(terms), collapse = "_")
-
     date <- which(stringi::stri_detect_regex(content_v, "^Narrowed by"))[2]
     if (!is.na(date)) {
       date <- content_v[date:(date + 3)]
@@ -1098,7 +983,6 @@ lnt_rename_docx <- function(tbl, encoding, simulate, verbose) {
       ))
     }
     date <- paste(na.omit(date), collapse = "-")
-
     file_name <- paste0(dirname(tbl$name_orig[i]),
                         "/",
                         paste(terms,
@@ -1106,7 +990,6 @@ lnt_rename_docx <- function(tbl, encoding, simulate, verbose) {
                               job,
                               sep = "_"),
                         ".docx")
-
     if (file.exists(file_name)) {
       tbl$name_new[i] <- tbl$name_orig[i]
       tbl$status[i] <- "not renamed (file exists)"
@@ -1127,11 +1010,8 @@ lnt_rename_docx <- function(tbl, encoding, simulate, verbose) {
       ), "%")
     }
   }
-
   return(tbl)
 }
-
-
 #' Check for highly similar articles.
 #'
 #' Check for highly similar articles by comparing all articles published on the
@@ -1304,7 +1184,6 @@ lnt_similarity <- function(texts,
           "text_duplicate",
           "Similarity"
         )]
-
         if (rel_dist) {
           duplicates.df$rel_dist <- vapply(seq_len(nrow(duplicates.df)), FUN.VALUE = 1, function(i) {
             # length of longer string
@@ -1375,8 +1254,6 @@ lnt_similarity <- function(texts,
   attributes(duplicates.df)$call <- call
   return(duplicates.df)
 }
-
-
 #' @title Convert Strings to dates
 #'
 #' @description  Converts dates from string formats common in LexisNexis to a
@@ -1424,7 +1301,6 @@ lnt_asDate <- function(x,
     Italian = "it",
     Russian = "ru"
   )
-
   if (!locale == "auto") locales <- locale
   for (loc in locales) {
     dat <- stri_replace_all_regex(
@@ -1457,7 +1333,6 @@ lnt_asDate <- function(x,
     replacement = "M\u00c4rz",
     vectorize_all = FALSE
   )
-
   if (any(
     format == "auto",
     locale == "auto"
@@ -1504,7 +1379,6 @@ lnt_asDate <- function(x,
   if (!format[1] %in% formats) {
     message("A non-standard format was provided. Conversion is tried but might fail.")
   }
-
   dat <- stringi::stri_datetime_parse(
     str = dat,
     format = format,
@@ -1513,10 +1387,7 @@ lnt_asDate <- function(x,
   )
   dat <- as.Date(dat)
   return(dat)
-
 }
-
-
 #' @title Lookup keywords in articles
 #'
 #' @description This function looks for the provided pattern in the string or
@@ -1572,17 +1443,14 @@ lnt_lookup <- function(x,
                        word_boundaries = c("both", "before", "after"),
                        cores = NULL,
                        verbose = TRUE) {
-
   UseMethod("lnt_lookup")
 }
-
 #' @rdname lnt_lookup
 #' @noRd
 #' @export
 lnt_lookup.default <- function(x, ...) {
   stop("'x' must be either a character vector or LNToutput object.")
 }
-
 #' @rdname lnt_lookup
 #' @noRd
 #' @export
@@ -1593,7 +1461,6 @@ lnt_lookup.LNToutput <- function(x,
                                  word_boundaries = c("both", "before", "after"),
                                  cores = NULL,
                                  verbose = TRUE) {
-
   IDs <- x@meta$ID
   x <- stringi::stri_join(x@meta$Headline,
                           x@articles$Article,
@@ -1608,7 +1475,6 @@ lnt_lookup.LNToutput <- function(x,
              cores = cores,
              verbose = verbose)
 }
-
 #' @rdname lnt_lookup
 #' @noRd
 #' @export
@@ -1619,7 +1485,6 @@ lnt_lookup.character <- function(x,
                                  word_boundaries = c("both", "before", "after"),
                                  cores = NULL,
                                  verbose = TRUE) {
-
   if (!is.null(word_boundaries) | isFALSE(word_boundaries)) {
     if (word_boundaries[1] == "both" | isTRUE(word_boundaries)) {
       pattern <- paste0(
@@ -1676,8 +1541,6 @@ lnt_lookup.character <- function(x,
   }
   return(return)
 }
-
-
 #' @title Display diff of similar articles
 #'
 #' @description This function is a wrapper for \link[diffobj]{diffPrint}. It is
@@ -1748,9 +1611,7 @@ lnt_diff <- function(x,
     )
   }
 }
-
 # Conversion ------------------------------------------------------------
-
 #' Convert LNToutput to other formats
 #'
 #' Takes output from \link{lnt_read} and converts it to other formats. You can
@@ -1800,21 +1661,19 @@ lnt_diff <- function(x,
 #' tidy <- lnt_convert(LNToutput, to = "tidytext")
 #'
 #' Corpus <- lnt_convert(LNToutput, to = "tm")
-#' 
+#'
 #' \dontrun{
-#' dbloc <- lnt_convert(LNToutput, to = "SQLite") 
+#' dbloc <- lnt_convert(LNToutput, to = "SQLite")
 #' }
-#' 
+#'
 #' @export
 #' @md
-
 lnt_convert <- function(x,
                         to = "data.frame",
                         what = "articles",
                         collapse = FALSE,
                         file = "LNT.sqlite",
                         ...) {
-
   valid_to <- c("data.frame",
                 "rDNA",
                 "quanteda",
@@ -1822,12 +1681,10 @@ lnt_convert <- function(x,
                 "corpustools",
                 "tm",
                 "tidytext")
-
   if (!to %in% valid_to) {
     stop(to, " is not a valid selection. Choose one of: ",
          paste(valid_to, collapse = ", "))
   }
-
   switch(
     to,
     "data.frame"  = return(lnt2df(x, what = what, collapse = collapse)),
@@ -1839,8 +1696,6 @@ lnt_convert <- function(x,
     "tidytext"    = return(lnt2tidy(x, what = what, ...))
   )
 }
-
-
 #' @rdname lnt_convert
 #' @importFrom tibble as_tibble
 #' @export
@@ -1864,8 +1719,6 @@ lnt2df <- function(x, what = "articles", ...) {
   }
   return(as_tibble(df))
 }
-
-
 #' @rdname lnt_convert
 #' @export
 lnt2rDNA <- function(x, what = "articles", collapse = TRUE) {
@@ -1933,7 +1786,6 @@ lnt2rDNA <- function(x, what = "articles", collapse = TRUE) {
   dta[is.na(dta)] <- ""
   return(dta)
 }
-
 #' @rdname lnt_convert
 #' @export
 #' @importFrom quanteda corpus metacorpus
@@ -1974,7 +1826,6 @@ lnt2quanteda <- function(x, what = "articles", collapse = NULL, ...) {
     )
   }
   dots <- list(...)
-
   if (any(grepl("metacorpus", names(dots)))) {
     metacorpus <- c(list(
       converted_from = "LexiNexisTools"),
@@ -1984,20 +1835,15 @@ lnt2quanteda <- function(x, what = "articles", collapse = NULL, ...) {
   } else {
     metacorpus <- list(converted_from = "LexiNexisTools")
   }
-
   dta <- corpus(
     x = text,
     docnames = as.character(ID),
     docvars = meta,
     dots
   )
-
   quanteda::metacorpus(dta, names(metacorpus)) <- unname(unlist(unname(metacorpus)))
-
   return(dta)
 }
-
-
 #' @rdname lnt_convert
 #' @export
 lnt2tm <- function(x, what = "articles", collapse = NULL, ...) {
@@ -2048,8 +1894,6 @@ lnt2tm <- function(x, what = "articles", collapse = NULL, ...) {
   corpus <- tm::Corpus(tm::DataframeSource(df), ...)
   return(corpus)
 }
-
-
 #' @rdname lnt_convert
 #' @export
 #' @importFrom methods slot slotNames
@@ -2083,8 +1927,6 @@ lnt2cptools <- function(x, what = "articles", ...) {
   )
   return(tcorpus)
 }
-
-
 #' @rdname lnt_convert
 #' @export
 lnt2tidy <- function(x, what = "articles", ...) {
@@ -2111,8 +1953,6 @@ lnt2tidy <- function(x, what = "articles", ...) {
   }
   return(tidy)
 }
-
-
 #' @rdname lnt_convert
 #' @export
 #' @importFrom methods slot slotNames
@@ -2130,8 +1970,6 @@ lnt2SQLite <- function(x, file = "LNT.sqlite", ...) {
   on.exit(RSQLite::dbDisconnect(db))
   return(db)
 }
-
-
 #' Convert LNToutput to other formats
 #'
 #' Takes output from \link{lnt_read} and converts chosen articles to a BibTeX
@@ -2149,13 +1987,9 @@ lnt2SQLite <- function(x, file = "LNT.sqlite", ...) {
 #'
 #' bib <- lnt2bibtex(LNToutput, art_id = 1)
 lnt2bibtex <- function(x, art_id, ...) {
-
   dat <- x[x@meta$ID %in% art_id]
-
   out <- lapply(seq_len(nrow(dat)), function(i) {
-
     meta <- dat[i]@meta
-
     bib <- c(
       "@article{",
       paste0("  author = {", tools::toTitleCase(tolower(meta$Author)), "},"),
@@ -2165,7 +1999,6 @@ lnt2bibtex <- function(x, art_id, ...) {
       paste0("  journal = {", meta$Newspaper, "}"),
       "}"
     )
-
     attr(bib, "names") <- c(
       "",
       "author",
@@ -2175,21 +2008,16 @@ lnt2bibtex <- function(x, art_id, ...) {
       "journal",
       ""
     )
-
     class(bib) <- "Bibtex"
     return(bib)
   })
-
   if (length(out) > 1) {
     return(out)
   } else {
     return(out[[1]])
   }
 }
-
-
 # Miscellaneous ------------------------------------------------------------
-
 #' Title
 #'
 #' @param pkg
@@ -2217,8 +2045,6 @@ check_install <- function(pkg) {
     }
   }
 }
-
-
 #' @title Adds or replaces articles
 #'
 #' @description This functions adds a dataframe to a slot in an LNToutput object
@@ -2320,8 +2146,6 @@ lnt_add <- function(to,
   }
   return(to)
 }
-
-
 #' Provides a small sample TXT/DOCX file
 #'
 #' Copies a small TXT sample file (as used by the old Nexis) or a DOCX (as used
@@ -2383,8 +2207,6 @@ lnt_sample <- function(format = "txt",
   }
   return(to)
 }
-
-
 #' Status message
 #'
 #' Internal function to print status messages
@@ -2402,8 +2224,6 @@ status <- function(m, v, start_time) {
     ), "]")
   }
 }
-
-
 #' Truncate
 #'
 #' Internal function, used to truncate text
@@ -2429,21 +2249,21 @@ trim <- function(x, n, e = "...") {
   x[is.na(x)] <- ""
   return(x)
 }
-
 #' Get files
 #'
 #' Find files from LexisNexis in folder(s).
 #'
 #' @param x character, name or names of file(s) or folder(s) to be searched.
-#' @param pattern file pattern to be searched.
+#' @param types file types/extensions to be searched.
 #' @param recursive logical. Should the listing recurse into directories?
 #' @param ignore_case logical. Should pattern-matching be case-insensitive?
 #'
 #' @importFrom stringi stri_replace_all_fixed
+#' @importFrom tools file_ext
 #'
 #' @noRd
 get_files <- function(x,
-                      pattern = ".txt$|.rtf$|.doc$|.pdf$|.docx$",
+                      types = c("txt", "rtf", "doc", "pdf", "docx", "zip"),
                       recursive = TRUE,
                       ignore_case = TRUE) {
   # Check how files are provided
@@ -2463,56 +2283,44 @@ get_files <- function(x,
       stop("No path was given as x.")
     }
   }
-  if (all(grepl(pattern, x, ignore.case = ignore_case))) {
+  if (all(tolower(tools::file_ext(x)) %in% types)) {
     files <- x
-  } else if (any(grepl(pattern, x, ignore.case = ignore_case))) {
+  } else if (any(tolower(tools::file_ext(x)) %in% types)) {
     warning("Not all provided files were TXT, DOC, RTF, PDF or DOCX files. Other formats are ignored.")
-    files <- grep(pattern, x, ignore.case = ignore_case, value = TRUE)
+    files <- x[tolower(tools::file_ext(x)) %in% types]
   } else if (any(dir.exists(x))) {
     if (length(x) > 1) {
       files <- unlist(lapply(x, function(f) {
         list.files(
           path = f,
-          pattern = pattern,
-          ignore.case = ignore_case,
           full.names = TRUE,
           recursive = recursive
         )
       }))
+      files <- files[tolower(tools::file_ext(files)) %in% types]
     } else {
       files <- list.files(
         path = x,
-        pattern = pattern,
-        ignore.case = ignore_case,
         full.names = TRUE,
         recursive = recursive
       )
+      files <- files[tolower(tools::file_ext(files)) %in% types]
     }
   } else {
     stop("Provide either file name(s) ending on ",
-         stri_replace_all_fixed(
-           toupper(pattern),
-           c("$", "|"),
-           c("", " or "),
-           vectorize_all = FALSE
-         ),
-         " or folder name(s) to x or leave black to search wd.")
+         paste(types, collapse = ", "),
+         " or folder name(s) to x or leave blank to search wd.")
   }
   if (length(files) > 0) {
+    #zips <-
     return(files)
   } else {
     stop("No ",
-         stri_replace_all_fixed(
-           pattern,
-           c("$", "|"),
-           c("", " or "),
-           vectorize_all = FALSE
-         ),
-         " files found.")
+        paste(types, collapse = ", "),
+        " files found.")
   }
 }
-
-#' Get files
+#' Read files into lines
 #'
 #' Internal function, used read files of differnt formats
 #'
@@ -2526,9 +2334,7 @@ get_files <- function(x,
 #'
 lnt_read_lines <- function(files,
                            encoding) {
-
   files <- split(files, tolower(stri_extract_last_regex(files, ".{4}$")))
-
   ### read in txt file
   if (length(files$.txt) > 0) {
     if (length(files$.txt) > 1) {
@@ -2544,7 +2350,6 @@ lnt_read_lines <- function(files,
   } else {
     lines_txt <- character()
   }
-
   ### read in doc file
   if (length(files$.doc) > 0) {
     check_install("striprtf")
@@ -2561,7 +2366,6 @@ lnt_read_lines <- function(files,
   } else {
     lines_doc <- character()
   }
-
   ### read in rtf file
   if (length(files$.rtf) > 0) {
     check_install("striprtf")
@@ -2578,7 +2382,6 @@ lnt_read_lines <- function(files,
   } else {
     lines_rtf <- character()
   }
-
   ### read in pdf file
   if (length(files$.pdf) > 0) {
     check_install("pdftools")
@@ -2607,7 +2410,6 @@ lnt_read_lines <- function(files,
   } else {
     lines_pdf <- character()
   }
-
   ### read in docx (nexis uni)
   if (length(files$docx) > 0) {
     check_install("xml2")
@@ -2632,8 +2434,6 @@ lnt_read_lines <- function(files,
   } else {
     lines_docx <- character()
   }
-
-
   return(list(nexis = c(lines_txt, lines_doc, lines_rtf, lines_pdf),
               uni = lines_docx))
 }
