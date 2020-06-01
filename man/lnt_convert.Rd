@@ -87,7 +87,7 @@ tidy <- lnt_convert(LNToutput, to = "tidytext")
 Corpus <- lnt_convert(LNToutput, to = "tm")
 
 \dontrun{
-dbloc <- lnt_convert(LNToutput, to = "SQLite") 
+dbloc <- lnt_convert(LNToutput, to = "SQLite")
 }
 
 }

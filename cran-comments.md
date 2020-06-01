@@ -1,5 +1,5 @@
 ## Test environments
-* local Kubuntu 18.04, R version 3.6.2
+* local Kubuntu 18.04, R version 4.0.0
 * win-builder.r-project.org, R-release, R-oldrelease, R-devel
 * R-hub via rhub::check_for_cran()
 * Ubuntu Xenial 16.04 (on travis-ci), R: release, R: oldrel, R: devel

@@ -1,14 +1,14 @@
 Package: LexisNexisTools
 Title: Working with Files from 'LexisNexis'
 Version: 0.3.0.9000
-Date: 2020-05-31
+Date: 2020-06-01
 Authors@R: person("Johannes", "Gruber", email = "j.gruber.1@research.gla.ac.uk", 
   role = c("aut", "cre"))
 Description: My PhD supervisor once told me that everyone doing newspaper
     analysis starts by writing code to read in files from the 'LexisNexis' newspaper
     archive (retrieved e.g., from <http://www.nexis.com/> or any of the partner
     sites). However, while this is a nice exercise I do recommend, not everyone has
-    the time. This package takes TXT files downloaded from the newspaper archive of
+    the time. This package takes files downloaded from the newspaper archive of
     'LexisNexis', reads them into R and offers functions for further processing.
 Depends:
     R (>= 3.5.0)

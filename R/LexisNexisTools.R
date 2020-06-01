@@ -211,6 +211,11 @@ lnt_read <- function(x,
                      file_type = c("txt", "rtf", "doc", "pdf", "docx", "zip"),
                      verbose = TRUE,
                      ...) {
+  if ("file_pattern" %in% names(list(...))) {
+    warning("The argument 'file_pattern' was used in earlier versions of the ",
+            "package and has been replaced by 'file_type'. Please consider ",
+            "changing your syntax.")
+  }
   files <- get_files(x, recursive = recursive, types = file_type)
   # Track the time
   if (verbose) {
@@ -1265,6 +1270,7 @@ lnt_similarity <- function(texts,
 #'   \link[stringi]{stri_datetime_format} for format options).
 #' @param locale A ISO 639-1 locale code (see
 #'   \url{https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes}).
+#' @param ... Not used.
 #'
 #' @return This function returns an object of class \link{date}.
 #' @export
@@ -1279,7 +1285,8 @@ lnt_similarity <- function(texts,
 #' @importFrom utils head menu
 lnt_asDate <- function(x,
                        format = "auto",
-                       locale = "auto") {
+                       locale = "auto",
+                       ...) {
   dat <- x
   formats <- c(
     English = "MMMM d,yyyy",

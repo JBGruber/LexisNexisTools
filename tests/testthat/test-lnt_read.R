@@ -41,11 +41,18 @@ test_that("Read in folder", {
   }, is_more_than(19))
 })
 
-test_that("no articles found", {
+test_that("Errors and warnings", {
   expect_error({
     writeLines("", "../files/emtpy.txt")
     lnt_read("../files/emtpy.txt", verbose = FALSE, extract_paragraphs = FALSE)
   }, "No articles found in provided file(s)", fixed = TRUE)
+  expect_warning({
+    lnt_read(dirname(files),
+             convert_date = FALSE,
+             file_pattern = "txt",
+             verbose = FALSE)
+  }, "The argument 'file_pattern' was used in earlier versions of the package and has been replaced by 'file_type'. Please consider changing your syntax.",
+  fixed = TRUE)
 })
 
 teardown(unlink(
