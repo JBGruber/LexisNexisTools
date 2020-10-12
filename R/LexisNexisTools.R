@@ -181,6 +181,7 @@ setMethod("+",
 #' @param recursive A logical flag indicating whether subdirectories are
 #'   searched for more files.
 #' @param file_type File types/extensions to be included in search for files.
+#' @param remove_cover Logical. Should the cover page be removed.
 #' @param verbose A logical flag indicating whether information should be
 #'   printed to the screen.
 #' @param ... Additional arguments passed on to \link{lnt_asDate}.
@@ -223,6 +224,7 @@ lnt_read <- function(x,
                      exclude_lines = "^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIC: |^DATELINE: ",
                      recursive = FALSE,
                      file_type = c("txt", "rtf", "doc", "pdf", "docx", "zip"),
+                     remove_cover = TRUE,
                      verbose = TRUE,
                      ...) {
   if ("file_pattern" %in% names(list(...))) {
@@ -270,6 +272,7 @@ lnt_read <- function(x,
       exclude_lines = exclude_lines,
       verbose = verbose,
       start_time = start_time,
+      remove_cover = remove_cover,
       ...
     )
   }
@@ -605,6 +608,7 @@ lnt_parse_uni <- function(lines,
                           exclude_lines,
                           verbose,
                           start_time,
+                          remove_cover = TRUE,
                           ...) {
   if (end_keyword == "auto") {
     end_keyword <- "^End of Document$"
@@ -624,18 +628,20 @@ lnt_parse_uni <- function(lines,
     lines[grep(exclude_lines, lines)] <- ""
   }
   # remove cover page(s) (which are separated by 2 empty lines)
-  lines <- lapply(unname(split(lines, names(lines))), function(l) {
-    l <- rle(l)
-    if (sum(l$lengths > 2 & l$values == "")) {
-      l$article <- cumsum(l$lengths > 2 & l$values == "")
-      l <- l$values[l$article > min(l$article)] # remove before 1st double blank
-    } else {
-      l <- l$values
-    }
-    l <- l[!l == ""]
-    return(l)
-  })
-  lines <- unlist(lines)
+  if (remove_cover) {
+    lines <- lapply(unname(split(lines, names(lines))), function(l) {
+      l <- rle(l)
+      if (sum(l$lengths > 2 & l$values == "")) {
+        l$article <- cumsum(l$lengths > 2 & l$values == "")
+        l <- l$values[l$article > min(l$article)] #remove before 1st double blank
+      } else {
+        l <- l$values
+      }
+      l <- l[!l == ""]
+      return(l)
+    })
+    lines <- unlist(lines)
+  }
   articles.l <- split(
     lines, cumsum(stringi::stri_detect_regex(lines, end_keyword))
   )
