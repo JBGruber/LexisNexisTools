@@ -160,7 +160,7 @@ viewer.)
 
 <p align="center">
 
-<a href="https://ibb.co/fj5YjG"><img src="https://preview.ibb.co/fOfNdb/LN.png" alt="LN" border="1"></a>
+<a href="https://imgbb.com/MZXXd7z"><img src="https://preview.ibb.co/fOfNdb/LN.png" alt="LN" border="1"></a>
 
 </p>
 

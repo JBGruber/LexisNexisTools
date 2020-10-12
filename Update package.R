@@ -73,7 +73,7 @@ devtools::check_win_oldrelease()
 devtools::check_win_release()
 
 ## check r_hub
-rhub::check_for_cran(env_vars=c(R_COMPILE_AND_INSTALL_PACKAGES = "always"))
+rhub::check_for_cran()
 
 ## release
 revdepcheck::revdep_check()
