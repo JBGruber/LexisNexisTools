@@ -1053,7 +1053,7 @@ lnt_rename_docx <- function(tbl, encoding, simulate, verbose) {
 #'
 #' Check for highly similar articles by comparing all articles published on the
 #' same date. This function implements two measures to test if articles are
-#' almost identical. The function \link[quanteda]{textstat_simil}, which
+#' almost identical. The function \link[quanteda.textstats]{textstat_simil}, which
 #' compares the word similarity of two given texts; and a relative modification
 #' of the generalized Levenshtein (edit) distance implementation in
 #' \link[stringdist]{stringdist}. The relative distance is calculated by
@@ -1101,7 +1101,8 @@ lnt_rename_docx <- function(tbl, encoding, simulate, verbose) {
 #' @author Johannes B. Gruber
 #' @export
 #' @importFrom stringdist stringdist
-#' @importFrom quanteda dfm docnames textstat_simil
+#' @importFrom quanteda dfm docnames
+#' @importFrom quanteda.textstats textstat_simil
 #' @importFrom utils combn
 #' @examples
 #' \dontrun{
@@ -1195,7 +1196,7 @@ lnt_similarity <- function(texts,
   duplicates.df <- lapply(dates.d, function(x) {
     if (sum(x == na.omit(dates)) > 1) {
       text_dfm_day <- quanteda::dfm_subset(text_dfm, subset = (dates == x))
-      sim <- stats::as.dist(quanteda::textstat_simil(
+      sim <- stats::as.dist(textstat_simil(
         text_dfm_day,
         selection = NULL,
         method = "cosine",

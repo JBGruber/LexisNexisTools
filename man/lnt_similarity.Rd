@@ -63,7 +63,7 @@ A data.table consisting of information about duplicated
 \description{
 Check for highly similar articles by comparing all articles published on the
 same date. This function implements two measures to test if articles are
-almost identical. The function \link[quanteda]{textstat_simil}, which
+almost identical. The function \link[quanteda.textstats]{textstat_simil}, which
 compares the word similarity of two given texts; and a relative modification
 of the generalized Levenshtein (edit) distance implementation in
 \link[stringdist]{stringdist}. The relative distance is calculated by
