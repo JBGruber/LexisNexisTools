@@ -1184,7 +1184,7 @@ lnt_similarity <- function(texts,
     verbose = FALSE
   )
   if (verbose) {
-    message("\t...quanteda dfm construced for similarity comparison [",
+    message("\t...quanteda dfm constructed for similarity comparison [",
       format(
         (Sys.time() - start_time),
         digits = 2, nsmall = 2
@@ -1699,7 +1699,7 @@ lnt_diff <- function(x,
 #'
 #'   * tidytext ... passed on to [tidytext::unnest_tokens()].
 #'
-#'   * lnt2SQLite ... passed on to [RSQLite::dbWriteTable()].
+#'   * lnt2SQLite ... passed on to [`RSQLite::dbWriteTable-method()`][`RSQLite::dbWriteTable,SQLiteConnection,character,character-method`].
 #'
 #' @examples
 #' LNToutput <- lnt_read(lnt_sample(copy = FALSE))
