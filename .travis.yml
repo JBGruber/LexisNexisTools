@@ -10,8 +10,6 @@ matrix:
       - os: linux
         sudo: required
         r: oldrel
-        before_install:
-          - Rscript -e 'install.packages("remotes");remotes::install_version("statnet.common", version = "4.1.4")' # oldrel needs a special version
       - os: linux
         sudo: required
         r: devel

@@ -1,5 +1,4 @@
 context("Read sample file")
-
 files <- c(system.file("extdata", "sample.DOCX", package = "LexisNexisTools"),
            system.file("extdata", "sample.DOCX", package = "LexisNexisTools"))
 
@@ -28,4 +27,18 @@ test_that("Test local collection", {
                      verbose = FALSE)
     nrow(test)
   }, 2970)
+})
+
+test_that("Read files from zip", {
+  tempf <- paste0(tempfile(), ".zip")
+  zip(zipfile = tempf, files, flags = "-j")
+  expect_equal(
+    basename(LexisNexisTools:::get_files(x = tempf)),
+    "sample.DOCX"
+  )
+  expect_equal({
+    test <- lnt_read(x = tempf,
+                     verbose = FALSE)
+    dim(test)
+  }, c(Articles = 10, Meta_variable = 10, data.frames = 3))
 })

@@ -31,21 +31,28 @@ test_that("Read in sample file", {
 test_that("Read in folder", {
   expect_error({
     lnt_read("../")
-  }, "No .txt or .rtf or .doc or .pdf or .docx files found.", fixed = TRUE)
+  }, "No txt, rtf, doc, pdf, docx, zip files found.", fixed = TRUE)
   expect_that({
     test <- lnt_read(dirname(files),
                      recursive = TRUE,
                      extract_paragraphs = FALSE,
-                     file_pattern = ".txt$")
+                     file_type = "txt")
     length(test@meta$ID)
   }, is_more_than(19))
 })
 
-test_that("no articles found", {
+test_that("Errors and warnings", {
   expect_error({
     writeLines("", "../files/emtpy.txt")
     lnt_read("../files/emtpy.txt", verbose = FALSE, extract_paragraphs = FALSE)
   }, "No articles found in provided file(s)", fixed = TRUE)
+  expect_warning({
+    lnt_read(dirname(files),
+             convert_date = FALSE,
+             file_pattern = "txt",
+             verbose = FALSE)
+  }, "The argument 'file_pattern' was used in earlier versions of the package and has been replaced by 'file_type'. Please consider changing your syntax.",
+  fixed = TRUE)
 })
 
 teardown(unlink(

@@ -74,6 +74,7 @@ test_that("Convert LNToutput to quanteda", {
 # saveRDS(corpus, "../files/quanteda_1.5.RDS")
 
 test_that("Convert LNToutput to corpustools", {
+  skip_if_not_installed("corpustools")
   expect_equal({
     cptools <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
                            to = "corpustools", what = "Articles")
@@ -99,7 +100,8 @@ test_that("Convert LNToutput to corpustools", {
 # }, "../files/corpustools.RDS")
 
 test_that("Convert LNToutput to tidytext", {
-  expect_equal({
+  skip_if_not_installed("tidytext")
+  expect_equivalent({
     lnt_convert(x = readRDS("../files/LNToutput.RDS"),
                            to = "tidytext", what = "Articles")
   }, readRDS("../files/tidytext.RDS"))
@@ -114,6 +116,7 @@ test_that("Convert LNToutput to tidytext", {
 #                     to = "tidytext", what = "Articles"), "../files/tidytext.RDS")
 
 test_that("Convert LNToutput to tm", {
+  skip_if_not_installed("tm")
   expect_equal({
     lnt_convert(x = readRDS("../files/LNToutput.RDS"),
                 to = "tm", what = "Articles")
@@ -144,23 +147,25 @@ test_that("Convert LNToutput to tm", {
 #                     to = "tm", what = "Articles"), "../files/tm.RDS")
 
 test_that("Convert LNToutput to SQLite", {
+  skip_if_not_installed("RSQLite")
   skip_on_cran()
   expect_equal({
-    unlink("../files/LNT.sqlite")
+    tempf <- paste0(tempdir(), "/LNT.sqlite")
     conn <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
                         to = "SQLite", what = "Articles",
-                        file = "../files/LNT.sqlite")
+                        file = tempf)
+    unlink(tempf)
     conn@dbname <- basename(conn@dbname)
     conn
   }, readRDS("../files/SQLite.RDS"))
 })
 
 test_that("Test error messages", {
-  expect_error ({
+  expect_error({
     lnt_convert(x = readRDS("../files/LNToutput.RDS"),
                 to = "rDNA", what = "Article")
   }, "Choose either \"articles\" or \"paragraphs\" as what argument.", fixed = TRUE)
-  expect_error ({
+  expect_error({
     lnt_convert(x = readRDS("../files/LNToutput.RDS"),
                 to = "quanteda", what = "Paragraph")
   }, "Choose either \"articles\" or \"paragraphs\" as what argument.", fixed = TRUE)

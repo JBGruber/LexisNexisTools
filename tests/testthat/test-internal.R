@@ -4,7 +4,7 @@ test_that("get files throws correct errors", {
   expect_error(LexisNexisTools:::get_files(),
                "No path was given as x.")
   expect_error(LexisNexisTools:::get_files("test.mp3"),
-               "Provide either file name(s) ending on .TXT or .RTF or .DOC or .PDF or .DOCX or folder name(s) to x or leave black to search wd.",
+               "Provide either file name(s) ending on txt, rtf, doc, pdf, docx, zip or folder name(s) to x or leave blank to search wd.",
                fixed = TRUE)
 })
 

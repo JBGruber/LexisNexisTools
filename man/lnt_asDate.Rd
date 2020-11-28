@@ -4,7 +4,7 @@
 \alias{lnt_asDate}
 \title{Convert Strings to dates}
 \usage{
-lnt_asDate(x, format = "auto", locale = "auto")
+lnt_asDate(x, format = "auto", locale = "auto", ...)
 }
 \arguments{
 \item{x}{A character object to be converted.}
@@ -15,6 +15,8 @@ day, month and year or provide a custom format (see
 
 \item{locale}{A ISO 639-1 locale code (see
 \url{https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes}).}
+
+\item{...}{Not used.}
 }
 \value{
 This function returns an object of class \link{date}.

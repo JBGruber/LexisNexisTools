@@ -108,7 +108,7 @@ In these cases, you should remove the whole article after inspecting it.
 (Use `View(LNToutput@articles$Article[LNToutput@meta$Graphic])` to view these articles in a spreadsheet like viewer.)
 
 <p align="center">
-   <a href="https://ibb.co/fj5YjG"><img src="https://preview.ibb.co/fOfNdb/LN.png" alt="LN" border="1"></a>
+   <a href="https://imgbb.com/MZXXd7z"><img src="https://preview.ibb.co/fOfNdb/LN.png" alt="LN" border="1"></a>
 </p>
 
 To use the function, you can again provide either file name(s), folder name(s) or nothing---to search the current working directory for relevant files---as `x` argument:

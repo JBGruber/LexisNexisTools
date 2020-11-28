@@ -15,7 +15,8 @@ lnt_read(
   author_keyword = "auto",
   exclude_lines = "^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIC: |^DATELINE: ",
   recursive = FALSE,
-  file_pattern = ".txt$|.rtf$|.doc$|.pdf$|.docx$",
+  file_type = c("txt", "rtf", "doc", "pdf", "docx", "zip"),
+  remove_cover = TRUE,
   verbose = TRUE,
   ...
 )
@@ -59,7 +60,9 @@ Set to \code{character()} if you want to turn off this feature.}
 \item{recursive}{A logical flag indicating whether subdirectories are
 searched for more files.}
 
-\item{file_pattern}{Pattern of file types to be included in search for files.}
+\item{file_type}{File types/extensions to be included in search for files.}
+
+\item{remove_cover}{Logical. Should the cover page be removed.}
 
 \item{verbose}{A logical flag indicating whether information should be
 printed to the screen.}

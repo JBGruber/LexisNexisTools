@@ -155,12 +155,11 @@ be in most cases:
     well. In these cases, you should remove the whole article after
     inspecting it. (Use
     `View(LNToutput@articles$Article[LNToutput@meta$Graphic])` to view
-    these articles in a spreadsheet like
-viewer.)
+    these articles in a spreadsheet like viewer.)
 
 <p align="center">
 
-<a href="https://ibb.co/fj5YjG"><img src="https://preview.ibb.co/fOfNdb/LN.png" alt="LN" border="1"></a>
+<a href="https://imgbb.com/MZXXd7z"><img src="https://preview.ibb.co/fOfNdb/LN.png" alt="LN" border="1"></a>
 
 </p>
 
@@ -292,8 +291,7 @@ duplicates_df <- lnt_similarity(texts = LNToutput@articles$Article,
     ##  ...processing date 2010-01-11: 5 duplicates found [3.05 secs].      
     ## Threshold = 0.97; 4 days processed; 5 duplicates found; in 3.05 secs
 
-Now you can inspect the results using the function
-`lnt_diff()`:
+Now you can inspect the results using the function `lnt_diff()`:
 
 ``` r
 lnt_diff(duplicates_df, min = 0, max = Inf)
@@ -406,8 +404,7 @@ with ID 9, all other values are `NULL`, which means the keyword wasn’t
 found. If your focus shifts and you want to subset your data to only
 include articles which mention this keyword, you could append this
 information to the meta information in the LNToutput object and then
-subset it to articles where the list entry is different from
-`NULL`.
+subset it to articles where the list entry is different from `NULL`.
 
 ``` r
 LNToutput@meta$stats <- lnt_lookup(LNToutput, pattern = "statistical computing")
