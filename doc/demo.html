@@ -12,7 +12,7 @@
 
 <meta name="author" content="Johannes B. Gruber" />
 
-<meta name="date" content="2020-11-28" />
+<meta name="date" content="2020-12-07" />
 
 <title>Basic Usage</title>
 
@@ -379,7 +379,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Basic Usage</h1>
 <h4 class="author">Johannes B. Gruber</h4>
-<h4 class="date">2020-11-28</h4>
+<h4 class="date">2020-12-07</h4>
 
 
 
@@ -558,7 +558,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="identify-highly-similar-articles" class="section level3">
 <h3>Identify Highly Similar Articles</h3>
 <p>In ‘LexisNexis’ itself, there is an option to group highly similar articles. However, experience shows that this feature does not always work perfectly. One common problem when working with ‘LexisNexis’ data is thus that many articles appear to be delivered twice or more times. While direct duplicates can be filtered out using, for example, <code>LNToutput &lt;- LNToutput[!duplicated(LNToutput@articles$Article), ]</code> this does not work for articles with small differences. Hence when one comma or white space is different between two articles, they are treated as different.</p>
-<p>The function <code>lnt_similarity()</code> combines the fast similarity measure from <a href="https://github.com/quanteda/quanteda">quanteda</a> with the much slower but more accurate relative <a href="https://en.wikipedia.org/wiki/Levenshtein_distance">Levenshtein distance</a> to compare all articles published on the same day. Calculating the Levenshtein distance might be very slow though if you have many articles published each day in your data set. If you think the less accurate similarity measure might be sufficient in your case, simply turn this feature off with <code>rel_dist = FALSE</code>. The easiest way to use <code>lnt_similarity()</code> is to input an <code>LNToutput</code> object directly. However, it is also possible to provide texts, dates and IDs separately:</p>
+<p>The function <code>lnt_similarity()</code> combines the fast similarity measure from <a href="https://github.com/quanteda/quanteda.textstats"><strong>quanteda.textstats</strong></a> with the much slower but more accurate relative <a href="https://en.wikipedia.org/wiki/Levenshtein_distance">Levenshtein distance</a> to compare all articles published on the same day. Calculating the Levenshtein distance might be very slow though if you have many articles published each day in your data set. If you think the less accurate similarity measure might be sufficient in your case, simply turn this feature off with <code>rel_dist = FALSE</code>. The easiest way to use <code>lnt_similarity()</code> is to input an <code>LNToutput</code> object directly. However, it is also possible to provide texts, dates and IDs separately:</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># Either provide a LNToutput</span></span>
 <span id="cb11-2"><a href="#cb11-2"></a>duplicates_df &lt;-<span class="st"> </span><span class="kw">lnt_similarity</span>(<span class="dt">LNToutput =</span> LNToutput,</span>
 <span id="cb11-3"><a href="#cb11-3"></a>                                <span class="dt">threshold =</span> <span class="fl">0.97</span>)</span></code></pre></div>

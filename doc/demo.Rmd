@@ -201,7 +201,7 @@ One common problem when working with 'LexisNexis' data is thus that many article
 While direct duplicates can be filtered out using, for example, `LNToutput <- LNToutput[!duplicated(LNToutput@articles$Article), ]` this does not work for articles with small differences.
 Hence when one comma or white space is different between two articles, they are  treated as different.
 
-The function `lnt_similarity()` combines the fast similarity measure from [quanteda](https://github.com/quanteda/quanteda) with the much slower but more accurate relative [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance) to compare all articles published on the same day.
+The function `lnt_similarity()` combines the fast similarity measure from [**quanteda.textstats**](https://github.com/quanteda/quanteda.textstats) with the much slower but more accurate relative [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance) to compare all articles published on the same day.
 Calculating the Levenshtein distance might be very slow though if you have many articles published each day in your data set.
 If you think the less accurate similarity measure might be sufficient in your case, simply turn this feature off with `rel_dist = FALSE`.
 The easiest way to use `lnt_similarity()` is to input an `LNToutput` object directly.
