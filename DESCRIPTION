@@ -18,7 +18,7 @@ Imports:
     methods (>= 3.3.0),
     parallel (>= 3.3.0),
     pbapply (>= 1.3.4),
-    quanteda (>= 2.9),
+    quanteda (>= 1.1.0),
     quanteda.textstats,
     stats (>= 3.3.0),
     stringdist (>= 0.9.4.0),
@@ -41,9 +41,6 @@ Suggests:
     spelling,
     striprtf,
     xml2
-Remotes:
-    quanteda/quanteda@modularise,
-    quanteda/quanteda.textstats
 Encoding: UTF-8
 LazyData: true
 URL: https://github.com/JBGruber/LexisNexisTools
