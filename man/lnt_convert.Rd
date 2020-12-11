@@ -68,7 +68,7 @@ for tuning the outcome:
 \item corpustools ... passed on to \code{\link[corpustools:create_tcorpus]{corpustools::create_tcorpus()}}.
 \item tm ... passed on to \code{\link[tm:Corpus]{tm::Corpus()}}.
 \item tidytext ... passed on to \code{\link[tidytext:unnest_tokens]{tidytext::unnest_tokens()}}.
-\item lnt2SQLite ... passed on to \code{\link[RSQLite:dbWriteTable]{RSQLite::dbWriteTable()}}.
+\item lnt2SQLite ... passed on to \code{\link[RSQLite:dbWriteTable]{RSQLite::dbWriteTable-method()}}.
 }
 }
 \examples{

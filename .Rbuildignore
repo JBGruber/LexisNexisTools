@@ -14,3 +14,5 @@ test.R
 README.Rmd
 ^codecov\.yml$
 ^CRAN-RELEASE$
+^Meta$
+^doc$

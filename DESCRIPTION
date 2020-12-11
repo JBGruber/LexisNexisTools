@@ -19,6 +19,7 @@ Imports:
     parallel (>= 3.3.0),
     pbapply (>= 1.3.4),
     quanteda (>= 1.1.0),
+    quanteda.textstats,
     stats (>= 3.3.0),
     stringdist (>= 0.9.4.0),
     stringi (>= 1.1.7),
