@@ -33,6 +33,7 @@ addons:
       - libwebp-dev
       - libpoppler-cpp-dev
       - poppler-data
+      - libgit2-dev
 
 script:
     - R CMD build .
