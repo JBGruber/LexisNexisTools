@@ -48,7 +48,7 @@ lnt_sample()
 The function `lnt_rename()` renames files to a standard format:
 For TXT files this format is "searchTerm_startDate-endDate_documentRange.txt" (e.g., "Obama_20091201-20100511_1-500.txt") (for other file types the format is similar but depends on what information is available).
 Note, that this will not work if your files lack a cover page with this information.
-Currently, it seems, like 'LexisNexis' only delivers those cover pages when you first create a link to your search ("link to this search" on the results page), follow this link, and then download the TXT files from there (see here for a [visual explanation](https://github.com/JBGruber/LexisNexisTools/wiki/Downloading-TXT-Files-From-Nexis)).
+Currently, it seems, like 'LexisNexis' only delivers those cover pages when you first create a link to your search ("link to this search" on the results page), follow this link, and then download the TXT files from there (see here for a [visual explanation](https://github.com/JBGruber/LexisNexisTools/wiki/Downloading-Files-From-Nexis)).
 If you do not want to rename files, you can skip to the next section.
 The rest of the package's functionality stays untouched by whether you rename your files or not.
 However, in a larger database, you will profit from a consistent naming scheme.

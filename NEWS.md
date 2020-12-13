@@ -1,3 +1,7 @@
+# LexisNexisTools 0.3.3
+
+* Updated namespacing for planned v3 modularisation of quanteda (thank you @kbenoit)
+
 # LexisNexisTools 0.3.2
 
 * Fixed tests that caused problems on CRAN

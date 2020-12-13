@@ -2,6 +2,7 @@ LNToutput
 Levenshtein
 LexisNexis
 LexisNexis’
+LexisNexisTools
 Lorem
 Nexis
 Pg
@@ -37,7 +38,6 @@ stat’
 stringdist
 testthat
 textstat
-textstats
 tidytext
 tm
 wd

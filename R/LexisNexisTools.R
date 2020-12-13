@@ -1535,7 +1535,7 @@ lnt_lookup.character <- function(x,
                                  word_boundaries = c("both", "before", "after"),
                                  cores = NULL,
                                  verbose = TRUE) {
-  
+
   if (!is.null(word_boundaries) | isFALSE(word_boundaries)) {
     if (word_boundaries[1] == "both" | isTRUE(word_boundaries)) {
       pattern <- paste0(
@@ -1709,7 +1709,7 @@ lnt_diff <- function(x,
 #' docs <- lnt_convert(LNToutput, to = "rDNA")
 #'
 #' corpus <- lnt_convert(LNToutput, to = "quanteda")
-#' 
+#'
 #' \dontrun{
 #'
 #' tCorpus <- lnt_convert(LNToutput, to = "corpustools")

@@ -67,7 +67,7 @@ information. Currently, it seems, like ‘LexisNexis’ only delivers those
 cover pages when you first create a link to your search (“link to this
 search” on the results page), follow this link, and then download the
 TXT files from there (see here for a [visual
-explanation](https://github.com/JBGruber/LexisNexisTools/wiki/Downloading-TXT-Files-From-Nexis)).
+explanation](https://github.com/JBGruber/LexisNexisTools/wiki/Downloading-Files-From-Nexis)).
 If you do not want to rename files, you can skip to the next section.
 The rest of the package’s functionality stays untouched by whether you
 rename your files or not. However, in a larger database, you will profit
