@@ -100,6 +100,7 @@ test_that("Convert LNToutput to corpustools", {
 # }, "../files/corpustools.RDS")
 
 test_that("Convert LNToutput to tidytext", {
+  skip_on_ci()
   skip_if_not_installed("tidytext")
   expect_equivalent({
     lnt_convert(x = readRDS("../files/LNToutput.RDS"),
