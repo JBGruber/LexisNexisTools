@@ -16,3 +16,4 @@ README.Rmd
 ^CRAN-RELEASE$
 ^Meta$
 ^doc$
+^\.github$
