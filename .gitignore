@@ -4,6 +4,4 @@
 .Ruserdata
 .directory
 LexisNexisTools.Rproj
-inst/doc
-doc
-Meta
+vignettes/demo.html

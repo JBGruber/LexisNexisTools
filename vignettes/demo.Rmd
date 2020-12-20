@@ -108,7 +108,7 @@ In these cases, you should remove the whole article after inspecting it.
 (Use `View(LNToutput@articles$Article[LNToutput@meta$Graphic])` to view these articles in a spreadsheet like viewer.)
 
 <p align="center">
-   <a href="https://imgbb.com/MZXXd7z"><img src="https://preview.ibb.co/fOfNdb/LN.png" alt="LN" border="1"></a>
+   <img src="../man/figures/LN.png" width="100%" border="1" />
 </p>
 
 To use the function, you can again provide either file name(s), folder name(s) or nothing---to search the current working directory for relevant files---as `x` argument:
@@ -238,7 +238,7 @@ lnt_diff(duplicates_df, min = 0, max = Inf)
 
 
 <p align="center">
-  <a href="https://imgbb.com/"><img src="https://image.ibb.co/gjXa7J/diff.png" alt="diff" border="1"></a>
+   <img src="../man/figures/diff.png" alt="diff" border="1">
 </p>
 
 By default, 25 randomly selected articles are displayed one after another, ordered by least to most different within the min and max limits.

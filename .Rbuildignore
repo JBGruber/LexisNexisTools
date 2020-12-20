@@ -1,7 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^cran-comments\.md$
-.travis.yml
 .lintr
 .Rproj.user
 .Rhistory
