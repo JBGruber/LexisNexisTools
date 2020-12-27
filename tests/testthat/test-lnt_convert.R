@@ -86,8 +86,8 @@ test_that("Convert LNToutput to corpustools", {
   expect_equal({
     cptools <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
                            to = "corpustools", what = "Paragraphs")
-    c(nrow(cptools$get()), class(cptools), length(unique(cptools$get()$doc_id)))
-  }, c("9992", "tCorpus", "R6", "122"))
+    c(class(cptools), length(unique(cptools$get()$doc_id)))
+  }, c("tCorpus", "R6", "122"))
 })
 
 # saveRDS({
@@ -100,7 +100,6 @@ test_that("Convert LNToutput to corpustools", {
 # }, "../files/corpustools.RDS")
 
 test_that("Convert LNToutput to tidytext", {
-  skip_on_ci()
   skip_if_not_installed("tidytext")
   expect_equivalent({
     lnt_convert(x = readRDS("../files/LNToutput.RDS"),
@@ -109,8 +108,8 @@ test_that("Convert LNToutput to tidytext", {
   expect_equal({
     test <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
                         to = "tidytext", what = "Paragraphs")
-    nrow(test)
-  }, 8587)
+    c(class(test), length(unique(test)))
+  }, c("tbl_df", "tbl", "data.frame", "12"))
 })
 
 # saveRDS(lnt_convert(x = readRDS("../files/LNToutput.RDS"),
