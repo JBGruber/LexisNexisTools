@@ -1101,7 +1101,7 @@ lnt_rename_docx <- function(tbl, encoding, simulate, verbose) {
 #' @author Johannes B. Gruber
 #' @export
 #' @importFrom stringdist stringdist
-#' @importFrom quanteda dfm docnames
+#' @importFrom quanteda dfm docnames tokens tokens_remove
 #' @importFrom quanteda.textstats textstat_simil
 #' @importFrom utils combn
 #' @examples
@@ -1177,12 +1177,8 @@ lnt_similarity <- function(texts,
       " articles over ", length(dates.d), " dates..."
     )
   }
-  text_dfm <- quanteda::dfm(texts,
-    tolower = TRUE,
-    remove = "[^[:alnum:]]",
-    valuetype = "regex",
-    verbose = FALSE
-  )
+  text_toks <- tokens_remove(tokens(texts), "[^[:alnum:]]", valuetype = "regex")
+  text_dfm <- dfm(text_toks, tolower = TRUE, verbose = FALSE)
   if (verbose) {
     message("\t...quanteda dfm constructed for similarity comparison [",
       format(
@@ -1849,7 +1845,7 @@ lnt2rDNA <- function(x, what = "articles", collapse = TRUE) {
 
 #' @rdname lnt_convert
 #' @export
-#' @importFrom quanteda corpus metacorpus
+#' @importFrom quanteda corpus meta
 lnt2quanteda <- function(x, what = "articles", collapse = NULL, ...) {
   what <- tolower(what)
   if (!what %in% c("articles", "paragraphs")) {
@@ -1887,12 +1883,12 @@ lnt2quanteda <- function(x, what = "articles", collapse = NULL, ...) {
     )
   }
   dots <- list(...)
-  if (any(grepl("metacorpus", names(dots)))) {
+  if (any(grepl("meta", names(dots)))) {
     metacorpus <- c(list(
       converted_from = "LexiNexisTools"),
-      dots$metacorpus
+      dots$meta
     )
-    dots$metacorpus <- NULL
+    dots$meta <- NULL
   } else {
     metacorpus <- list(converted_from = "LexiNexisTools")
   }
@@ -1902,7 +1898,7 @@ lnt2quanteda <- function(x, what = "articles", collapse = NULL, ...) {
     docvars = meta,
     dots
   )
-  quanteda::metacorpus(dta, names(metacorpus)) <- unname(unlist(unname(metacorpus)))
+  quanteda::meta(dta, names(metacorpus)) <- unname(unlist(unname(metacorpus)))
   return(dta)
 }
 
