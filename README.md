@@ -4,8 +4,8 @@
 [![R-CMD-check](https://github.com/JBGruber/LexisNexisTools/workflows/R-CMD-check/badge.svg)](https://github.com/JBGruber/LexisNexisTools/actions)
 [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version-ago/LexisNexisTools)](https://cran.r-project.org/package=LexisNexisTools)
 [![CRAN\_Download\_Badge](http://cranlogs.r-pkg.org/badges/grand-total/LexisNexisTools)](https://cran.r-project.org/package=LexisNexisTools)
-[![Coverage
-Status](https://codecov.io/gh/JBGruber/LexisNexisTools/branch/master/graph/badge.svg)](https://codecov.io/github/JBGruber/LexisNexisTools)
+[![Codecov test
+coverage](https://codecov.io/gh/JBGruber/LexisNexisTools/branch/master/graph/badge.svg)](https://codecov.io/gh/JBGruber/LexisNexisTools?branch=master)
 
 ## Motivation
 
@@ -59,9 +59,9 @@ lnt_sample()
 ‘LexisNexis’ does not give its files proper names. The function
 `lnt_rename()` renames files to a standard format: For TXT files this
 format is “searchTerm\_startDate-endDate\_documentRange.txt” (e.g.,
-“Obama\_20091201-20100511\_1-500.txt”) (for other file types the
-format is similar but depends on what information is available). Note,
-that this will not work if your files lack a cover page with this
+“Obama\_20091201-20100511\_1-500.txt”) (for other file types the format
+is similar but depends on what information is available). Note, that
+this will not work if your files lack a cover page with this
 information. Currently, it seems, like ‘LexisNexis’ only delivers those
 cover pages when you first create a link to your search (“link to this
 search” on the results page), follow this link, and then download the
@@ -74,29 +74,23 @@ from a consistent naming scheme.
 
 There are three ways in which you can rename the files:
 
-  - Run lnt\_rename() directly in your working directory without the x
+-   Run lnt\_rename() directly in your working directory without the x
     argument, which will prompt an option to scan for TXT files in your
     current working directory:
-
-<!-- end list -->
 
 ``` r
 report <- lnt_rename()
 ```
 
-  - Provide a folder path (and set `recursive = TRUE` if you want to
+-   Provide a folder path (and set `recursive = TRUE` if you want to
     scan for files recursively):
-
-<!-- end list -->
 
 ``` r
 report <- lnt_rename(x = getwd(), report = TRUE)
 ```
 
-  - Provide a character object with file names. Use `list.files()` to
+-   Provide a character object with file names. Use `list.files()` to
     search for files in a certain path.
-
-<!-- end list -->
 
 ``` r
 my_files <- list.files(pattern = ".txt", path = getwd(),
@@ -107,7 +101,7 @@ report
 ```
 
 | name\_orig | name\_new                               | status  | type |
-| :--------- | :-------------------------------------- | :------ | :--- |
+|:-----------|:----------------------------------------|:--------|:-----|
 | sample.TXT | SampleFile\_20091201-20100511\_1-10.txt | renamed | txt  |
 
 Using `list.files()` instead of the built-in mechanism allows you to
@@ -133,33 +127,30 @@ some form but can be left to ‘auto’ to use ‘LexisNexis’ defaults in
 several languages. All keywords can be regular expressions and need to
 be in most cases:
 
-  - `start_keyword`: The English default is “\\d+ of \\d+ DOCUMENTS$”
+-   `start_keyword`: The English default is “\\d+ of \\d+ DOCUMENTS$”
     which stands for, for example, “1 of 112 DOCUMENTS”. It is used to
     split up the text in the TXT files into individual articles. You
     will not have to change anything here, except you work with
     documents in languages other than the currently supported.
-  - `end_keyword`: This keyword is used to remove unnecessary
+-   `end_keyword`: This keyword is used to remove unnecessary
     information at the end of an article. Usually, this is “^LANGUAGE:”.
     Where the keyword isn’t found, the additional information ends up in
     the article text.
-  - `length_keyword`: This keyword, which is usually just “^LENGTH:” (or
+-   `length_keyword`: This keyword, which is usually just “^LENGTH:” (or
     its equivalent in other languages) finds the information about the
     length of an article. However, since this is always the last line of
     the metadata, it is used to separate metadata and article text.
     There seems to be only one type of cases where this information is
     missing: if the article consists only of a graphic (which
-    ‘LexisNexis’ does not retrieve). The final output from
-    `lnt_read()` has a column named `Graphic`, which indicates if this
-    keyword was missing. The article text then contains all metadata as
-    well. In these cases, you should remove the whole article after
-    inspecting it. (Use
-    `View(LNToutput@articles$Article[LNToutput@meta$Graphic])` to view
-    these articles in a spreadsheet like viewer.)
+    ‘LexisNexis’ does not retrieve). The final output from `lnt_read()`
+    has a column named `Graphic`, which indicates if this keyword was
+    missing. The article text then contains all metadata as well. In
+    these cases, you should remove the whole article after inspecting
+    it. (Use `View(LNToutput@articles$Article[LNToutput@meta$Graphic])`
+    to view these articles in a spreadsheet like viewer.)
 
 <p align="center">
-
 <img src="man/figures/LN.png" width="100%" border="1" />
-
 </p>
 
 To use the function, you can again provide either file name(s), folder
@@ -207,11 +198,11 @@ paragraphs_df <- LNToutput@paragraphs
 head(meta_df, n = 3)
 ```
 
-| ID | Source\_File                            | Newspaper         | Date       | Length    | Section         | Author          | Edition             | Headline                   | Graphic |
-| -: | :-------------------------------------- | :---------------- | :--------- | :-------- | :-------------- | :-------------- | :------------------ | :------------------------- | :------ |
-|  1 | SampleFile\_20091201-20100511\_1-10.txt | Guardian.com      | 2010-01-11 | 355 words | NA              | Andrew Sparrow  | NA                  | Lorem ipsum dolor sit amet | FALSE   |
-|  2 | SampleFile\_20091201-20100511\_1-10.txt | Guardian          | 2010-01-11 | 927 words | NA              | Simon Tisdall   | NA                  | Lorem ipsum dolor sit amet | FALSE   |
-|  3 | SampleFile\_20091201-20100511\_1-10.txt | The Sun (England) | 2010-01-11 | 677 words | FEATURES; Pg. 6 | TREVOR Kavanagh | Edition 1; Scotland | Lorem ipsum dolor sit amet | FALSE   |
+|  ID | Source\_File                            | Newspaper         | Date       | Length    | Section         | Author          | Edition             | Headline                   | Graphic |
+|----:|:----------------------------------------|:------------------|:-----------|:----------|:----------------|:----------------|:--------------------|:---------------------------|:--------|
+|   1 | SampleFile\_20091201-20100511\_1-10.txt | Guardian.com      | 2010-01-11 | 355 words | NA              | Andrew Sparrow  | NA                  | Lorem ipsum dolor sit amet | FALSE   |
+|   2 | SampleFile\_20091201-20100511\_1-10.txt | Guardian          | 2010-01-11 | 927 words | NA              | Simon Tisdall   | NA                  | Lorem ipsum dolor sit amet | FALSE   |
+|   3 | SampleFile\_20091201-20100511\_1-10.txt | The Sun (England) | 2010-01-11 | 677 words | FEATURES; Pg. 6 | TREVOR Kavanagh | Edition 1; Scotland | Lorem ipsum dolor sit amet | FALSE   |
 
 If you want to keep only one data.frame including metadata and text data
 you can easily do so:
@@ -297,9 +288,7 @@ lnt_diff(duplicates_df, min = 0, max = Inf)
 ```
 
 <p align="center">
-
 <img src="man/figures/diff.png" alt="diff" border="1">
-
 </p>
 
 By default, 25 randomly selected articles are displayed one after
@@ -323,9 +312,9 @@ LNToutput[1, ]
 #> 1 articles
 #> 5 paragraphs
 #> # A tibble: 1 x 10
-#>      ID Source_File Newspaper Date       Length Section Author Edition Headline
-#>   <int> <chr>       <chr>     <date>     <chr>  <chr>   <chr>  <chr>   <chr>   
-#> 1     1 SampleFile… Guardian… 2010-01-11 355 w… <NA>    Andre… <NA>    Lorem i…
+#>      ID Source_File  Newspaper Date       Length Section Author Edition Headline
+#>   <int> <chr>        <chr>     <date>     <chr>  <chr>   <chr>  <chr>   <chr>   
+#> 1     1 SampleFile_… Guardian… 2010-01-11 355 w… <NA>    Andre… <NA>    Lorem i…
 #> # … with 1 more variable: Graphic <lgl>
 #> # A tibble: 1 x 2
 #>      ID Article                                                                 
@@ -358,11 +347,11 @@ paragraphs_df <- LNToutput@paragraphs
 head(meta_df, n = 3)
 ```
 
-| ID | Source\_File                            | Newspaper         | Date       | Length    | Section         | Author          | Edition             | Headline                   | Graphic |
-| -: | :-------------------------------------- | :---------------- | :--------- | :-------- | :-------------- | :-------------- | :------------------ | :------------------------- | :------ |
-|  1 | SampleFile\_20091201-20100511\_1-10.txt | Guardian.com      | 2010-01-11 | 355 words | NA              | Andrew Sparrow  | NA                  | Lorem ipsum dolor sit amet | FALSE   |
-|  2 | SampleFile\_20091201-20100511\_1-10.txt | Guardian          | 2010-01-11 | 927 words | NA              | Simon Tisdall   | NA                  | Lorem ipsum dolor sit amet | FALSE   |
-|  3 | SampleFile\_20091201-20100511\_1-10.txt | The Sun (England) | 2010-01-11 | 677 words | FEATURES; Pg. 6 | TREVOR Kavanagh | Edition 1; Scotland | Lorem ipsum dolor sit amet | FALSE   |
+|  ID | Source\_File                            | Newspaper         | Date       | Length    | Section         | Author          | Edition             | Headline                   | Graphic |
+|----:|:----------------------------------------|:------------------|:-----------|:----------|:----------------|:----------------|:--------------------|:---------------------------|:--------|
+|   1 | SampleFile\_20091201-20100511\_1-10.txt | Guardian.com      | 2010-01-11 | 355 words | NA              | Andrew Sparrow  | NA                  | Lorem ipsum dolor sit amet | FALSE   |
+|   2 | SampleFile\_20091201-20100511\_1-10.txt | Guardian          | 2010-01-11 | 927 words | NA              | Simon Tisdall   | NA                  | Lorem ipsum dolor sit amet | FALSE   |
+|   3 | SampleFile\_20091201-20100511\_1-10.txt | The Sun (England) | 2010-01-11 | 677 words | FEATURES; Pg. 6 | TREVOR Kavanagh | Edition 1; Scotland | Lorem ipsum dolor sit amet | FALSE   |
 
 ### Lookup Keywords
 
@@ -411,9 +400,9 @@ LNToutput
 #> 1 articles
 #> 7 paragraphs
 #> # A tibble: 1 x 11
-#>      ID Source_File Newspaper Date       Length Section Author Edition Headline
-#>   <int> <chr>       <chr>     <date>     <chr>  <chr>   <chr>  <chr>   <chr>   
-#> 1     9 SampleFile… Sunday M… 2010-01-10 446 w… NEWS; … Ross … 3 Star… R (prog…
+#>      ID Source_File  Newspaper Date       Length Section Author Edition Headline
+#>   <int> <chr>        <chr>     <date>     <chr>  <chr>   <chr>  <chr>   <chr>   
+#> 1     9 SampleFile_… Sunday M… 2010-01-10 446 w… NEWS; … Ross … 3 Star… R (prog…
 #> # … with 2 more variables: Graphic <lgl>, stats <named list>
 #> # A tibble: 1 x 2
 #>      ID Article                                                                 
