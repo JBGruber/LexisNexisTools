@@ -1101,7 +1101,7 @@ lnt_rename_docx <- function(tbl, encoding, simulate, verbose) {
 #' @author Johannes B. Gruber
 #' @export
 #' @importFrom stringdist stringdist
-#' @importFrom quanteda dfm docnames
+#' @importFrom quanteda dfm docnames tokens tokens_remove
 #' @importFrom quanteda.textstats textstat_simil
 #' @importFrom utils combn
 #' @examples
@@ -1177,12 +1177,8 @@ lnt_similarity <- function(texts,
       " articles over ", length(dates.d), " dates..."
     )
   }
-  text_dfm <- quanteda::dfm(texts,
-    tolower = TRUE,
-    remove = "[^[:alnum:]]",
-    valuetype = "regex",
-    verbose = FALSE
-  )
+  text_toks <- tokens_remove(tokens(texts), "[^[:alnum:]]", valuetype = "regex")
+  text_dfm <- dfm(text_toks, tolower = TRUE, verbose = FALSE)
   if (verbose) {
     message("\t...quanteda dfm constructed for similarity comparison [",
       format(
