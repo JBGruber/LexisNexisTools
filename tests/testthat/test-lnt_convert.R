@@ -101,15 +101,14 @@ test_that("Convert LNToutput to corpustools", {
 
 test_that("Convert LNToutput to tidytext", {
   skip_if_not_installed("tidytext")
-  expect_equivalent({
-    lnt_convert(x = readRDS("../files/LNToutput.RDS"),
-                           to = "tidytext", what = "Articles")
-  }, readRDS("../files/tidytext.RDS"))
   expect_equal({
     test <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
                         to = "tidytext", what = "Paragraphs")
-    c(class(test), length(unique(test)))
-  }, c("tbl_df", "tbl", "data.frame", "12"))
+    list(class(test), 
+         length(unique(test)), 
+         length(unique(test$Art_ID)),
+         length(unique(test$Par_ID)))
+  }, list(c("tbl_df", "tbl", "data.frame"), 12L, 10L, 122L))
 })
 
 # saveRDS(lnt_convert(x = readRDS("../files/LNToutput.RDS"),
