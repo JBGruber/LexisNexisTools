@@ -154,10 +154,20 @@ test_that("Convert LNToutput to SQLite", {
     conn <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
                         to = "SQLite", what = "Articles",
                         file = tempf)
+    
+    conn2 <- RSQLite::dbConnect(conn)
+    
+    out <- list(class(conn2), basename(conn2@dbname), 
+                RSQLite::dbListTables(conn2),
+                nrow(RSQLite::dbReadTable(conn2, "meta")),
+                nrow(RSQLite::dbReadTable(conn2, "paragraphs")))
+    
+    RSQLite::dbDisconnect(conn2)
     unlink(tempf)
-    conn@dbname <- basename(conn@dbname)
-    conn
-  }, readRDS("../files/SQLite.RDS"))
+    
+    out
+  }, list(structure("SQLiteConnection", package = "RSQLite"), "LNT.sqlite", 
+          c("articles", "meta", "paragraphs"), 10L, 122L))
 })
 
 test_that("Test error messages", {
