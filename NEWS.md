@@ -1,3 +1,9 @@
+# LexisNexisTools 0.3.4
+
+* Fixes for compliance with quanteda v3 (thank you @kbenoit)
+* All images for building the vignette now live inside the package
+* `lnt_read_lines` and `lnt_read` now ignore Word lock files
+
 # LexisNexisTools 0.3.3
 
 * Updated namespacing for planned v3 modularisation of quanteda (thank you @kbenoit)

@@ -1,7 +1,7 @@
 bibentry(bibtype = "Manual",
          title = "{L}exis{N}exis{T}ools. {A}n {R} package for working with newspaper data from '{LexisNexis}'",
          author = as.person("Johannes Gruber"),
-         year = format(Sys.Date(), "%Y"),
+         year = 2021,
          url = "https://github.com/JBGruber/LexisNexisTools",
-         note = "R package version 0.3.3"
+         note = "R package version 0.3.3.9000
 )

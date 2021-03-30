@@ -1610,8 +1610,9 @@ lnt_lookup.character <- function(x,
 #'   LNToutput = lnt_read(lnt_sample(copy = FALSE)),
 #'   threshold = 0.97
 #' )
-#'
+#' \dontrun{
 #' lnt_diff(duplicates.df, min = 0.18, max = 0.30)
+#' }
 #' @author Johannes Gruber
 #' @export
 #' @importFrom quanteda tokens
@@ -2439,6 +2440,8 @@ lnt_read_lines <- function(files,
   if (length(files$.doc) > 0) {
     check_install("striprtf")
     if (length(files$.doc) > 1) {
+      # ignore lock files
+      files$.doc <- files$.doc[!grepl("^~\\$", basename(files$.doc))]
       lines_doc <- unlist(lapply(files$.doc, function(f) {
         out <- striprtf::read_rtf(f)
         names(out) <- rep(f, times = length(out))
@@ -2499,6 +2502,8 @@ lnt_read_lines <- function(files,
   if (length(files$docx) > 0) {
     check_install("xml2")
     if (length(files$docx) > 1) {
+      # ignore lock files
+      files$docx <- files$docx[!grepl("^~\\$", basename(files$docx))]
       lines_docx <- unlist(lapply(files$docx, function(f) {
         con <- unz(description = f, filename = "word/document.xml")
         out <- xml2::read_xml(con, encoding = "utf-8")

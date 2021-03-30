@@ -37,16 +37,16 @@ spelling::spell_check_files("README.Rmd", ignore = readLines("./inst/WORDLIST"),
 ## Update Citation
 update_citation <- function() {
   cit <- readLines("./inst/CITATION")
-  note <- grep("note =", cit)
+  version <- grep("note = ", cit)
+  year <- grep("year = ", cit)
+  
   desc <- readLines("DESCRIPTION")
-  date <- desc[grepl("^Date:", desc)]
-  date2 <- gsub("[^[:digit:]-]", "", date)
-  desc[grepl("^Date:", desc)] <- gsub(date2, Sys.Date(), desc[grepl("^Date:", desc)])
-  vers <- desc[grepl("^Version:", desc)]
-  vers2 <- gsub("[^[:digit:].]", "", vers)
-  vers3 <- gsub("\\d+{3}", "", vers2)
-  vers3 <- gsub("[[:punct:]]$", "", vers3)
-  cit[note] <- gsub("\\d+.\\d+.\\d+", vers3, cit[note]) 
+  vers <- gsub("[^[:digit:].]", "", grep("^Version:", desc, value = TRUE))
+  cit[version] <- gsub("R package version (.*)", paste0("R package version ", vers), cit[version])
+  
+  y <- gsub(".*(\\d{4}).*", "\\1", grep("^Date:", desc, value = TRUE))
+  cit[year] <- paste0("         year = ", y, ",")
+  
   writeLines(cit, "./inst/CITATION")
 }
 update_citation()
