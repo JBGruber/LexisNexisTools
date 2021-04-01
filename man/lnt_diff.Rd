@@ -27,12 +27,13 @@ This function is a wrapper for \link[diffobj]{diffPrint}. It is
   highly similar articles identified via \link{lnt_similarity}.
 }
 \examples{
+\dontrun{
 # Test similarity of articles
 duplicates.df <- lnt_similarity(
   LNToutput = lnt_read(lnt_sample(copy = FALSE)),
   threshold = 0.97
 )
-\dontrun{
+
 lnt_diff(duplicates.df, min = 0.18, max = 0.30)
 }
 }

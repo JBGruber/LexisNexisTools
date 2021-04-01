@@ -42,7 +42,8 @@ update_citation <- function() {
   
   desc <- readLines("DESCRIPTION")
   vers <- gsub("[^[:digit:].]", "", grep("^Version:", desc, value = TRUE))
-  cit[version] <- gsub("R package version (.*)", paste0("R package version ", vers), cit[version])
+  vers <- gsub(".9000$", "", vers)
+  cit[version] <- gsub("R package version (.*)", paste0("R package version ", vers, "\""), cit[version])
   
   y <- gsub(".*(\\d{4}).*", "\\1", grep("^Date:", desc, value = TRUE))
   cit[year] <- paste0("         year = ", y, ",")
