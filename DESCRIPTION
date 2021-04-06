@@ -1,7 +1,7 @@
 Package: LexisNexisTools
 Title: Working with Files from 'LexisNexis'
-Version: 0.3.3.9000
-Date: 2021-03-30
+Version: 0.3.4
+Date: 2021-04-06
 Authors@R: person("Johannes", "Gruber", email = "j.gruber.1@research.gla.ac.uk", 
   role = c("aut", "cre"))
 Description: My PhD supervisor once told me that everyone doing newspaper
@@ -42,7 +42,6 @@ Suggests:
     striprtf,
     xml2
 Encoding: UTF-8
-LazyData: true
 URL: https://github.com/JBGruber/LexisNexisTools
 BugReports: https://github.com/JBGruber/LexisNexisTools/issues
 RoxygenNote: 7.1.1
