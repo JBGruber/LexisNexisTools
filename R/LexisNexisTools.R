@@ -608,7 +608,7 @@ lnt_parse_uni <- function(lines,
                           exclude_lines,
                           verbose,
                           start_time,
-                          remove_cover = TRUE,
+                          remove_cover,
                           ...) {
   if (end_keyword == "auto") {
     end_keyword <- "^End of Document$"
@@ -645,6 +645,10 @@ lnt_parse_uni <- function(lines,
   articles.l <- split(
     lines, cumsum(stringi::stri_detect_regex(lines, end_keyword))
   )
+  if (!length(articles.l)) {
+    stop("No articles found to parse.")
+  }
+  # last "article" only contains End of Document
   articles.l[[length(articles.l)]] <- NULL
   names(articles.l) <- NULL
   if (!length(articles.l)) {
@@ -662,14 +666,14 @@ lnt_parse_uni <- function(lines,
     split <- which(stri_detect_regex(a, "^Body$"))[1]
     if (!is.na(split)) {
       list(
-        source = names(a)[1],
+        source = names(a)[2],
         meta = unname(a[2:split]),
         article = unname(a[(split + 1):(length(a) - 1)]),
         graphic = FALSE
       )
     } else {
       list(
-        source = names(a)[1],
+        source = names(a)[2],
         meta = NULL,
         article = a,
         graphic = TRUE
