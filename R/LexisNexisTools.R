@@ -620,7 +620,7 @@ lnt_parse_uni <- function(lines,
     length_keyword <- "^Length:\u00a0|^L\u00c4NGE:|^LONGUEUR:"
   }
   if (author_keyword == "auto") {
-    author_keyword <- "^Byline:\u00a0"
+    author_keyword <- "^Byline:\u00a0|^Author:\u00a0"
   }
   status("\t...files loaded", verbose, start_time)
   # exclude some lines
@@ -659,7 +659,7 @@ lnt_parse_uni <- function(lines,
   }
   # split meta from body
   df.l <- lapply(articles.l, function(a) {
-    split <- which(stri_detect_regex(a, "^Body$"))[1]
+    split <- which(stringi::stri_detect_regex(a, "^Body$|^Text$"))[1]
     if (!is.na(split)) {
       list(
         source = names(a)[1],
@@ -679,11 +679,11 @@ lnt_parse_uni <- function(lines,
   status("\t...articles split", verbose, start_time)
   # make data.frame
   ### length
-  . <- vapply(df.l, FUN.VALUE = character(1), function(i) {
+  len <- vapply(df.l, FUN.VALUE = character(1), function(i) {
     grep(pattern = length_keyword, x = i$meta,
          value = TRUE, ignore.case = TRUE)[1]
   })
-  length.v <- trimws(stri_replace_all_regex(., length_keyword, ""))
+  length.v <- trimws(stringi::stri_replace_all_regex(len, length_keyword, ""))
   status("\t...lengths extracted", verbose, start_time)
   ### headline First non emtpy line
   headline.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
@@ -720,7 +720,7 @@ lnt_parse_uni <- function(lines,
   author.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
     grep(pattern = author_keyword, x = i$meta, value = TRUE)[1]
   })
-  author.v <- stri_replace_all_regex(author.v, author_keyword, "")
+  author.v <- stringi::stri_replace_all_regex(author.v, author_keyword, "")
   author.v[author.v == ""] <- NA
   status("\t...authors extracted", verbose, start_time)
   ### section (where available)
@@ -728,7 +728,7 @@ lnt_parse_uni <- function(lines,
   section.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
     grep(pattern = section_keyword, x = i$meta, value = TRUE)[1]
   })
-  section.v <- stri_replace_all_regex(section.v, section_keyword, "")
+  section.v <- stringi::stri_replace_all_regex(section.v, section_keyword, "")
   status("\t...sections extracted", verbose, start_time)
   ### edition (not yet implemented)
   edition.v <- NA
@@ -1146,7 +1146,7 @@ lnt_similarity <- function(texts,
       stop("Supply either 'LNToutput' or 'texts' and 'dates'.")
     }
     if (is.null(IDs)) IDs <- seq_along(texts)
-  } else if (!missing(LNToutput)) {
+  } else {
     if (missing(texts)) texts <- LNToutput@articles$Article
     if (missing(dates)) dates <- LNToutput@meta$Date
     if (is.null(IDs)) IDs <- LNToutput@articles$ID
@@ -1177,11 +1177,16 @@ lnt_similarity <- function(texts,
       " articles over ", length(dates.d), " dates..."
     )
   }
-  text_dfm <- quanteda::dfm(texts,
+  text_tok <- quanteda::tokens(texts)
+  text_dfm <- quanteda::dfm(text_tok,
     tolower = TRUE,
-    remove = "[^[:alnum:]]",
-    valuetype = "regex",
     verbose = FALSE
+  )
+  text_dfm <- quanteda::dfm_select(
+    text_dfm,
+    selection = "remove",
+    pattern = "[^[:alnum:]]",
+    valuetype = "regex"
   )
   if (verbose) {
     message("\t...quanteda dfm constructed for similarity comparison [",
@@ -1343,6 +1348,7 @@ lnt_asDate <- function(x,
     Italian = "it",
     Russian = "ru"
   )
+  if (!format == "auto") formats <- format
   if (!locale == "auto") locales <- locale
   for (loc in locales) {
     dat <- stri_replace_all_regex(
@@ -1849,7 +1855,7 @@ lnt2rDNA <- function(x, what = "articles", collapse = TRUE) {
 
 #' @rdname lnt_convert
 #' @export
-#' @importFrom quanteda corpus metacorpus
+#' @importFrom quanteda corpus
 lnt2quanteda <- function(x, what = "articles", collapse = NULL, ...) {
   what <- tolower(what)
   if (!what %in% c("articles", "paragraphs")) {
@@ -1902,7 +1908,7 @@ lnt2quanteda <- function(x, what = "articles", collapse = NULL, ...) {
     docvars = meta,
     dots
   )
-  quanteda::metacorpus(dta, names(metacorpus)) <- unname(unlist(unname(metacorpus)))
+  quanteda::meta(dta, names(metacorpus)) <- unname(unlist(unname(metacorpus)))
   return(dta)
 }
 

@@ -55,15 +55,13 @@ test_that("Convert LNToutput to quanteda", {
     corpus <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
                           to = "quanteda", what = "Articles",
                           collapse = TRUE)
-    quanteda::texts(corpus)
-    length(gregexpr("\n\n", quanteda::texts(corpus))[[1]])
+    length(gregexpr("\n\n", as.character(corpus))[[1]])
   }, 4L)
   expect_equal({
     corpus <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
                           to = "quanteda", what = "Articles",
                           collapse = "%%")
-    quanteda::texts(corpus)
-    length(gregexpr("%%", quanteda::texts(corpus))[[1]])
+    length(gregexpr("%%", as.character(corpus))[[1]])
   }, 4L)
 })
 
@@ -183,6 +181,5 @@ test_that("Convert LNToutput to bibtex", {
 })
 
 # saveRDS(test, "../files/bibtex.RDS")
-lnt2bibtex
 
 teardown(unlink("../files/LNT.sqlite"))
