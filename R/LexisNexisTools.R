@@ -608,7 +608,7 @@ lnt_parse_uni <- function(lines,
                           exclude_lines,
                           verbose,
                           start_time,
-                          remove_cover = TRUE,
+                          remove_cover,
                           ...) {
   if (end_keyword == "auto") {
     end_keyword <- "^End of Document$"
@@ -645,6 +645,10 @@ lnt_parse_uni <- function(lines,
   articles.l <- split(
     lines, cumsum(stringi::stri_detect_regex(lines, end_keyword))
   )
+  if (!length(articles.l)) {
+    stop("No articles found to parse.")
+  }
+  # last "article" only contains End of Document
   articles.l[[length(articles.l)]] <- NULL
   names(articles.l) <- NULL
   if (!length(articles.l)) {
@@ -662,14 +666,14 @@ lnt_parse_uni <- function(lines,
     split <- which(stringi::stri_detect_regex(a, "^Body$|^Text$"))[1]
     if (!is.na(split)) {
       list(
-        source = names(a)[1],
+        source = names(a)[2],
         meta = unname(a[2:split]),
         article = unname(a[(split + 1):(length(a) - 1)]),
         graphic = FALSE
       )
     } else {
       list(
-        source = names(a)[1],
+        source = names(a)[2],
         meta = NULL,
         article = a,
         graphic = TRUE
@@ -1101,7 +1105,7 @@ lnt_rename_docx <- function(tbl, encoding, simulate, verbose) {
 #' @author Johannes B. Gruber
 #' @export
 #' @importFrom stringdist stringdist
-#' @importFrom quanteda dfm docnames
+#' @importFrom quanteda dfm docnames tokens tokens_remove
 #' @importFrom quanteda.textstats textstat_simil
 #' @importFrom utils combn
 #' @examples
@@ -1177,17 +1181,8 @@ lnt_similarity <- function(texts,
       " articles over ", length(dates.d), " dates..."
     )
   }
-  text_tok <- quanteda::tokens(texts)
-  text_dfm <- quanteda::dfm(text_tok,
-    tolower = TRUE,
-    verbose = FALSE
-  )
-  text_dfm <- quanteda::dfm_select(
-    text_dfm,
-    selection = "remove",
-    pattern = "[^[:alnum:]]",
-    valuetype = "regex"
-  )
+  text_toks <- tokens_remove(tokens(texts), "[^[:alnum:]]", valuetype = "regex")
+  text_dfm <- dfm(text_toks, tolower = TRUE, verbose = FALSE)
   if (verbose) {
     message("\t...quanteda dfm constructed for similarity comparison [",
       format(
@@ -1615,13 +1610,15 @@ lnt_lookup.character <- function(x,
 #' @param ... Currently not used.
 #'
 #' @examples
+#' \dontrun{
 #' # Test similarity of articles
 #' duplicates.df <- lnt_similarity(
 #'   LNToutput = lnt_read(lnt_sample(copy = FALSE)),
 #'   threshold = 0.97
 #' )
-#'
+#' 
 #' lnt_diff(duplicates.df, min = 0.18, max = 0.30)
+#' }
 #' @author Johannes Gruber
 #' @export
 #' @importFrom quanteda tokens
@@ -1855,7 +1852,7 @@ lnt2rDNA <- function(x, what = "articles", collapse = TRUE) {
 
 #' @rdname lnt_convert
 #' @export
-#' @importFrom quanteda corpus
+#' @importFrom quanteda corpus meta
 lnt2quanteda <- function(x, what = "articles", collapse = NULL, ...) {
   what <- tolower(what)
   if (!what %in% c("articles", "paragraphs")) {
@@ -1893,12 +1890,12 @@ lnt2quanteda <- function(x, what = "articles", collapse = NULL, ...) {
     )
   }
   dots <- list(...)
-  if (any(grepl("metacorpus", names(dots)))) {
+  if (any(grepl("meta", names(dots)))) {
     metacorpus <- c(list(
       converted_from = "LexiNexisTools"),
-      dots$metacorpus
+      dots$meta
     )
-    dots$metacorpus <- NULL
+    dots$meta <- NULL
   } else {
     metacorpus <- list(converted_from = "LexiNexisTools")
   }
@@ -2449,6 +2446,8 @@ lnt_read_lines <- function(files,
   if (length(files$.doc) > 0) {
     check_install("striprtf")
     if (length(files$.doc) > 1) {
+      # ignore lock files
+      files$.doc <- files$.doc[!grepl("^~\\$", basename(files$.doc))]
       lines_doc <- unlist(lapply(files$.doc, function(f) {
         out <- striprtf::read_rtf(f)
         names(out) <- rep(f, times = length(out))
@@ -2509,6 +2508,8 @@ lnt_read_lines <- function(files,
   if (length(files$docx) > 0) {
     check_install("xml2")
     if (length(files$docx) > 1) {
+      # ignore lock files
+      files$docx <- files$docx[!grepl("^~\\$", basename(files$docx))]
       lines_docx <- unlist(lapply(files$docx, function(f) {
         con <- unz(description = f, filename = "word/document.xml")
         out <- xml2::read_xml(con, encoding = "utf-8")
