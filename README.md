@@ -2,8 +2,8 @@
 # LexisNexisTools
 
 [![R-CMD-check](https://github.com/JBGruber/LexisNexisTools/workflows/R-CMD-check/badge.svg)](https://github.com/JBGruber/LexisNexisTools/actions)
-[![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version-ago/LexisNexisTools)](https://cran.r-project.org/package=LexisNexisTools)
-[![CRAN\_Download\_Badge](http://cranlogs.r-pkg.org/badges/grand-total/LexisNexisTools)](https://cran.r-project.org/package=LexisNexisTools)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version-ago/LexisNexisTools)](https://cran.r-project.org/package=LexisNexisTools)
+[![CRAN_Download_Badge](http://cranlogs.r-pkg.org/badges/grand-total/LexisNexisTools)](https://cran.r-project.org/package=LexisNexisTools)
 [![Codecov test
 coverage](https://codecov.io/gh/JBGruber/LexisNexisTools/branch/master/graph/badge.svg)](https://codecov.io/gh/JBGruber/LexisNexisTools?branch=master)
 
@@ -58,14 +58,14 @@ lnt_sample()
 
 ‘LexisNexis’ does not give its files proper names. The function
 `lnt_rename()` renames files to a standard format: For TXT files this
-format is “searchTerm\_startDate-endDate\_documentRange.txt” (e.g.,
-“Obama\_20091201-20100511\_1-500.txt”) (for other file types the format
-is similar but depends on what information is available). Note, that
-this will not work if your files lack a cover page with this
-information. Currently, it seems, like ‘LexisNexis’ only delivers those
-cover pages when you first create a link to your search (“link to this
-search” on the results page), follow this link, and then download the
-TXT files from there (see here for a [visual
+format is “searchTerm_startDate-endDate_documentRange.txt” (e.g.,
+“Obama_20091201-20100511_1-500.txt”) (for other file types the format is
+similar but depends on what information is available). Note, that this
+will not work if your files lack a cover page with this information.
+Currently, it seems, like ‘LexisNexis’ only delivers those cover pages
+when you first create a link to your search (“link to this search” on
+the results page), follow this link, and then download the TXT files
+from there (see here for a [visual
 explanation](https://github.com/JBGruber/LexisNexisTools/wiki/Downloading-Files-From-Nexis)).
 If you do not want to rename files, you can skip to the next section.
 The rest of the package’s functionality stays untouched by whether you
@@ -74,7 +74,7 @@ from a consistent naming scheme.
 
 There are three ways in which you can rename the files:
 
--   Run lnt\_rename() directly in your working directory without the x
+-   Run lnt_rename() directly in your working directory without the x
     argument, which will prompt an option to scan for TXT files in your
     current working directory:
 
@@ -100,9 +100,9 @@ report <- lnt_rename(x = my_files, report = TRUE)
 report
 ```
 
-| name\_orig | name\_new                               | status  | type |
-|:-----------|:----------------------------------------|:--------|:-----|
-| sample.TXT | SampleFile\_20091201-20100511\_1-10.txt | renamed | txt  |
+| name_orig  | name_new                              | status  | type |
+|:-----------|:--------------------------------------|:--------|:-----|
+| sample.TXT | SampleFile_20091201-20100511_1-10.txt | renamed | txt  |
 
 Using `list.files()` instead of the built-in mechanism allows you to
 specify a file pattern. This might be a preferred option if you have a
@@ -198,11 +198,11 @@ paragraphs_df <- LNToutput@paragraphs
 head(meta_df, n = 3)
 ```
 
-|  ID | Source\_File                            | Newspaper         | Date       | Length    | Section         | Author          | Edition             | Headline                   | Graphic |
-|----:|:----------------------------------------|:------------------|:-----------|:----------|:----------------|:----------------|:--------------------|:---------------------------|:--------|
-|   1 | SampleFile\_20091201-20100511\_1-10.txt | Guardian.com      | 2010-01-11 | 355 words | NA              | Andrew Sparrow  | NA                  | Lorem ipsum dolor sit amet | FALSE   |
-|   2 | SampleFile\_20091201-20100511\_1-10.txt | Guardian          | 2010-01-11 | 927 words | NA              | Simon Tisdall   | NA                  | Lorem ipsum dolor sit amet | FALSE   |
-|   3 | SampleFile\_20091201-20100511\_1-10.txt | The Sun (England) | 2010-01-11 | 677 words | FEATURES; Pg. 6 | TREVOR Kavanagh | Edition 1; Scotland | Lorem ipsum dolor sit amet | FALSE   |
+|  ID | Source_File                           | Newspaper         | Date       | Length    | Section         | Author          | Edition             | Headline                   | Graphic |
+|----:|:--------------------------------------|:------------------|:-----------|:----------|:----------------|:----------------|:--------------------|:---------------------------|:--------|
+|   1 | SampleFile_20091201-20100511_1-10.txt | Guardian.com      | 2010-01-11 | 355 words | NA              | Andrew Sparrow  | NA                  | Lorem ipsum dolor sit amet | FALSE   |
+|   2 | SampleFile_20091201-20100511_1-10.txt | Guardian          | 2010-01-11 | 927 words | NA              | Simon Tisdall   | NA                  | Lorem ipsum dolor sit amet | FALSE   |
+|   3 | SampleFile_20091201-20100511_1-10.txt | The Sun (England) | 2010-01-11 | 677 words | FEATURES; Pg. 6 | TREVOR Kavanagh | Edition 1; Scotland | Lorem ipsum dolor sit amet | FALSE   |
 
 If you want to keep only one data.frame including metadata and text data
 you can easily do so:
@@ -311,16 +311,16 @@ LNToutput[1, ]
 #> Object of class 'LNToutput':
 #> 1 articles
 #> 5 paragraphs
-#> # A tibble: 1 x 10
+#> # A tibble: 1 × 10
 #>      ID Source_File  Newspaper Date       Length Section Author Edition Headline
 #>   <int> <chr>        <chr>     <date>     <chr>  <chr>   <chr>  <chr>   <chr>   
 #> 1     1 SampleFile_… Guardian… 2010-01-11 355 w… <NA>    Andre… <NA>    Lorem i…
 #> # … with 1 more variable: Graphic <lgl>
-#> # A tibble: 1 x 2
+#> # A tibble: 1 × 2
 #>      ID Article                                                                 
 #>   <int> <chr>                                                                   
 #> 1     1 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam lacinia …
-#> # A tibble: 5 x 3
+#> # A tibble: 5 × 3
 #>   Art_ID Par_ID Paragraph                                                       
 #>    <int>  <int> <chr>                                                           
 #> 1      1      1 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam …
@@ -347,11 +347,11 @@ paragraphs_df <- LNToutput@paragraphs
 head(meta_df, n = 3)
 ```
 
-|  ID | Source\_File                            | Newspaper         | Date       | Length    | Section         | Author          | Edition             | Headline                   | Graphic |
-|----:|:----------------------------------------|:------------------|:-----------|:----------|:----------------|:----------------|:--------------------|:---------------------------|:--------|
-|   1 | SampleFile\_20091201-20100511\_1-10.txt | Guardian.com      | 2010-01-11 | 355 words | NA              | Andrew Sparrow  | NA                  | Lorem ipsum dolor sit amet | FALSE   |
-|   2 | SampleFile\_20091201-20100511\_1-10.txt | Guardian          | 2010-01-11 | 927 words | NA              | Simon Tisdall   | NA                  | Lorem ipsum dolor sit amet | FALSE   |
-|   3 | SampleFile\_20091201-20100511\_1-10.txt | The Sun (England) | 2010-01-11 | 677 words | FEATURES; Pg. 6 | TREVOR Kavanagh | Edition 1; Scotland | Lorem ipsum dolor sit amet | FALSE   |
+|  ID | Source_File                           | Newspaper         | Date       | Length    | Section         | Author          | Edition             | Headline                   | Graphic |
+|----:|:--------------------------------------|:------------------|:-----------|:----------|:----------------|:----------------|:--------------------|:---------------------------|:--------|
+|   1 | SampleFile_20091201-20100511_1-10.txt | Guardian.com      | 2010-01-11 | 355 words | NA              | Andrew Sparrow  | NA                  | Lorem ipsum dolor sit amet | FALSE   |
+|   2 | SampleFile_20091201-20100511_1-10.txt | Guardian          | 2010-01-11 | 927 words | NA              | Simon Tisdall   | NA                  | Lorem ipsum dolor sit amet | FALSE   |
+|   3 | SampleFile_20091201-20100511_1-10.txt | The Sun (England) | 2010-01-11 | 677 words | FEATURES; Pg. 6 | TREVOR Kavanagh | Edition 1; Scotland | Lorem ipsum dolor sit amet | FALSE   |
 
 ### Lookup Keywords
 
@@ -399,16 +399,16 @@ LNToutput
 #> Object of class 'LNToutput':
 #> 1 articles
 #> 7 paragraphs
-#> # A tibble: 1 x 11
+#> # A tibble: 1 × 11
 #>      ID Source_File  Newspaper Date       Length Section Author Edition Headline
 #>   <int> <chr>        <chr>     <date>     <chr>  <chr>   <chr>  <chr>   <chr>   
 #> 1     9 SampleFile_… Sunday M… 2010-01-10 446 w… NEWS; … Ross … 3 Star… R (prog…
 #> # … with 2 more variables: Graphic <lgl>, stats <named list>
-#> # A tibble: 1 x 2
+#> # A tibble: 1 × 2
 #>      ID Article                                                                 
 #>   <int> <chr>                                                                   
 #> 1     9 R is a programming language and free software environment for statistic…
-#> # A tibble: 7 x 3
+#> # A tibble: 7 × 3
 #>   Art_ID Par_ID Paragraph                                                       
 #>    <int>  <int> <chr>                                                           
 #> 1      9     67 R is a programming language and free software environment for s…

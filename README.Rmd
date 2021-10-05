@@ -362,7 +362,7 @@ readLines("README.Rmd") %>%
     '  comment = "#>"',
     ')',
     'library("kableExtra")',
-    ' ```',
+    '```',
     .,
     '```{r echo = FALSE}',
     'unlink("sample.TXT")',

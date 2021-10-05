@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 library("kableExtra")
- ```
+```
 ## Demo
 ### Load Package
 
