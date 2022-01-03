@@ -1,8 +1,8 @@
 Package: LexisNexisTools
 Title: Working with Files from 'LexisNexis'
-Version: 0.3.3.9000
-Date: 2021-10-05
-Authors@R: person("Johannes", "Gruber", email = "j.gruber.1@research.gla.ac.uk", 
+Version: 0.3.5
+Date: 2022-01-04
+Authors@R: person("Johannes", "Gruber", email = "Gruber@europa-uni.de", 
   role = c("aut", "cre"))
 Description: My PhD supervisor once told me that everyone doing newspaper
     analysis starts by writing code to read in files from the 'LexisNexis' newspaper

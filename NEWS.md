@@ -1,3 +1,7 @@
+# LexisNexisTools 0.3.5
+
+* Fixes issue in vignette
+
 # LexisNexisTools 0.3.4
 
 * Fixes for compliance with quanteda v3 (thank you @kbenoit)

@@ -3,5 +3,5 @@ bibentry(bibtype = "Manual",
          author = as.person("Johannes Gruber"),
          year = 2021,
          url = "https://github.com/JBGruber/LexisNexisTools",
-         note = "R package version 0.3.4"
+         note = "R package version 0.3.5"
 )
