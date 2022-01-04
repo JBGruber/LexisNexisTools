@@ -1,8 +1,3 @@
----
-output: github_document
----
-
-
 
 # LexisNexisTools
 
@@ -90,9 +85,9 @@ report
 ```
 
 
-|name_orig  |name_new             |status                    |type |
-|:----------|:--------------------|:-------------------------|:----|
-|sample.TXT |file16326e74a3fa.TXT |not renamed (file exists) |txt  |
+|name_orig  |name_new                              |status  |type |
+|:----------|:-------------------------------------|:-------|:----|
+|sample.TXT |SampleFile_20091201-20100511_1-10.txt |renamed |txt  |
 
 Using `list.files()` instead of the built-in mechanism allows you to specify a file pattern.
 This might be a preferred option if you have a folder in which only some of the TXT files contain newspaper articles from 'LexisNexis' but other files have the ending TXT as well.
@@ -168,11 +163,11 @@ head(meta_df, n = 3)
 
 ```
 
-| ID|Source_File          |Newspaper         |Date       |Length    |Section         |Author          |Edition             |Headline                   |Graphic |
-|--:|:--------------------|:-----------------|:----------|:---------|:---------------|:---------------|:-------------------|:--------------------------|:-------|
-|  1|file16326e74a3fa.TXT |Guardian.com      |2010-01-11 |355 words |NA              |Andrew Sparrow  |NA                  |Lorem ipsum dolor sit amet |FALSE   |
-|  2|file16326e74a3fa.TXT |Guardian          |2010-01-11 |927 words |NA              |Simon Tisdall   |NA                  |Lorem ipsum dolor sit amet |FALSE   |
-|  3|file16326e74a3fa.TXT |The Sun (England) |2010-01-11 |677 words |FEATURES; Pg. 6 |TREVOR Kavanagh |Edition 1; Scotland |Lorem ipsum dolor sit amet |FALSE   |
+| ID|Source_File                           |Newspaper         |Date       |Length    |Section         |Author          |Edition             |Headline                   |Graphic |
+|--:|:-------------------------------------|:-----------------|:----------|:---------|:---------------|:---------------|:-------------------|:--------------------------|:-------|
+|  1|SampleFile_20091201-20100511_1-10.txt |Guardian.com      |2010-01-11 |355 words |NA              |Andrew Sparrow  |NA                  |Lorem ipsum dolor sit amet |FALSE   |
+|  2|SampleFile_20091201-20100511_1-10.txt |Guardian          |2010-01-11 |927 words |NA              |Simon Tisdall   |NA                  |Lorem ipsum dolor sit amet |FALSE   |
+|  3|SampleFile_20091201-20100511_1-10.txt |The Sun (England) |2010-01-11 |677 words |FEATURES; Pg. 6 |TREVOR Kavanagh |Edition 1; Scotland |Lorem ipsum dolor sit amet |FALSE   |
 
 If you want to keep only one data.frame including metadata and text data you can easily do so:
 
@@ -272,22 +267,23 @@ LNToutput[1, ]
 #> 1 articles
 #> 5 paragraphs
 #> # A tibble: 1 × 10
-#>      ID Source_File Newspaper Date       Length Section Author Edition
-#>   <int> <chr>       <chr>     <date>     <chr>  <chr>   <chr>  <chr>  
-#> 1     1 file16326e… Guardian… 2010-01-11 355 w… <NA>    Andre… <NA>   
-#> # … with 2 more variables: Headline <chr>, Graphic <lgl>
+#>      ID Source_File      Newspaper  Date       Length Section Author 
+#>   <int> <chr>            <chr>      <date>     <chr>  <chr>   <chr>  
+#> 1     1 SampleFile_2009… Guardian.… 2010-01-11 355 w… <NA>    Andrew…
+#> # … with 3 more variables: Edition <chr>, Headline <chr>,
+#> #   Graphic <lgl>
 #> # A tibble: 1 × 2
-#>      ID Article                                                       
-#>   <int> <chr>                                                         
-#> 1     1 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etia…
+#>      ID Article                                                      
+#>   <int> <chr>                                                        
+#> 1     1 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Eti…
 #> # A tibble: 5 × 3
-#>   Art_ID Par_ID Paragraph                                             
-#>    <int>  <int> <chr>                                                 
-#> 1      1      1 Lorem ipsum dolor sit amet, consectetur adipiscing el…
-#> 2      1      2 Duis eleifend ipsum vehicula nunc luctus vestibulum. …
-#> 3      1      3 Sed ut ex quis nisi interdum ornare quis quis velit. …
-#> 4      1      4 Aliquam ut consectetur urna, et dignissim turpis. Ut …
-#> 5      1      5 Fusce sit amet aliquet lorem, id faucibus nisl. Nulla…
+#>   Art_ID Par_ID Paragraph                                            
+#>    <int>  <int> <chr>                                                
+#> 1      1      1 Lorem ipsum dolor sit amet, consectetur adipiscing e…
+#> 2      1      2 Duis eleifend ipsum vehicula nunc luctus vestibulum.…
+#> 3      1      3 Sed ut ex quis nisi interdum ornare quis quis velit.…
+#> 4      1      4 Aliquam ut consectetur urna, et dignissim turpis. Ut…
+#> 5      1      5 Fusce sit amet aliquet lorem, id faucibus nisl. Null…
 ```
 
 In this case, writing `[1, ]` delivers an LNToutput object which includes only the first article and the metadata and paragraphs belonging to it.
@@ -305,11 +301,11 @@ paragraphs_df <- LNToutput@paragraphs
 head(meta_df, n = 3)
 ```
 
-| ID|Source_File          |Newspaper         |Date       |Length    |Section         |Author          |Edition             |Headline                   |Graphic |
-|--:|:--------------------|:-----------------|:----------|:---------|:---------------|:---------------|:-------------------|:--------------------------|:-------|
-|  1|file16326e74a3fa.TXT |Guardian.com      |2010-01-11 |355 words |NA              |Andrew Sparrow  |NA                  |Lorem ipsum dolor sit amet |FALSE   |
-|  2|file16326e74a3fa.TXT |Guardian          |2010-01-11 |927 words |NA              |Simon Tisdall   |NA                  |Lorem ipsum dolor sit amet |FALSE   |
-|  3|file16326e74a3fa.TXT |The Sun (England) |2010-01-11 |677 words |FEATURES; Pg. 6 |TREVOR Kavanagh |Edition 1; Scotland |Lorem ipsum dolor sit amet |FALSE   |
+| ID|Source_File                           |Newspaper         |Date       |Length    |Section         |Author          |Edition             |Headline                   |Graphic |
+|--:|:-------------------------------------|:-----------------|:----------|:---------|:---------------|:---------------|:-------------------|:--------------------------|:-------|
+|  1|SampleFile_20091201-20100511_1-10.txt |Guardian.com      |2010-01-11 |355 words |NA              |Andrew Sparrow  |NA                  |Lorem ipsum dolor sit amet |FALSE   |
+|  2|SampleFile_20091201-20100511_1-10.txt |Guardian          |2010-01-11 |927 words |NA              |Simon Tisdall   |NA                  |Lorem ipsum dolor sit amet |FALSE   |
+|  3|SampleFile_20091201-20100511_1-10.txt |The Sun (England) |2010-01-11 |677 words |FEATURES; Pg. 6 |TREVOR Kavanagh |Edition 1; Scotland |Lorem ipsum dolor sit amet |FALSE   |
 
 ### Lookup Keywords
 
@@ -354,24 +350,24 @@ LNToutput
 #> 1 articles
 #> 7 paragraphs
 #> # A tibble: 1 × 11
-#>      ID Source_File Newspaper Date       Length Section Author Edition
-#>   <int> <chr>       <chr>     <date>     <chr>  <chr>   <chr>  <chr>  
-#> 1     9 file16326e… Sunday M… 2010-01-10 446 w… NEWS; … Ross … 3 Star…
-#> # … with 3 more variables: Headline <chr>, Graphic <lgl>,
-#> #   stats <named list>
+#>      ID Source_File    Newspaper  Date       Length  Section Author  
+#>   <int> <chr>          <chr>      <date>     <chr>   <chr>   <chr>   
+#> 1     9 SampleFile_20… Sunday Mi… 2010-01-10 446 wo… NEWS; … Ross Ih…
+#> # … with 4 more variables: Edition <chr>, Headline <chr>,
+#> #   Graphic <lgl>, stats <named list>
 #> # A tibble: 1 × 2
-#>      ID Article                                                       
-#>   <int> <chr>                                                         
-#> 1     9 R is a programming language and free software environment for…
+#>      ID Article                                                      
+#>   <int> <chr>                                                        
+#> 1     9 R is a programming language and free software environment fo…
 #> # A tibble: 7 × 3
-#>   Art_ID Par_ID Paragraph                                             
-#>    <int>  <int> <chr>                                                 
-#> 1      9     67 R is a programming language and free software environ…
-#> 2      9     68 R is a GNU package. The source code for the R softwar…
-#> 3      9     69 R is an implementation of the S programming language …
-#> 4      9     70 R was created by Ross Ihaka and Robert Gentleman at t…
-#> 5      9     71 R and its libraries implement a wide variety of stati…
-#> 6      9     72 Another strength of R is static graphics, which can p…
+#>   Art_ID Par_ID Paragraph                                            
+#>    <int>  <int> <chr>                                                
+#> 1      9     67 R is a programming language and free software enviro…
+#> 2      9     68 R is a GNU package. The source code for the R softwa…
+#> 3      9     69 R is an implementation of the S programming language…
+#> 4      9     70 R was created by Ross Ihaka and Robert Gentleman at …
+#> 5      9     71 R and its libraries implement a wide variety of stat…
+#> 6      9     72 Another strength of R is static graphics, which can …
 #> # … with 1 more row
 ```
 
