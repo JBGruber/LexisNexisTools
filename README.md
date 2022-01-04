@@ -9,7 +9,7 @@ output: github_document
 [![R-CMD-check](https://github.com/JBGruber/LexisNexisTools/workflows/R-CMD-check/badge.svg)](https://github.com/JBGruber/LexisNexisTools/actions)
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version-ago/LexisNexisTools)](https://cran.r-project.org/package=LexisNexisTools)
 [![CRAN_Download_Badge](https://cranlogs.r-pkg.org/badges/grand-total/LexisNexisTools)](https://cran.r-project.org/package=LexisNexisTools)
-[![Codecov test coverage](https://app.codecov.io/gh/JBGruber/LexisNexisTools/branch/master/graph/badge.svg)](https://app.codecov.io/gh/JBGruber/LexisNexisTools?branch=master)
+[![Codecov test coverage](https://codecov.io/gh/JBGruber/LexisNexisTools/branch/master/graph/badge.svg)](https://app.codecov.io/gh/JBGruber/LexisNexisTools?branch=master)
 
 ## Motivation
 
@@ -90,9 +90,9 @@ report
 ```
 
 
-|name_orig  |name_new                              |status  |type |
-|:----------|:-------------------------------------|:-------|:----|
-|sample.TXT |SampleFile_20091201-20100511_1-10.txt |renamed |txt  |
+|name_orig  |name_new             |status                    |type |
+|:----------|:--------------------|:-------------------------|:----|
+|sample.TXT |file16326e74a3fa.TXT |not renamed (file exists) |txt  |
 
 Using `list.files()` instead of the built-in mechanism allows you to specify a file pattern.
 This might be a preferred option if you have a folder in which only some of the TXT files contain newspaper articles from 'LexisNexis' but other files have the ending TXT as well.
@@ -168,11 +168,11 @@ head(meta_df, n = 3)
 
 ```
 
-| ID|Source_File                           |Newspaper         |Date       |Length    |Section         |Author          |Edition             |Headline                   |Graphic |
-|--:|:-------------------------------------|:-----------------|:----------|:---------|:---------------|:---------------|:-------------------|:--------------------------|:-------|
-|  1|SampleFile_20091201-20100511_1-10.txt |Guardian.com      |2010-01-11 |355 words |NA              |Andrew Sparrow  |NA                  |Lorem ipsum dolor sit amet |FALSE   |
-|  2|SampleFile_20091201-20100511_1-10.txt |Guardian          |2010-01-11 |927 words |NA              |Simon Tisdall   |NA                  |Lorem ipsum dolor sit amet |FALSE   |
-|  3|SampleFile_20091201-20100511_1-10.txt |The Sun (England) |2010-01-11 |677 words |FEATURES; Pg. 6 |TREVOR Kavanagh |Edition 1; Scotland |Lorem ipsum dolor sit amet |FALSE   |
+| ID|Source_File          |Newspaper         |Date       |Length    |Section         |Author          |Edition             |Headline                   |Graphic |
+|--:|:--------------------|:-----------------|:----------|:---------|:---------------|:---------------|:-------------------|:--------------------------|:-------|
+|  1|file16326e74a3fa.TXT |Guardian.com      |2010-01-11 |355 words |NA              |Andrew Sparrow  |NA                  |Lorem ipsum dolor sit amet |FALSE   |
+|  2|file16326e74a3fa.TXT |Guardian          |2010-01-11 |927 words |NA              |Simon Tisdall   |NA                  |Lorem ipsum dolor sit amet |FALSE   |
+|  3|file16326e74a3fa.TXT |The Sun (England) |2010-01-11 |677 words |FEATURES; Pg. 6 |TREVOR Kavanagh |Edition 1; Scotland |Lorem ipsum dolor sit amet |FALSE   |
 
 If you want to keep only one data.frame including metadata and text data you can easily do so:
 
@@ -274,7 +274,7 @@ LNToutput[1, ]
 #> # A tibble: 1 × 10
 #>      ID Source_File Newspaper Date       Length Section Author Edition
 #>   <int> <chr>       <chr>     <date>     <chr>  <chr>   <chr>  <chr>  
-#> 1     1 SampleFile… Guardian… 2010-01-11 355 w… <NA>    Andre… <NA>   
+#> 1     1 file16326e… Guardian… 2010-01-11 355 w… <NA>    Andre… <NA>   
 #> # … with 2 more variables: Headline <chr>, Graphic <lgl>
 #> # A tibble: 1 × 2
 #>      ID Article                                                       
@@ -305,11 +305,11 @@ paragraphs_df <- LNToutput@paragraphs
 head(meta_df, n = 3)
 ```
 
-| ID|Source_File                           |Newspaper         |Date       |Length    |Section         |Author          |Edition             |Headline                   |Graphic |
-|--:|:-------------------------------------|:-----------------|:----------|:---------|:---------------|:---------------|:-------------------|:--------------------------|:-------|
-|  1|SampleFile_20091201-20100511_1-10.txt |Guardian.com      |2010-01-11 |355 words |NA              |Andrew Sparrow  |NA                  |Lorem ipsum dolor sit amet |FALSE   |
-|  2|SampleFile_20091201-20100511_1-10.txt |Guardian          |2010-01-11 |927 words |NA              |Simon Tisdall   |NA                  |Lorem ipsum dolor sit amet |FALSE   |
-|  3|SampleFile_20091201-20100511_1-10.txt |The Sun (England) |2010-01-11 |677 words |FEATURES; Pg. 6 |TREVOR Kavanagh |Edition 1; Scotland |Lorem ipsum dolor sit amet |FALSE   |
+| ID|Source_File          |Newspaper         |Date       |Length    |Section         |Author          |Edition             |Headline                   |Graphic |
+|--:|:--------------------|:-----------------|:----------|:---------|:---------------|:---------------|:-------------------|:--------------------------|:-------|
+|  1|file16326e74a3fa.TXT |Guardian.com      |2010-01-11 |355 words |NA              |Andrew Sparrow  |NA                  |Lorem ipsum dolor sit amet |FALSE   |
+|  2|file16326e74a3fa.TXT |Guardian          |2010-01-11 |927 words |NA              |Simon Tisdall   |NA                  |Lorem ipsum dolor sit amet |FALSE   |
+|  3|file16326e74a3fa.TXT |The Sun (England) |2010-01-11 |677 words |FEATURES; Pg. 6 |TREVOR Kavanagh |Edition 1; Scotland |Lorem ipsum dolor sit amet |FALSE   |
 
 ### Lookup Keywords
 
@@ -356,7 +356,7 @@ LNToutput
 #> # A tibble: 1 × 11
 #>      ID Source_File Newspaper Date       Length Section Author Edition
 #>   <int> <chr>       <chr>     <date>     <chr>  <chr>   <chr>  <chr>  
-#> 1     9 SampleFile… Sunday M… 2010-01-10 446 w… NEWS; … Ross … 3 Star…
+#> 1     9 file16326e… Sunday M… 2010-01-10 446 w… NEWS; … Ross … 3 Star…
 #> # … with 3 more variables: Headline <chr>, Graphic <lgl>,
 #> #   stats <named list>
 #> # A tibble: 1 × 2
