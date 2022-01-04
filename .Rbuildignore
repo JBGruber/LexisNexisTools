@@ -16,3 +16,4 @@ README.Rmd
 ^Meta$
 ^doc$
 ^\.github$
+^CRAN-SUBMISSION$
