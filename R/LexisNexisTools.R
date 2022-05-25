@@ -715,7 +715,7 @@ lnt_parse_uni <- function(lines,
   date.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
     . <- stringi::stri_extract_last_regex(
       str = i$meta[seq_len(10)],
-      pattern = "\\w+ \\d+, \\d+|\\d+ \\w+ \\d+|\\d+. \\w+ \\d+"
+      pattern = "^\\w+ \\d+, \\d+|^\\d+ \\w+ \\d+|^\\d+. \\w+ \\d+|^\\w+ \\d+. \\w+ \\d+"
     )
     na.omit(.)[1]
   })
@@ -2259,13 +2259,14 @@ lnt_sample <- function(format = "txt",
   if (is.null(path)) {
     path <- getwd()
   }
-  if (tolower(format) == "txt") {
-    f <- "sample.TXT"
-  } else if (tolower(format) == "docx") {
-    f <- "sample.DOCX"
-  } else {
-    stop("Choose either \"txt\" or \"docx\" as format.")
-  }
+  
+  f <- switch (tolower(format),
+    txt = "sample.TXT",
+    docx = "sample.DOCX"
+  )
+  
+  if (is.null(f)) stop("Choose either \"txt\" or \"docx\" as format.") 
+    
   if (copy) {
     to <- paste0(path, "/", f)
     if (all(file.exists(paste0(path, "/", f)), !overwrite)) {
