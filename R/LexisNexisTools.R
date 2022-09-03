@@ -417,7 +417,7 @@ lnt_parse_nexis <- function(lines,
       d1 <- df.l[[i]]$meta[(date + 1):(date + 2)]
       if (!d1[1] == "") {
         edition.v <- d1[1]
-        if (!d1[2] == "") {
+        if (isTRUE(!d1[2] == "")) {
           edition.v <- c(edition.v, d1[2])
         }
         edition.v
