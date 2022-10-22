@@ -14,11 +14,12 @@ test_that("Convert LNToutput to data.frame", {
 
 test_that("Convert LNToutput to rDNA", {
   expect_equal({
-    lnt_convert(x = readRDS("../files/LNToutput.RDS"),
-                to = "rDNA",
-                what = "Articles",
-                collapse = TRUE)
-  }, readRDS("../files/rDNA.RDS"))
+    test <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
+                        to = "rDNA",
+                        what = "Articles",
+                        collapse = TRUE)
+    c(class(test), nrow(test), ncol(test))
+  }, c("data.frame", "10", "10"))
   expect_equal({
     test <- lnt_convert(x = readRDS("../files/LNToutput.RDS"),
                         to = "rDNA",

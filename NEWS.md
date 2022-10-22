@@ -1,3 +1,7 @@
+# LexisNexisTools 0.3.6
+
+* Fixes issue in tests
+
 # LexisNexisTools 0.3.5
 
 * Fixes issue in vignette
