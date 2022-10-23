@@ -31,7 +31,9 @@ test_that("Test local collection", {
 
 test_that("Read files from zip", {
   tempf <- paste0(tempfile(), ".zip")
-  zip(zipfile = tempf, files, flags = "-j")
+  # zip fails if no zip application is installed
+  t <- try(zip(zipfile = tempf, files, flags = "-j"))
+  skip_if("try-error" %in% class(t))
   expect_equal(
     basename(LexisNexisTools:::get_files(x = tempf)),
     "sample.DOCX"
