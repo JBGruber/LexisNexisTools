@@ -63,6 +63,11 @@ jobs:
           do
             eval sudo $cmd
           done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "20.04"))')
+      
+      - name: Do not check suggests on Windows
+        if: runner.os == 'Windows'
+        env:
+          _R_CHECK_FORCE_SUGGESTS_: false
 
       - name: Install dependencies
         run: |
