@@ -1,7 +1,7 @@
 
 # LexisNexisTools
 
-[![R-CMD-check](https://github.com/JBGruber/LexisNexisTools/workflows/R-CMD-check/badge.svg)](https://github.com/JBGruber/LexisNexisTools/actions)
+[![R-CMD-check](https://github.com/JBGruber/LexisNexisTools/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/JBGruber/LexisNexisTools/actions/workflows/R-CMD-check.yaml)
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version-ago/LexisNexisTools)](https://cran.r-project.org/package=LexisNexisTools)
 [![CRAN_Download_Badge](https://cranlogs.r-pkg.org/badges/grand-total/LexisNexisTools)](https://cran.r-project.org/package=LexisNexisTools)
 [![Codecov test coverage](https://codecov.io/gh/JBGruber/LexisNexisTools/branch/master/graph/badge.svg)](https://app.codecov.io/gh/JBGruber/LexisNexisTools?branch=master)
