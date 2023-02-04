@@ -2400,7 +2400,7 @@ get_files <- function(x,
     zips <- tolower(tools::file_ext(files)) == "zip"
     if (any(zips)) {
       temp <- paste0(tempdir(), "/zips")
-      unzip(files[zips], exdir = temp)
+      lapply(files[zips], unzip, exdir = temp)
       files <- c(files[!zips],
                  get_files(temp))
     }
