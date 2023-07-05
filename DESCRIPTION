@@ -1,6 +1,6 @@
 Package: LexisNexisTools
 Title: Working with Files from 'LexisNexis'
-Version: 0.3.7
+Version: 0.3.7.9000
 Date: 2023-07-05
 Authors@R: person("Johannes", "Gruber", email = "JohannesB.Gruber@gmail.com", 
   role = c("aut", "cre"))
