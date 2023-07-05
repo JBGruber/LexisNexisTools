@@ -30,6 +30,7 @@ test_that("Test local collection", {
 })
 
 test_that("Read files from zip", {
+  skip_on_cran()
   tempf <- paste0(tempfile(), ".zip")
   # zip fails if no zip application is installed
   t <- try(zip(zipfile = tempf, files, flags = "-j"))

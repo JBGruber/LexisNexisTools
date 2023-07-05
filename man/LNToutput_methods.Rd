@@ -12,7 +12,7 @@
 
 \S4method{show}{LNToutput}(object)
 
-\S4method{[}{LNToutput,ANY,ANY,ANY}(x, i, j, invert = FALSE)
+\S4method{[}{LNToutput,ANY,ANY,ANY}(x, i, j, invert = FALSE, ..., drop = TRUE)
 
 \S4method{+}{LNToutput,LNToutput}(e1, e2)
 }
@@ -25,6 +25,10 @@
 character strings.}
 
 \item{invert}{Invert the selection of i.}
+
+\item{...}{not used.}
+
+\item{drop}{not used (it's here so tests do not complain).}
 
 \item{e1, e2}{LNToutput objects which will be combined.}
 }
