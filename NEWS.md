@@ -1,3 +1,7 @@
+# LexisNexisTools 0.3.7
+
+* Fixes issue in tests
+
 # LexisNexisTools 0.3.6
 
 * Fixes issue in tests
