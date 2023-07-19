@@ -385,7 +385,7 @@ lnt_parse_nexis <- function(lines,
   date.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
     . <- stringi::stri_extract_last_regex(
       str = i$meta[seq_len(10)],
-      pattern = "\\w+ \\d+, \\d+|\\d+ \\w+ \\d+|\\d+. \\w+ \\d+"
+      pattern = "^\\w[3,9] \\d{1,2}, \\d{4}|^\\d{1,2} \\w{3,9} \\d{4}|^\\d{1,2}. \\w{3,9} \\d{4}|^\\w+(,)? \\d{1,2}. \\w{3,9} \\d{4}|^\\w \\d{1,2}.\\w{3,9} \\d{4}"
     )
     na.omit(.)[1]
   })
