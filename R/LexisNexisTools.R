@@ -718,7 +718,7 @@ lnt_parse_uni <- function(lines,
   date.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
     . <- stringi::stri_extract_last_regex(
       str = i$meta[seq_len(10)],
-      pattern = "^\\w+ \\d+, \\d{4}|^\\d+ \\w+ \\d{4}|^\\d+. \\w+ \\d{4}|^\\w+ \\d+. \\w+ \\d{4}|^\\w+ \\d+.\\w+ \\d{4}"
+      pattern = "^\\w+ \\d+, \\d{4}|^\\d+ \\w+ \\d{4}|^\\d+. \\w+ \\d{4}|^\\w+ \\d+. \\w+ \\d{4}|^\\w+ \\d+.\\w+ \\d{4}" #adjusted to prevent NAs
     )
     na.omit(.)[1]
   })
