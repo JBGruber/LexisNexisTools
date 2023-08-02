@@ -385,9 +385,9 @@ lnt_parse_nexis <- function(lines,
   date.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
     . <- stringi::stri_extract_last_regex(
       str = i$meta[seq_len(10)],
-      pattern = "^\\w[3,9] \\d{1,2}, \\d{4}|^\\d{1,2} \\w{3,9} \\d{4}|^\\d{1,2}. \\w{3,9} \\d{4}|^\\w+(,)? \\d{1,2}. \\w{3,9} \\d{4}|^\\w{6,10} \\d{1,2}.\\w{3,9} \\d{4}"
+      pattern = "^\\w+ \\d+, \\d{4}|^\\d+ \\w+ \\d{4}|^\\d+. \\w+ \\d{4}|^\\w+ \\d+. \\w+ \\d{4}|^\\w+ \\d+.\\w+ \\d{4}"
     )
-    na.omit(.)[1] #Mittwoch 2 Juni 2021+ Samstag 2.April 2022
+    na.omit(.)[1] 
     
   })
   status("\t...dates extracted", verbose, start_time)
