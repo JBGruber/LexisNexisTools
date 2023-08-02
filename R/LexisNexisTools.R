@@ -328,7 +328,7 @@ lnt_parse_nexis <- function(lines,
   status("\t...files loaded", verbose, start_time)
   # exclude some lines
   if (length(exclude_lines) > 0) {
-    lines[grep("^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIC: |^DATELINE: ", lines)] <- ""
+    lines[grep("^LOAD-DATE: |^Load-Date: |^UPDATE: |^GRAFIK: |^GRAPHIC: |^DATELINE: ", lines)] <- ""
   }
   articles.l <- split(
     lines, cumsum(stringi::stri_detect_regex(lines, start_keyword))
@@ -385,9 +385,10 @@ lnt_parse_nexis <- function(lines,
   date.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
     . <- stringi::stri_extract_last_regex(
       str = i$meta[seq_len(10)],
-      pattern = "\\w+ \\d+, \\d+|\\d+ \\w+ \\d+|\\d+. \\w+ \\d+"
+      pattern = "^\\w+ \\d+, \\d{4}|^\\d+ \\w+ \\d{4}|^\\d+. \\w+ \\d{4}|^\\w+ \\d+. \\w+ \\d{4}|^\\w+ \\d+.\\w+ \\d{4}"
     )
-    na.omit(.)[1]
+    na.omit(.)[1] 
+    
   })
   status("\t...dates extracted", verbose, start_time)
   ### Author (where available)
@@ -717,7 +718,7 @@ lnt_parse_uni <- function(lines,
   date.v <- vapply(df.l, FUN.VALUE = character(1), function(i) {
     . <- stringi::stri_extract_last_regex(
       str = i$meta[seq_len(10)],
-      pattern = "^\\w+ \\d+, \\d+|^\\d+ \\w+ \\d+|^\\d+. \\w+ \\d+|^\\w+ \\d+. \\w+ \\d+"
+      pattern = "^\\w+ \\d+, \\d{4}|^\\d+ \\w+ \\d{4}|^\\d+. \\w+ \\d{4}|^\\w+ \\d+. \\w+ \\d{4}|^\\w+ \\d+.\\w+ \\d{4}" #adjusted to prevent NAs
     )
     na.omit(.)[1]
   })
