@@ -797,7 +797,7 @@ lnt_parse_uni <- function(lines,
   Paragraph <- NULL
   Art_ID <- NULL
   articles.df <- paragraphs.df[,
-                               list(Article = stri_join(Paragraph, collapse = " ")),
+                               list(Article = stri_join(Paragraph, collapse = "\n")),
                                by = list(ID = Art_ID)]
   articles.df <- tibble::as_tibble(articles.df)
   paragraphs.df <- tibble::as_tibble(paragraphs.df)
