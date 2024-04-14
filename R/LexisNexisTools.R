@@ -332,7 +332,7 @@ lnt_parse_nexis <- function(lines,
   status("\t...files loaded", verbose, start_time)
   # exclude some lines
   if (length(exclude_lines) > 0) {
-    lines[grep("^LOAD-DATE: |^UPDATE: |^GRAFIK: |^GRAPHIC: |^DATELINE: ", lines)] <- ""
+    lines[grep(exclude_lines, lines)] <- ""
   }
   articles.l <- split(
     lines, cumsum(stringi::stri_detect_regex(lines, start_keyword))
