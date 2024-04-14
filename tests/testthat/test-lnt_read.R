@@ -9,6 +9,8 @@ test_that("Read in sample file", {
     test@meta$Source_File <- basename(test@meta$Source_File)
     attributes(test)$created$time <- "2018-12-15 01:00:38 GMT"
     attributes(test)$created$Version <- "0.2.1.9000"
+    # ensures compatibility with different version of tibble
+    attributes(test@paragraphs)$.internal.selfref <- NULL
     test
   }, readRDS("../files/LNToutput.RDS"))
   expect_equal({
@@ -16,6 +18,7 @@ test_that("Read in sample file", {
     test@meta$Source_File <- basename(test@meta$Source_File)
     attributes(test)$created$time <- "2018-12-15 01:00:38 GMT"
     attributes(test)$created$Version <- "0.2.1.9000"
+    attributes(test@paragraphs)$.internal.selfref <- NULL
     test <- test[1:10]
     test
   }, readRDS("../files/LNToutput.RDS"))
@@ -24,6 +27,7 @@ test_that("Read in sample file", {
     test@meta$Source_File <- basename(test@meta$Source_File)
     attributes(test)$created$time <- "2018-12-15 01:00:38 GMT"
     attributes(test)$created$Version <- "0.2.1.9000"
+    attributes(test@paragraphs)$.internal.selfref <- NULL
     test
   }, readRDS("../files/LNToutput2.RDS"))
 })
