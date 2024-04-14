@@ -1,9 +1,13 @@
 Package: LexisNexisTools
 Title: Working with Files from 'LexisNexis'
 Version: 0.3.7.9000
-Date: 2023-07-05
-Authors@R: person("Johannes", "Gruber", email = "JohannesB.Gruber@gmail.com", 
-  role = c("aut", "cre"))
+Date: 2024-04-14
+Authors@R: 
+    person(given = "Johannes B.",
+           family = "Gruber",
+           email = "JohannesB.Gruber@gmail.com", 
+           role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-9177-1772"))
 Description: My PhD supervisor once told me that everyone doing newspaper
     analysis starts by writing code to read in files from the 'LexisNexis' newspaper
     archive (retrieved e.g., from <https://www.lexisnexis.com/> or any of the partner
@@ -44,6 +48,6 @@ Suggests:
 Encoding: UTF-8
 URL: https://github.com/JBGruber/LexisNexisTools
 BugReports: https://github.com/JBGruber/LexisNexisTools/issues
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 VignetteBuilder: knitr
 Language: en-GB

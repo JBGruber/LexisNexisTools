@@ -17,6 +17,7 @@ lnt_read(
   recursive = FALSE,
   file_type = c("txt", "rtf", "doc", "pdf", "docx", "zip"),
   remove_cover = TRUE,
+  remove_classification = TRUE,
   verbose = TRUE,
   ...
 )
@@ -63,6 +64,9 @@ searched for more files.}
 \item{file_type}{File types/extensions to be included in search for files.}
 
 \item{remove_cover}{Logical. Should the cover page be removed.}
+
+\item{remove_classification}{Logical. Should the classification provided by 
+LexisNexis be removed?}
 
 \item{verbose}{A logical flag indicating whether information should be
 printed to the screen.}

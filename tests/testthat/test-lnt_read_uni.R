@@ -14,9 +14,13 @@ test_that("Read in sample file", {
     dim(test)
   }, c(Articles = 20, Meta_variable = 10, data.frames = 3))
   expect_equal({
-    test <- lnt_read(files[1], verbose = TRUE)
+    test <- lnt_read(files[1], verbose = TRUE, remove_classification = FALSE)
     dim(test@paragraphs)
   }, c(83L, 3L))
+  expect_equal({
+    test <- lnt_read(files[1], verbose = TRUE, remove_classification = TRUE)
+    dim(test@paragraphs)
+  }, c(74L, 3L))
 })
 
 test_that("Test local collection", {
